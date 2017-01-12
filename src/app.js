@@ -1,14 +1,18 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-console.log('foo')
+import { Provider } from 'react-redux'
+import store from './store'
+import Counter from './counter'
 
-export default class App extends Component {
-  render(){
-    return (
+const App = () => (
+  <Provider store={store}>
+    <div>
       <h1>Cribbage Patch</h1>
-    )
-  }
-}
+      <Counter />
+    </div>
+  </Provider>
+)
+
 ReactDOM.render(
   <App />,
   document.getElementById('app')
