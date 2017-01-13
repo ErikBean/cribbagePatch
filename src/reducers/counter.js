@@ -1,6 +1,5 @@
 const initialState = { counter: 0 }
 export default (state = initialState, action) => {
-  console.log('>>> Here2: ', action)
   switch (action.type) {
     case 'INCREMENT':
       return {

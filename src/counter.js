@@ -5,7 +5,9 @@ const Counter = (props) => (
   <div>
     <button onClick={props.increment}>INCREMENT</button>
     <button onClick={props.decrement}>DECREMENT</button>
-    {props.counter}
+    <div>
+      {props.counter}
+    </div>
   </div>
 )
 
@@ -14,5 +16,6 @@ const mapDispatchToProps = (dispatch) => ({
   increment: () => dispatch({type: 'INCREMENT'}),
   decrement: () => dispatch({type: 'DECREMENT'})
 })
+
 export default connect(mapStateToProps, mapDispatchToProps)(Counter)
 

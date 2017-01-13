@@ -8,6 +8,33 @@
   </head>
   <body>
     <div id="app"></div>
+    <script src='node_modules/gun/gun.js'></script>
     <script type="text/javascript" src="dist/bundle.js"></script>
+    <script>
+    	(function () {
+
+    		// Sync this gun instance with the server.
+    		var gun = Gun([
+    			'https://gun-starter-app-ujjhononwf.now.sh/gun',
+    		]);
+
+    		// Reads key 'data'.
+    		var data = gun.get('data');
+
+    		// Exposed so the JS console can see it.
+    		window.data = data;
+
+    		console.log('Gun reference exposed as %cwindow.data', 'color: red');
+
+    		// Writes a value to the key 'data'.
+    		// data.put({ message: 'Hello world!' });
+        console.log('data is currently: ', data.val())
+    		// Listen for real-time change events.
+    		data.path('message').on(function (message) {
+    			console.log('Message:', message);
+    		});
+
+    	}()) 
+  	</script>
   </body>
 </html>
