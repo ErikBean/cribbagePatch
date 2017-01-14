@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import store from './store'
-import Counter from './counter'
+import Game from './game'
 
 const App = () => (
   <Provider store={store}>
     <div>
       <h1>Cribbage Patch</h1>
-      <Counter />
+      <Game />
     </div>
   </Provider>
 )
