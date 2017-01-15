@@ -24,6 +24,9 @@ Redux should look something like...
 ```
 Refactor TODO:
 Cards should be a set in gun, not a string. That way we can .map() 
+I should never have to do JSON.parse() or .stringify() 
+add redux devtools
+
 
 Rules TODO:
 

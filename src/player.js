@@ -1,26 +1,32 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { createDeck, shuffle } from './deck'
+import { createDeck, shuffle, valueOf } from './deck'
 const Player = (props) => (
   <div>
-    <b>Player {props.num}:</b>
-    <i>cut: {props.cut}</i>
-    
+    <span style={{fontWeight: props.isCurrentPlayer ? 'bold' : 'normal'}}>Player {props.num}:</span>
+    <i>cut: {props.myCut}</i>
+    <h3 hidden={!props.hasGameStarted || !props.isCurrentPlayer}>
+      {props.hasFirstCrib ? 'You win!' : 'You lose :('}
+      <br />
+      Let's start the game!
+    </h3>
   </div>
 )
 
-
-const mapStateToProps = (state, ownProps) => ({
-  cut: state[`player${ownProps.num}`].beginGameCut
-})
-const mapDispatchToProps = (dispatch) => ({
-  init: () => {
-    deck = shuffle(createDeck())
-    dispatch({type: 'UPDATE_DECK', payload: deck})
-  },
-  beginGameCut: (deck) => {
-    dispatch({type: 'BEGIN_GAME_CUT', payload: deck[0]})
+const mapStateToProps = (state, ownProps) => {
+  const myPlayerNum = `player${ownProps.num}`
+  const theirPlayerNum = `player${ownProps.num === '1' ? 2 : 1}`
+  const myCut = state[myPlayerNum].beginGameCut
+  const theirCut = state[theirPlayerNum].beginGameCut
+  return {
+    myCut,
+    theirCut,
+    hasFirstCrib: valueOf(myCut) > valueOf(theirCut),
+    hasGameStarted: state.meta.hasGameStarted
   }
+}
+const mapDispatchToProps = (dispatch) => ({
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Player)

@@ -1,4 +1,4 @@
-const initialState = 'uninitialized'
+const initialState = null
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'UPDATE_DECK':

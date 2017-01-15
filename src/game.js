@@ -8,30 +8,27 @@ const game = (props) => (
   <div>
     <div>
       <button disabled={props.isPlayer2 || props.p1Cut} onClick={props.player1Cut}>Shuffle and Cut</button>
-      <button disabled={props.hasGameStarted} onClick={props.player2Cut}>Cut</button>
-      <h3 hidden={!props.hasGameStarted}>Let's start the game!</h3>
+      <button disabled={props.isPlayer1 || props.p2Cut} onClick={props.player2Cut}>Cut</button>
     </div>
-    <Player num='1'/>
-    <Player num='2'/>
+    <Player num='1' isCurrentPlayer={props.isPlayer1}/>
+    <Player num='2' isCurrentPlayer={props.isPlayer2}/>
     <div>
-      {props.deck}
+      {JSON.stringify(props.deck)}
     </div>
-    <button onClick={reload}>Restart the Game</button>
   </div>
 )
 
-function reload() {
-  window.restart() // wipe gunDB
-  window.location.reload()
+const mapStateToProps = (state) => {
+  const { player1, player2, deck } = state
+  const { isPlayer1, isPlayer2 } = state.meta
+  return {
+    isPlayer1,
+    isPlayer2,
+    p1Cut: player1.beginGameCut,
+    p2Cut: player2.beginGameCut,
+    deck
+  }
 }
-
-const mapStateToProps = (state) => ({
-  isPlayer1: state.meta.isPlayer1,
-  isPlayer2: state.meta.isPlayer2,
-  p1Cut: state.player1.beginGameCut,
-  hasGameStarted: state.meta.hasGameStarted,
-  deck: state.deck,
-})
 const mapDispatchToProps = (dispatch) => ({
   player1Cut: () => {
     dispatch({type: `ASSIGN_PLAYER1`})
