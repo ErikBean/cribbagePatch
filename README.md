@@ -10,7 +10,7 @@ Redux should look something like...
   },
   game:{
     deck: [deck.H13, deck.D2, '...' ],
-    cut: '3H',
+    beginGameCut: '3H',
     crib: 'localPlayer' || true,
     playedCards: ['H1', 'C13', '...'],
     crib: []
@@ -29,6 +29,6 @@ TODO:
 3. client machine with lower number randomizes deck Array, and 
 remove 6 cards from top into hand array for each player, push all this to gun
 5. Each player selects 2 cards for crib
-6. player w/o crib selects slot in array to cut the deck, move card to game.cut
+6. player w/o crib selects slot in array to beginGameCut the deck, move card to game.beginGameCut
 7. Compute score of hands
 8. Player w/o crib has to select card to lead, copy this from hand to playedCards

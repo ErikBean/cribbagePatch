@@ -1,11 +1,8 @@
-const initialState = { deck: 'uninitialized' }
+const initialState = 'uninitialized'
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'INIT_DECK':
-      return {
-        ...state,
-        deck: action.payload
-      }
+    case 'UPDATE_DECK':
+      return action.payload
     default:
       return state
   }
