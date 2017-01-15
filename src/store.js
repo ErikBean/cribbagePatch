@@ -58,9 +58,6 @@ game.on((data) => {
   if(store.getState().deck === 'uninitialized' && data.deck){
     store.dispatch({type: 'UPDATE_DECK', payload: JSON.parse(data.deck)})
   }
-  if(!store.getState().meta.hasReceivedInitData){
-    store.dispatch({type: 'INIT_GUN_DATA'})
-  }
 })
 
 // console.log('game is currently: ', game.val())

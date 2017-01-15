@@ -4,11 +4,9 @@ import { createDeck, shuffle } from './deck'
 import Player from './player'
 import store from './store'
 
-let deck
 const game = (props) => (
   <div>
     <div>
-      {props.waitingForDB ? 'Waitng to connect...' : ''}
       <button disabled={props.isPlayer2 || props.p1Cut} onClick={props.player1Cut}>Shuffle and Cut</button>
       <button disabled={props.hasGameStarted} onClick={props.player2Cut}>Cut</button>
       <h3 hidden={!props.hasGameStarted}>Let's start the game!</h3>
@@ -28,7 +26,6 @@ function reload() {
 }
 
 const mapStateToProps = (state) => ({
-  waitingForDB: !state.meta.hasReceivedInitData,
   isPlayer1: state.meta.isPlayer1,
   isPlayer2: state.meta.isPlayer2,
   p1Cut: state.player1.beginGameCut,
@@ -38,7 +35,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   player1Cut: () => {
     dispatch({type: `ASSIGN_PLAYER1`})
-    deck = shuffle(createDeck())
+    const deck = shuffle(createDeck())
     dispatch({type: 'UPDATE_DECK', payload: deck})
     dispatch({type: `BEGIN_GAME_CUT_1`, payload: deck[0]})
   },

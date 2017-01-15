@@ -22,10 +22,13 @@ Redux should look something like...
   remotePlayer: 'Same  structure as local'
 }
 ```
-TODO:
+Refactor TODO:
+Cards should be a set in gun, not a string. That way we can .map() 
 
-1. Init deck with 52 cards
-2. choose crib - each player chooses random index for first crib
+Rules TODO:
+
+1. DONE! Init deck with 52 cards
+2. DONE! choose crib - each player chooses random index for first crib
 3. client machine with lower number randomizes deck Array, and 
 remove 6 cards from top into hand array for each player, push all this to gun
 5. Each player selects 2 cards for crib
