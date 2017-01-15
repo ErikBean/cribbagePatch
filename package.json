@@ -5,11 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "start": "http-server -o --cors"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ErikBean/cribbagePatch.git"
+  },
+  "engines": {
+    "node": "4.x.x"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +24,7 @@
   "homepage": "https://github.com/ErikBean/cribbagePatch#readme",
   "dependencies": {
     "gun": "^0.3.9991",
+    "http-server": "^0.9.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",

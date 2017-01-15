@@ -11,28 +11,27 @@ const game = (props) => (
       {props.waitingForDB ? 'Waitng to connect...' : ''}
       <button disabled={props.isPlayer2 || props.p1Cut} onClick={props.player1Cut}>Shuffle and Cut</button>
       <button disabled={props.hasGameStarted} onClick={props.player2Cut}>Cut</button>
-      <div>
-        Player One Cut: {props.p1Cut} 
-      </div>
-      <div>
-        Player Two Cut: {props.p2Cut}
-      </div>
       <h3 hidden={!props.hasGameStarted}>Let's start the game!</h3>
     </div>
-    <Player />
+    <Player num='1'/>
+    <Player num='2'/>
     <div>
       {props.deck}
     </div>
+    <button onClick={reload}>Restart the Game</button>
   </div>
 )
 
+function reload() {
+  window.restart() // wipe gunDB
+  window.location.reload()
+}
 
 const mapStateToProps = (state) => ({
   waitingForDB: !state.meta.hasReceivedInitData,
   isPlayer1: state.meta.isPlayer1,
   isPlayer2: state.meta.isPlayer2,
   p1Cut: state.player1.beginGameCut,
-  p2Cut: state.player2.beginGameCut,
   hasGameStarted: state.meta.hasGameStarted,
   deck: state.deck,
 })

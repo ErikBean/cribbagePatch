@@ -2,15 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { createDeck, shuffle } from './deck'
 const Player = (props) => (
-  <div hidden={props.noPlayer}>
-    <div>{`You are player ${props.playerNum}`}</div>
+  <div>
+    <b>Player {props.num}:</b>
+    <i>cut: {props.cut}</i>
+    
   </div>
 )
 
 
-const mapStateToProps = (state) => ({
-  playerNum: state.meta.isPlayer1 ? 1 : 2,
-  noPlayer: !state.meta.isPlayer1 && !state.meta.isPlayer2 
+const mapStateToProps = (state, ownProps) => ({
+  cut: state[`player${ownProps.num}`].beginGameCut
 })
 const mapDispatchToProps = (dispatch) => ({
   init: () => {
