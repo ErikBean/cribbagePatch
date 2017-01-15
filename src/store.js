@@ -22,21 +22,19 @@ let game = gun.get('game');
 
 // Exposed so the JS console can see it.
 window.game = game;
+
 let cachedDeck = {}
 let cachedPlayer = {}
 
-function pushDeck (newDeck) {
-  if(newDeck && newDeck !== 'uninitialized' && newDeck !== cachedDeck){
-    cachedDeck = newDeck
-    console.log('>>> Push this deck to DB: ', newDeck)
-    game.put({
-      deck: newDeck
-    })
+function pushDeck (deck) {
+  if(deck !== null && deck !== cachedDeck){
+    cachedDeck = deck
+    console.log('>>> Push this deck to DB: ', deck)
+    game.put({ deck })
   }
 }
 
 function pushPlayer (currentPlayer, id) {
-  
   if(currentPlayer && currentPlayer !== cachedPlayer[id]){
     cachedPlayer[id] = currentPlayer
     console.log(`>>> Push this ${id} to DB: `, currentPlayer)
@@ -60,11 +58,11 @@ store.subscribe(() => {
 })
 
 game.path('deck').on((remoteDeck) => {
-  console.log('>>> new remoteDeck: ', remoteDeck)
+  console.warn('>>> new remoteDeck: ', remoteDeck)
   if(remoteDeck){
     delete remoteDeck._
   }
-  if(!store.getState().deck){
+  if(store.getState().deck === null){
     store.dispatch({type: 'UPDATE_DECK', payload: remoteDeck})
   }
 })

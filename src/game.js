@@ -12,8 +12,9 @@ const game = (props) => (
     </div>
     <Player num='1' isCurrentPlayer={props.isPlayer1}/>
     <Player num='2' isCurrentPlayer={props.isPlayer2}/>
-    <div>
-      {JSON.stringify(props.deck)}
+    <br />
+    <div id="debugDeck" onClick={(e) => showDeck(e, props.deck)}>
+      Click to log the deck
     </div>
   </div>
 )
@@ -43,3 +44,7 @@ const mapDispatchToProps = (dispatch) => ({
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(game)
+
+function showDeck (e, deck) {
+  e.target.innerHTML = JSON.stringify(deck)
+}

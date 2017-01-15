@@ -3,7 +3,9 @@ import { connect } from 'react-redux'
 import { createDeck, shuffle, valueOf } from './deck'
 const Player = (props) => (
   <div>
-    <span style={{fontWeight: props.isCurrentPlayer ? 'bold' : 'normal'}}>Player {props.num}:</span>
+    <div><b>Player {props.num}:</b></div>
+    <span hidden={props.isCurrentPlayer}> ( This is them ) </span>
+    <span hidden={!props.isCurrentPlayer}> ( This is you ) </span>
     <i>cut: {props.myCut}</i>
     <h3 hidden={!props.hasGameStarted || !props.isCurrentPlayer}>
       {props.hasFirstCrib ? 'You win!' : 'You lose :('}
