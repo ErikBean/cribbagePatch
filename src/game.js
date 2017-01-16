@@ -10,8 +10,8 @@ const game = (props) => (
       <button disabled={props.isPlayer2 || props.p1Cut} onClick={props.player1Cut}>Shuffle and Cut</button>
       <button disabled={props.isPlayer1 || props.p2Cut} onClick={props.player2Cut}>Cut</button>
     </div>
-    <Player num='1' isCurrentPlayer={props.isPlayer1}/>
-    <Player num='2' isCurrentPlayer={props.isPlayer2}/>
+    <Player num='1' isCurrentPlayer={props.isPlayer1} deal={props.deal}/>
+    <Player num='2' isCurrentPlayer={props.isPlayer2} deal={props.deal}/>
     <br />
     <div id="debugDeck" onClick={(e) => showDeck(e, props.deck)}>
       Click to log the deck
@@ -21,27 +21,34 @@ const game = (props) => (
 
 const mapStateToProps = (state) => {
   const { player1, player2, deck } = state
-  const { isPlayer1, isPlayer2 } = state.meta
+  const { isPlayer1, isPlayer2, hasGameStarted } = state.meta
   return {
     isPlayer1,
     isPlayer2,
+    hasGameStarted,
     p1Cut: player1.beginGameCut,
     p2Cut: player2.beginGameCut,
     deck
   }
 }
-const mapDispatchToProps = (dispatch) => ({
-  player1Cut: () => {
-    dispatch({type: `ASSIGN_PLAYER1`})
-    const deck = shuffle(createDeck())
-    dispatch({type: 'UPDATE_DECK', payload: deck})
-    dispatch({type: `BEGIN_GAME_CUT_1`, payload: deck[0]})
-  },
-  player2Cut: () => {
-    dispatch({type: `BEGIN_GAME_CUT_2`, payload: store.getState().deck[1]})
-    dispatch({type: `START_GAME`})
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    player1Cut: () => {
+      dispatch({type: `ASSIGN_PLAYER1`})
+      const deck = shuffle(createDeck())
+      dispatch({type: 'UPDATE_DECK', payload: deck})
+      dispatch({type: `BEGIN_GAME_CUT_1`, payload: deck[0]})
+    },
+    player2Cut: () => {
+      dispatch({type: `BEGIN_GAME_CUT_2`, payload: store.getState().deck[1]})
+      dispatch({type: `START_GAME`})
+    },
+    deal: () => {
+      const deck = shuffle(store.getState().deck)
+      dispatch({type: 'UPDATE_DECK', payload: deck})
+    }
   }
-})
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(game)
 

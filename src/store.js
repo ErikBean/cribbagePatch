@@ -1,4 +1,5 @@
 import { createStore, combineReducers } from 'redux'
+import { isEqual, clone } from 'lodash'
 import deck from './reducers/deck'
 import player1 from './reducers/player1'
 import player2 from './reducers/player2'
@@ -23,12 +24,14 @@ let game = gun.get('game');
 // Exposed so the JS console can see it.
 window.game = game;
 
-let cachedDeck = {}
+let cachedDeck = null
 let cachedPlayer = {}
 
 function pushDeck (deck) {
-  if(deck !== null && deck !== cachedDeck){
-    cachedDeck = deck
+  console.log('>>> want to push this: ', deck)
+  console.log('>>> equals cachedDeck? ', isEqual(deck, cachedDeck), deck, cachedDeck)
+  if(!isEqual(deck, cachedDeck)){
+    cachedDeck = clone(deck)
     console.log('>>> Push this deck to DB: ', deck)
     game.put({ deck })
   }
@@ -48,7 +51,7 @@ store.subscribe(() => {
   let newState = store.getState()
   const { isPlayer1, isPlayer2 } = newState.meta
   
-  pushDeck(store.getState().deck)
+  pushDeck(newState.deck)
 
   if(isPlayer1){
     pushPlayer(store.getState().player1, 'player1')
@@ -59,12 +62,11 @@ store.subscribe(() => {
 
 game.path('deck').on((remoteDeck) => {
   console.warn('>>> new remoteDeck: ', remoteDeck)
-  if(remoteDeck){
-    delete remoteDeck._
+  const newDeck = clone(remoteDeck)
+  if(newDeck){
+    delete newDeck._
   }
-  if(store.getState().deck === null){
-    store.dispatch({type: 'UPDATE_DECK', payload: remoteDeck})
-  }
+  store.dispatch({type: 'UPDATE_DECK', payload: newDeck})
 })
 
 // console.log('game is currently: ', game.val())
