@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from 'redux'
-import { isEqual, clone } from 'lodash'
+import { isEqual, clone, size } from 'lodash'
 import deck from './reducers/deck'
 import player1 from './reducers/player1'
 import player2 from './reducers/player2'
@@ -29,10 +29,10 @@ let cachedPlayer = {}
 
 function pushDeck (deck) {
   console.log('>>> want to push this: ', deck)
-  console.log('>>> equals cachedDeck? ', isEqual(deck, cachedDeck), deck, cachedDeck)
+  console.log('>>> equals cachedDeck? ', isEqual(deck, cachedDeck))
   if(!isEqual(deck, cachedDeck)){
     cachedDeck = clone(deck)
-    console.log('>>> Push this deck to DB: ', deck)
+    console.log('>>> Push this size deck to DB: ', size(deck))
     game.put({ deck })
   }
 }
@@ -50,9 +50,8 @@ function pushPlayer (currentPlayer, id) {
 store.subscribe(() => {
   let newState = store.getState()
   const { isPlayer1, isPlayer2 } = newState.meta
-  
-  pushDeck(newState.deck)
 
+  pushDeck(newState.deck)
   if(isPlayer1){
     pushPlayer(store.getState().player1, 'player1')
   } else if(isPlayer2){
@@ -72,11 +71,9 @@ game.path('deck').on((remoteDeck) => {
 // console.log('game is currently: ', game.val())
 // Listen for real-time change events.
 game.path('player1.beginGameCut').on(function (bgc1) {
-  console.log('>>> Got BGC1 fom DB: : ', bgc1)
   const { isPlayer1, isPlayer2 } = store.getState().meta
   const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
   if(isNotAssignedPlayer){
-    console.log('>>> Ok I am player2! ')
     store.dispatch({type: `ASSIGN_PLAYER2`})
   }
   if(!isPlayer1){
@@ -85,11 +82,9 @@ game.path('player1.beginGameCut').on(function (bgc1) {
 });
 
 game.path('player2.beginGameCut').on(function (bgc2) {
-  console.log('>>> Got BGC2 fom DB: : ', bgc2)
   const { isPlayer1, isPlayer2 } = store.getState().meta
   const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
   if(isNotAssignedPlayer){
-    console.log('>>> Ok I am player1! ')
     store.dispatch({type: `ASSIGN_PLAYER1`})
   }
   if(!isPlayer2){

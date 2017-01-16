@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { createDeck, shuffle } from './deck'
+import { size, clone } from 'lodash'
 import Player from './player'
 import store from './store'
 
@@ -44,7 +45,17 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch({type: `START_GAME`})
     },
     deal: () => {
-      const deck = shuffle(store.getState().deck)
+      let deck = shuffle(store.getState().deck)
+      let hand1 = {}, hand2 = {}
+      for(let i = 1; i < 7; i++){
+        const lastIndex = size(deck) - i
+        hand1[i] = clone(deck[lastIndex])
+        hand2[i] = clone(deck[lastIndex - 6 ])
+        console.warn({hand1, hand2})
+        deck[lastIndex] = null
+        deck[lastIndex - 6 ] = null
+      }
+      console.log('new deck', deck)
       dispatch({type: 'UPDATE_DECK', payload: deck})
     }
   }

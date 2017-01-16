@@ -10,8 +10,9 @@ const Player = (props) => (
     <div>cut for first crib: {props.myBGC}</div>
     <div>hand: {props.myHand}</div>
     <h5 hidden={!props.hasGameStarted || !props.isCurrentPlayer}>
-      {props.hasFirstCrib ? 'You win!' : 'You lose :('}
+      {props.hasFirstCrib ? 'You win!' : 'You lose'}
       <button hidden={!props.hasFirstCrib} onClick={props.deal}>Deal!</button>
+      <div hidden={props.myHand}>Waiting for deal</div>
     </h5>
   </div>
 )
