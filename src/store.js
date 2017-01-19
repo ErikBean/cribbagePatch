@@ -34,6 +34,7 @@ function pushDeck (deck) {
 
 function pushPlayer (currentPlayer, id) {
   if(!isEqual(currentPlayer, cachedPlayers[id])){
+    console.log('>>> push player: ', currentPlayer, id)
     cachedPlayers[id] = clone(currentPlayer)
     game.put({
       [id]: currentPlayer
@@ -41,28 +42,16 @@ function pushPlayer (currentPlayer, id) {
   }
 }
 
-
-let listenForOtherPlayer = once(function(player){
-  game.path(player).on((np) => {
-    console.log(`update from ${player}: `, np)
-    const { isPlayer1, isPlayer2 } = store.getState().meta
-    const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
-    if(isNotAssignedPlayer){
-      player === 'player1' ? store.dispatch({type: `ASSIGN_PLAYER2`}) : store.dispatch({type: `ASSIGN_PLAYER1`})
-    }
-  })
-})
-
 store.subscribe(() => {
   let newState = store.getState()
   const { isPlayer1, isPlayer2 } = newState.meta
-  const { player1, player2 } = store.getState()
+  const { players: { player1, player2 } } = store.getState()
   pushDeck(newState.deck)
   if(isPlayer1){
-    listenForOtherPlayer('player2')
+    // listenForOtherPlayer('player2')
     pushPlayer(player1, 'player1')
   } else if(isPlayer2){
-    listenForOtherPlayer('player1')
+    // listenForOtherPlayer('player1')
     pushPlayer(player2, 'player2')
   }
 })
@@ -72,31 +61,37 @@ game.path('deck').on((remoteDeck) => {
   store.dispatch({type: 'UPDATE_DECK', payload: omit(remoteDeck, '_')})
 })
 
-// console.log('game is currently: ', game.val())
-// // Listen for real-time change events.
-// game.path('player1.beginGameCut').on(function (bgc1) {
-//   const { isPlayer1, isPlayer2 } = store.getState().meta
-//   const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
-//   if(isNotAssignedPlayer){
-//     store.dispatch({type: `ASSIGN_PLAYER2`})
-//   }
-//   if(!isPlayer1){
-//     store.dispatch({type: `BEGIN_GAME_CUT_1`, payload: bgc1})
-//   }
-// });
-// 
-// game.path('player2.beginGameCut').on(function (bgc2) {
-//   const { isPlayer1, isPlayer2 } = store.getState().meta
-//   const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
-//   if(isNotAssignedPlayer){
-//     store.dispatch({type: `ASSIGN_PLAYER1`})
-//   }
-//   if(!isPlayer2){
-//     store.dispatch({type: `BEGIN_GAME_CUT_2`, payload: bgc2})
-//   }
-//   store.dispatch({type: `START_GAME`})
-// });
+game.path('player1').on((p1) => {
+  if(!p1) return
+  const { isPlayer1, isPlayer2 } = store.getState().meta
+  const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
+  if(isNotAssignedPlayer && p1.beginGameCut){
+    store.dispatch({type: `ASSIGN_PLAYER`, payload: 'player2'})
+  }
+  if(!isPlayer1){
+    store.dispatch({
+      type: 'UPDATE_PLAYER',
+      payload: {
+        player: 'player1',
+        update: p1
+      }
+    })
+  }
+})
 
+game.path('player2').on((p2) => {
+  if(!p2) return
+  const { isPlayer2 } = store.getState().meta
+  if(!isPlayer2){
+    store.dispatch({
+      type: 'UPDATE_PLAYER',
+      payload: {
+        player: 'player2',
+        update: p2
+      }
+    })
+  }
+})
 
 window.restart = () => game.put({
   player1: null,

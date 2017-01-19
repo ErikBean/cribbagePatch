@@ -21,14 +21,24 @@ const game = (props) => (
 )
 
 const mapStateToProps = (state) => {
-  const { players, deck } = state
+  const {
+    players: {
+      player1: {
+        beginGameCut: p1Cut
+      },
+      player2: {
+        beginGameCut: p2Cut
+      }
+    },
+    deck
+  } = state
   const { isPlayer1, isPlayer2, hasGameStarted } = state.meta
   return {
     isPlayer1,
     isPlayer2,
     hasGameStarted,
-    p1Cut: players.player1.beginGameCut,
-    p2Cut: players.player2.beginGameCut,
+    p1Cut,
+    p2Cut,
     deck
   }
 }
@@ -47,7 +57,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       })
     },
     player2Cut: () => {
-      dispatch({type: `ASSIGN_PLAYER`, payload: 'player2'})
       dispatch({
         type: `BEGIN_GAME_CUT`,
         payload: {
@@ -70,8 +79,20 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       }
       dispatch({type: 'UPDATE_DECK', payload: deck})
       
-      dispatch({type: 'GET_HAND_1', payload: hand1})
-      dispatch({type: 'GET_HAND_2', payload: hand2})
+      dispatch({
+        type: 'GET_HAND',
+        payload: {
+          player: 'player1',
+          hand: hand1
+        }
+      })
+      dispatch({
+        type: 'GET_HAND',
+        payload: {
+          player: 'player2',
+          hand: hand2
+        }
+      })
     }
   }
 }
