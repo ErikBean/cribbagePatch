@@ -8,7 +8,7 @@ const Player = (props) => (
     <span hidden={!props.isCurrentPlayer}> ( This is you ) </span>
 
     <div>cut for first crib: {props.myBGC}</div>
-    <div>hand: {props.myHand}</div>
+    <div>hand: {JSON.stringify(props.myHand)}</div>
     <h5 hidden={!props.hasGameStarted || !props.isCurrentPlayer}>
       {props.hasFirstCrib ? 'You win!' : 'You lose'}
       <button hidden={!props.hasFirstCrib} onClick={props.deal}>Deal!</button>
@@ -21,10 +21,10 @@ const mapStateToProps = (state, ownProps) => {
   const myPlayerNum = `player${ownProps.num}`
   const theirPlayerNum = `player${ownProps.num === '1' ? 2 : 1}`
   return {
-    myHand: state[myPlayerNum].hand,
-    myBGC: state[myPlayerNum].beginGameCut,
-    theirCut: state[theirPlayerNum].beginGameCut,
-    hasFirstCrib: valueOf(state[myPlayerNum].beginGameCut) > valueOf(state[theirPlayerNum].beginGameCut),
+    myHand: state.players[myPlayerNum].hand,
+    myBGC: state.players[myPlayerNum].beginGameCut,
+    theirCut: state.players[theirPlayerNum].beginGameCut,
+    hasFirstCrib: valueOf(state.players[myPlayerNum].beginGameCut) > valueOf(state.players[theirPlayerNum].beginGameCut),
     hasGameStarted: state.meta.hasGameStarted
   }
 }

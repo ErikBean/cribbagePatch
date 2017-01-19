@@ -21,34 +21,48 @@ const game = (props) => (
 )
 
 const mapStateToProps = (state) => {
-  const { player1, player2, deck } = state
+  const { players, deck } = state
   const { isPlayer1, isPlayer2, hasGameStarted } = state.meta
   return {
     isPlayer1,
     isPlayer2,
     hasGameStarted,
-    p1Cut: player1.beginGameCut,
-    p2Cut: player2.beginGameCut,
+    p1Cut: players.player1.beginGameCut,
+    p2Cut: players.player2.beginGameCut,
     deck
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     player1Cut: () => {
-      dispatch({type: `ASSIGN_PLAYER1`})
       const deck = shuffle(createDeck())
       dispatch({type: 'UPDATE_DECK', payload: deck})
-      dispatch({type: `BEGIN_GAME_CUT_1`, payload: deck[0]})
+      dispatch({type: `ASSIGN_PLAYER`, payload: 'player1'})
+      dispatch({
+        type: `BEGIN_GAME_CUT`,
+        payload: {
+          player: 'player1',
+          cut: deck[0]
+        }
+      })
     },
     player2Cut: () => {
-      dispatch({type: `BEGIN_GAME_CUT_2`, payload: store.getState().deck[1]})
+      dispatch({type: `ASSIGN_PLAYER`, payload: 'player2'})
+      dispatch({
+        type: `BEGIN_GAME_CUT`,
+        payload: {
+          player: 'player2',
+          cut: store.getState().deck[1]
+        }
+      })
       dispatch({type: `START_GAME`})
     },
     deal: () => {
       let deck = shuffle(store.getState().deck)
+      
       let hand1 = {}, hand2 = {}
       for(let i = 1; i < 7; i++){
-        const lastIndex = size(deck) - i
+        const lastIndex = size(deck) - i  
         hand1[i] = clone(deck[lastIndex])
         hand2[i] = clone(deck[lastIndex - 6 ])
         deck[lastIndex] = null
