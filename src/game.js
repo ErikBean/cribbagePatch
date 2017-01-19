@@ -51,12 +51,13 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         const lastIndex = size(deck) - i
         hand1[i] = clone(deck[lastIndex])
         hand2[i] = clone(deck[lastIndex - 6 ])
-        console.warn({hand1, hand2})
         deck[lastIndex] = null
         deck[lastIndex - 6 ] = null
       }
-      console.log('new deck', deck)
       dispatch({type: 'UPDATE_DECK', payload: deck})
+      
+      dispatch({type: 'GET_HAND_1', payload: hand1})
+      dispatch({type: 'GET_HAND_2', payload: hand2})
     }
   }
 }

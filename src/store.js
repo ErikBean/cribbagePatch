@@ -15,7 +15,7 @@ export default store
 window.store = store
 
 const gun = Gun([
-  'https://gun-starter-app-ujjhononwf.now.sh/gun',
+  'https://gun-starter-app-lzlbcefjql.now.sh',
 ]);
 
 // Reads key 'game'.
@@ -38,8 +38,8 @@ function pushDeck (deck) {
 }
 
 function pushPlayer (currentPlayer, id) {
-  if(currentPlayer && currentPlayer !== cachedPlayer[id]){
-    cachedPlayer[id] = currentPlayer
+  if(currentPlayer && !isEqual(currentPlayer, cachedPlayer[id])){
+    cachedPlayer[id] = clone(currentPlayer)
     console.log(`>>> Push this ${id} to DB: `, currentPlayer)
     game.put({
       [id]: currentPlayer
@@ -60,7 +60,7 @@ store.subscribe(() => {
 })
 
 game.path('deck').on((remoteDeck) => {
-  console.warn('>>> new remoteDeck: ', remoteDeck)
+  // console.warn('>>> new remoteDeck: ', remoteDeck)
   const newDeck = clone(remoteDeck)
   if(newDeck){
     delete newDeck._

@@ -6,6 +6,12 @@ export default (state = initialState, action) => {
         ...state,
         beginGameCut: action.payload
       }
+    case 'GET_HAND_1':{
+      return {
+        ...state,
+        hand: action.payload
+      }
+    }
     default:
       return state
   }
