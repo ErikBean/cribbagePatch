@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from 'redux'
-import { isEqual, clone, size, omit, once } from 'lodash'
+import { isEqual, clone, omit, get } from 'lodash'
 import deck from './reducers/deck'
 import players from './reducers/players'
 import meta from './reducers/meta'
@@ -62,37 +62,46 @@ game.path('deck').on((remoteDeck) => {
   }
 })
 
-game.path('player1').on((p1) => {
-  if(!p1) return
+function assignPlayer (player) {
   const { isPlayer1, isPlayer2 } = store.getState().meta
   const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
-  if(isNotAssignedPlayer && p1.beginGameCut){
-    store.dispatch({type: `ASSIGN_PLAYER`, payload: 'player2'})
+  if(isNotAssignedPlayer){
+    store.dispatch({type: `ASSIGN_PLAYER`, payload: player})
   }
-  if(!isPlayer1){
-    store.dispatch({
-      type: 'UPDATE_PLAYER',
-      payload: {
-        player: 'player1',
-        update: omit(p1, '_')
-      }
-    })
+}
+
+game.path('player1.beginGameCut').on((cut) => {
+  const beginGameCut = get(cache, 'player1.beginGameCut')
+  if(cut === beginGameCut) return
+  assignPlayer('player2')
+  
+  store.dispatch({
+    type: `BEGIN_GAME_CUT`,
+    payload: {
+      player: 'player1',
+      cut: cut
+    }
+  })
+  cache.player1 = {
+    ...cache.player1,
+    beginGameCut: cut
   }
 })
 
-game.path('player2').on((p2) => {
-  if(!p2) return
-  const { isPlayer2 } = store.getState().meta
-  if(!isPlayer2){
-    store.dispatch({
-      type: 'UPDATE_PLAYER',
-      payload: {
-        player: 'player2',
-        update: omit(p2, '_')
-      }
-    })
-  }
-})
+// game.path('player2.beginGameCut').on((data) => {
+//   const cut = omit(data, '_')
+//   if(cut === cache.player2.beginGameCut) return
+//   
+//   assignPlayer('player1')
+//   store.dispatch({
+//     type: `BEGIN_GAME_CUT`,
+//     payload: {
+//       player: 'player2',
+//       cut: cut
+//     }
+//   })
+//   cache.player2.beginGameCut = cut
+// })
 
 window.restart = () => game.put({
   player1: null,
