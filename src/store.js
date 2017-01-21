@@ -26,7 +26,7 @@ window.game = game;
 
 let cachedDeck = null
 let cache = {}
-
+window.cache = cache
 function pushDeck (deck) {
   if(!isEqual(deck, cachedDeck)){
     cache.deck = clone(deck)
@@ -71,8 +71,8 @@ function assignPlayer (player) {
 }
 
 game.path('player1.beginGameCut').on((cut) => {
-  const beginGameCut = get(cache, 'player1.beginGameCut')
-  if(cut === beginGameCut) return
+  const cachedCut = get(cache, 'player1.beginGameCut')
+  if(cut === cachedCut) return
   assignPlayer('player2')
   
   store.dispatch({
@@ -88,20 +88,24 @@ game.path('player1.beginGameCut').on((cut) => {
   }
 })
 
-// game.path('player2.beginGameCut').on((data) => {
-//   const cut = omit(data, '_')
-//   if(cut === cache.player2.beginGameCut) return
-//   
-//   assignPlayer('player1')
-//   store.dispatch({
-//     type: `BEGIN_GAME_CUT`,
-//     payload: {
-//       player: 'player2',
-//       cut: cut
-//     }
-//   })
-//   cache.player2.beginGameCut = cut
-// })
+game.path('player2.beginGameCut').on((cut) => {
+  const cachedCut = get(cache, 'player2.beginGameCut')
+  if(cut === cachedCut) return
+  assignPlayer('player1')
+  
+  store.dispatch({
+    type: `BEGIN_GAME_CUT`,
+    payload: {
+      player: 'player2',
+      cut: cut
+    }
+  })
+  cache.player2 = {
+    ...cache.player1,
+    beginGameCut: cut
+  }
+})
+
 
 window.restart = () => game.put({
   player1: null,
