@@ -9,7 +9,7 @@ const Player = (props) => (
 
     <div>cut for first crib: {props.myBGC}</div>
     <div>hand: {JSON.stringify(props.myHand)}</div>
-    <h5 hidden={!props.hasGameStarted || !props.isCurrentPlayer}>
+    <h5 hidden={!props.isCurrentPlayer || props.waitingForCut}>
       {props.hasFirstCrib ? 'You win!' : 'You lose'}
       <button hidden={!props.hasFirstCrib} onClick={props.deal}>Deal!</button>
       <div hidden={props.myHand}>Waiting for deal</div>
@@ -20,12 +20,15 @@ const Player = (props) => (
 const mapStateToProps = (state, ownProps) => {
   const myPlayerNum = `player${ownProps.num}`
   const theirPlayerNum = `player${ownProps.num === '1' ? 2 : 1}`
+  const my = state.players[myPlayerNum]
+  const their = state.players[theirPlayerNum]
+  console.log(valueOf(my.beginGameCut), valueOf(their.beginGameCut))
   return {
-    myHand: state.players[myPlayerNum].hand,
-    myBGC: state.players[myPlayerNum].beginGameCut,
-    theirCut: state.players[theirPlayerNum].beginGameCut,
-    hasFirstCrib: valueOf(state.players[myPlayerNum].beginGameCut) > valueOf(state.players[theirPlayerNum].beginGameCut),
-    hasGameStarted: state.meta.hasGameStarted
+    myHand: my.hand,
+    myBGC: my.beginGameCut,
+    theirCut: their.beginGameCut,
+    hasFirstCrib: valueOf(my.beginGameCut) > valueOf(their.beginGameCut),
+    waitingForCut: !my.beginGameCut || !their.beginGameCut
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => ({

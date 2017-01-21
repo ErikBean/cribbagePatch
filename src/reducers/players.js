@@ -7,27 +7,29 @@ const initialState = {
   }
 }
 export default (state = initialState, action) => {
+  if(!action.payload) return state
+  const { player, cut, hand, update } = action.payload
   switch (action.type) {
     case 'BEGIN_GAME_CUT':
       return {
         ...state,
-        [action.payload.player]: {
-          ...state[action.payload.player],
-          beginGameCut: action.payload.cut
+        [player]: {
+          ...state[player],
+          beginGameCut: cut
         }
       }
     case 'GET_HAND':
       return {
         ...state,
-        [action.payload.player]: {
-          ...state[action.payload.player],
-          hand: action.payload
+        [player]: {
+          ...state[player],
+          hand: hand
         }
       }
     case 'UPDATE_PLAYER':
       return {
         ...state,
-        [action.payload.player]: action.payload.update
+        [player]: update
       }
     default:
       return state

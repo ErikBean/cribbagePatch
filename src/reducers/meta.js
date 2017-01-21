@@ -1,7 +1,6 @@
 const initialState = {
   isPlayer1: false,
-  isPlayer2: false,
-  hasGameStarted: false,
+  isPlayer2: false
 }
 export default (state = initialState, action) => {
   switch (action.type) {
@@ -22,8 +21,7 @@ export default (state = initialState, action) => {
       }
     case 'START_GAME':
       return {
-        ...state,
-        hasGameStarted: true
+        ...state
       }
     default:
       return state

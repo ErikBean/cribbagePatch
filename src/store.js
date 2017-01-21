@@ -3,11 +3,13 @@ import { isEqual, clone, size, omit, once } from 'lodash'
 import deck from './reducers/deck'
 import players from './reducers/players'
 import meta from './reducers/meta'
-const store = createStore(combineReducers({
+const reducer = combineReducers({
+  meta,
   deck,
-  players,
-  meta
-}))
+  players
+})
+const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+const store = createStore(reducer, enhancer)
 export default store
 
 window.store = store
@@ -23,22 +25,20 @@ let game = gun.get('game');
 window.game = game;
 
 let cachedDeck = null
-let cachedPlayers = {}
+let cache = {}
 
 function pushDeck (deck) {
   if(!isEqual(deck, cachedDeck)){
-    cachedDeck = clone(deck)
+    cache.deck = clone(deck)
     game.put({ deck })
   }
 }
 
-function pushPlayer (currentPlayer, id) {
-  if(!isEqual(currentPlayer, cachedPlayers[id])){
-    console.log('>>> push player: ', currentPlayer, id)
-    cachedPlayers[id] = clone(currentPlayer)
-    game.put({
-      [id]: currentPlayer
-    })
+function pushPlayer (currentPlayer, playerNum) {
+  if(!isEqual(currentPlayer, cache[playerNum])){
+    console.log('>>> push player: ', currentPlayer, playerNum)
+    cache[playerNum] = clone(currentPlayer)
+    game.path(playerNum).put(currentPlayer)
   }
 }
 
@@ -48,17 +48,18 @@ store.subscribe(() => {
   const { players: { player1, player2 } } = store.getState()
   pushDeck(newState.deck)
   if(isPlayer1){
-    // listenForOtherPlayer('player2')
     pushPlayer(player1, 'player1')
   } else if(isPlayer2){
-    // listenForOtherPlayer('player1')
     pushPlayer(player2, 'player2')
   }
 })
 
 game.path('deck').on((remoteDeck) => {
   console.warn('>>> new remoteDeck: ', remoteDeck)
-  store.dispatch({type: 'UPDATE_DECK', payload: omit(remoteDeck, '_')})
+  const newDeck = omit(remoteDeck, '_')
+  if(!isEqual(newDeck, cache.deck)){
+    store.dispatch({type: 'UPDATE_DECK', payload: newDeck})
+  }
 })
 
 game.path('player1').on((p1) => {
@@ -73,7 +74,7 @@ game.path('player1').on((p1) => {
       type: 'UPDATE_PLAYER',
       payload: {
         player: 'player1',
-        update: p1
+        update: omit(p1, '_')
       }
     })
   }
@@ -87,7 +88,7 @@ game.path('player2').on((p2) => {
       type: 'UPDATE_PLAYER',
       payload: {
         player: 'player2',
-        update: p2
+        update: omit(p2, '_')
       }
     })
   }

@@ -32,11 +32,10 @@ const mapStateToProps = (state) => {
     },
     deck
   } = state
-  const { isPlayer1, isPlayer2, hasGameStarted } = state.meta
+  const { isPlayer1, isPlayer2 } = state.meta
   return {
     isPlayer1,
     isPlayer2,
-    hasGameStarted,
     p1Cut,
     p2Cut,
     deck
