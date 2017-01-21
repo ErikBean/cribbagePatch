@@ -31,9 +31,9 @@ function pushDeck (data) {
 
 function pushPlayer (data, playerNum) {
   const currentPlayer = JSON.stringify(data)
-  if(currentPlayer === cache[playerNum]) return
-  console.log('>>> push player: ', currentPlayer, playerNum)
+  if(currentPlayer === '{}' || currentPlayer === cache[playerNum]) return
   cache[playerNum] = currentPlayer
+  console.log('>>> push player: ', currentPlayer, playerNum)
   game.path(playerNum).put(currentPlayer)
 }
 
@@ -58,7 +58,6 @@ function updateDeck (remoteDeck) {
 
 
 function updatePlayer (playerNum, remotePlayer) {
-  console.log('>>> Here: ', remotePlayer)
   if(!remotePlayer || remotePlayer === '{}') return
   if(remotePlayer === cache[playerNum]) return
   cache[playerNum] = remotePlayer
