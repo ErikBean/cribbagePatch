@@ -12,14 +12,16 @@ const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_
 const store = createStore(reducer, enhancer)
 export default store
 
-const gun = Gun([
-  'https://gun-starter-app-lzlbcefjql.now.sh',
-]);
-
-// Reads key 'game'.
-let game = gun.get('game');
-
 let cache = {}
+
+store.subscribe(() => {
+  let newState = store.getState()
+  const { players: { player1, player2 } } = store.getState()
+  pushDeck(newState.deck)
+  pushPlayer(player1, 'player1')
+  pushPlayer(player2, 'player2')
+})
+
 function pushDeck (data) {
   const deck = JSON.stringify(data)
   if(deck === cache.deck) return
@@ -34,6 +36,13 @@ function pushPlayer (data, playerNum) {
   cache[playerNum] = currentPlayer
   game.path(playerNum).put(currentPlayer)
 }
+
+const gun = Gun([
+  'https://gun-starter-app-lzlbcefjql.now.sh',
+]);
+
+// Reads key 'game'.
+let game = gun.get('game');
 
 game.path('deck').on((remoteDeck) => updateDeck(remoteDeck))
 
@@ -63,19 +72,6 @@ function updatePlayer (playerNum, remotePlayer) {
     playerNum === 'player1' ? assignPlayer('player2') : assignPlayer('player1')
   }
 }
-
-
-store.subscribe(() => {
-  let newState = store.getState()
-  const { isPlayer1, isPlayer2 } = newState.meta
-  const { players: { player1, player2 } } = store.getState()
-  pushDeck(newState.deck)
-  if(isPlayer1){
-    pushPlayer(player1, 'player1')
-  } else if(isPlayer2){
-    pushPlayer(player2, 'player2')
-  }
-})
 
 function assignPlayer (player) {
   const { isPlayer1, isPlayer2 } = store.getState().meta
