@@ -51,7 +51,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         type: `BEGIN_GAME_CUT`,
         payload: {
           player: 'player1',
-          cut: deck[0]
+          cut: deck[1]
         }
       })
     },
@@ -60,24 +60,20 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         type: `BEGIN_GAME_CUT`,
         payload: {
           player: 'player2',
-          cut: store.getState().deck[1]
+          cut: store.getState().deck[0]
         }
       })
-      dispatch({type: `START_GAME`})
     },
     deal: () => {
-      let deck = shuffle(store.getState().deck)
-      
-      let hand1 = {}, hand2 = {}
-      for(let i = 1; i < 7; i++){
-        const lastIndex = size(deck) - i  
-        hand1[i] = clone(deck[lastIndex])
-        hand2[i] = clone(deck[lastIndex - 6 ])
-        deck[lastIndex] = null
-        deck[lastIndex - 6 ] = null
-      }
+      let deck = shuffle(createDeck())
       dispatch({type: 'UPDATE_DECK', payload: deck})
-      
+      let hand1 = []
+      let hand2 = []  
+      for(let i = 0; i < 6; i++){
+        hand1[i] = deck[i]
+        hand2[i] = deck[i + 6 ]
+      }
+      console.log('Ok computd hands, ',{hand1, hand2});
       dispatch({
         type: 'GET_HAND',
         payload: {

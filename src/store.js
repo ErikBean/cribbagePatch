@@ -12,8 +12,6 @@ const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_
 const store = createStore(reducer, enhancer)
 export default store
 
-window.store = store
-
 const gun = Gun([
   'https://gun-starter-app-lzlbcefjql.now.sh',
 ]);
@@ -21,24 +19,51 @@ const gun = Gun([
 // Reads key 'game'.
 let game = gun.get('game');
 
-// Exposed so the JS console can see it.
-window.game = game;
-
 let cache = {}
-window.cache = cache
-function pushDeck (deck) {
-  if(!isEqual(deck, get(cache, 'deck'))){
-    cache.deck = deck
-    game.put({ deck })
+function pushDeck (data) {
+  const deck = JSON.stringify(data)
+  if(deck === cache.deck) return
+  cache.deck = deck
+  game.path('deck').put(deck)
+}
+
+function pushPlayer (data, playerNum) {
+  const currentPlayer = JSON.stringify(data)
+  if(currentPlayer === cache[playerNum]) return
+  console.log('>>> push player: ', currentPlayer, playerNum)
+  cache[playerNum] = currentPlayer
+  game.path(playerNum).put(currentPlayer)
+}
+
+game.path('deck').on((remoteDeck) => updateDeck(remoteDeck))
+
+game.path('player1').on((data) => updatePlayer('player1', data))
+game.path('player2').on((data) => updatePlayer('player2', data))
+
+function updateDeck (remoteDeck) {
+  if(!remoteDeck || remoteDeck === cache.deck) return
+  cache.deck = remoteDeck
+  console.info('>>> update deck: ', remoteDeck)
+  store.dispatch({type: 'UPDATE_DECK', payload: JSON.parse(remoteDeck)})
+}
+
+
+function updatePlayer (playerNum, remotePlayer) {
+  if(!remotePlayer || remotePlayer === cache[playerNum]) return
+  cache[playerNum] = remotePlayer
+  console.log('>>> update player: ', remotePlayer)
+  store.dispatch({
+    type: 'UPDATE_PLAYER',
+    payload: {
+      player: playerNum,
+      update: JSON.parse(remotePlayer)
+    }
+  })
+  if(JSON.parse(remotePlayer).beginGameCut){
+    playerNum === 'player1' ? assignPlayer('player2') : assignPlayer('player1')
   }
 }
 
-function pushPlayer (currentPlayer, playerNum) {
-  if(isEqual(currentPlayer, get(cache, playerNum)) return
-  console.log('>>> push player: ', currentPlayer, playerNum)
-  set(cache, playerNum, currentPlayer)
-  game.path(playerNum).put(currentPlayer)
-}
 
 store.subscribe(() => {
   let newState = store.getState()
@@ -52,15 +77,6 @@ store.subscribe(() => {
   }
 })
 
-game.path('deck').on((remoteDeck) => {
-  const newDeck = omit(remoteDeck, '_')
-  if(!isEqual(newDeck, cache.deck)){
-    console.info('>>> new remoteDeck: ', remoteDeck)
-    store.dispatch({type: 'UPDATE_DECK', payload: newDeck})
-    cache.deck = newDeck
-  }
-})
-
 function assignPlayer (player) {
   const { isPlayer1, isPlayer2 } = store.getState().meta
   const isNotAssignedPlayer = ( !isPlayer1 && !isPlayer2 )
@@ -69,38 +85,14 @@ function assignPlayer (player) {
   }
 }
 
-game.path('player1.beginGameCut').on((cut) => {
-  if(cut === get(cache, 'player1.beginGameCut')) return
-  set(cache, 'player1.beginGameCut', cut)
-  assignPlayer('player2')
-  store.dispatch({
-    type: `BEGIN_GAME_CUT`,
-    payload: {
-      player: 'player1',
-      cut: cut
-    }
-  })
-})
-
-game.path('player2.beginGameCut').on((cut) => {
-  if(cut === get(cache, 'player2.beginGameCut')) return
-  set(cache, 'player2.beginGameCut', cut)
-  assignPlayer('player1')
-  store.dispatch({
-    type: `BEGIN_GAME_CUT`,
-    payload: {
-      player: 'player2',
-      cut: cut
-    }
-  })
-})
-
+// Debug helpers
+window.store = store
+window.game = game
+window.cache = cache
 
 window.restart = () => game.put({
   player1: null,
   player2: null,
   deck: null,
   meta: null,
-  localPlayer: null,
-  player: null
 })

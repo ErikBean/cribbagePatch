@@ -23,7 +23,7 @@ export default (state = initialState, action) => {
         ...state,
         [player]: {
           ...state[player],
-          hand: hand
+          hand
         }
       }
     case 'UPDATE_PLAYER':
