@@ -19,3 +19,37 @@ export function shuffle (array) {
 export function valueOf (card) {
   return typeof card === 'string' ? parseInt(card.slice(1)) : -1
 }
+
+export function getNumberOrFace (card) {
+  const number = valueOf(card)
+  switch (number) {
+    case 1:
+      return 'ace'
+      break
+    case 11:
+      return 'jack'
+      break
+    case 12:
+      return 'queen'
+      break
+    case 13:
+      return 'king'
+    default:
+      return number
+  }
+}
+
+export function getSuit(card){
+  switch (card[0]) {
+    case 'H':
+      return 'hearts'
+    case 'D':
+      return 'diamonds'
+    case 'S':
+      return 'spades'
+    case 'C':
+      return 'clubs'
+    default:
+      return 'XXXX'
+  }
+}

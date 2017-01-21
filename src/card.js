@@ -1,45 +1,32 @@
-import React from 'react'
-import { valueOf } from './deck'
+import React, { Component } from 'react'
+import { valueOf, getNumberOrFace, getSuit } from './deck'
 
-function getNumberOrFace (card) {
-  const number = valueOf(card)
-  switch (number) {
-    case 1:
-      return 'ace'
-      break
-    case 11:
-      return 'jack'
-      break
-    case 12:
-      return 'queen'
-      break
-    case 13:
-      return 'king'
-    default:
-      return number
+export default class Card extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      selected: false
+    }
+    this.toggleSelect = this.toggleSelect.bind(this)
+  }
+  toggleSelect() {
+    this.setState({
+      selected: !this.state.selected
+    })
+  }
+  render() {
+    const value = getNumberOrFace(this.props.card)
+    const suit = getSuit(this.props.card)
+    const style = {
+      display: 'inline-block',
+      border: this.state.selected ? '3px solid green' : 'none',
+      height: '200px',
+      width: '150px',
+      background: `url(../styles/svg-cards/${value}_of_${suit}.svg) no-repeat`,
+      backgroundSize: 'contain'
+    }
+    return (
+      <div onClick={this.toggleSelect} style={style}/>
+    )
   }
 }
-
-function getSuit(card){
-  switch (card[0]) {
-    case 'H':
-      return 'hearts'
-    case 'D':
-      return 'diamonds'
-    case 'S':
-      return 'spades'
-    case 'C':
-      return 'clubs'
-    default:
-      return 'XXXX'
-  }
-}
-
-const Card = (props) => {
-  const value = getNumberOrFace(props.card)
-  const suit = getSuit(props.card)
-  return (
-    <img src={`../styles/svg-cards/${value}_of_${suit}.svg`} />
-  )
-}
-export default Card

@@ -14,9 +14,9 @@ const Player = (props) => (
         {props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'}
         <br />Waiting for deal
       </div>
-      <div>hand: <Hand hand={props.myHand || []} /></div>
       <button hidden={!props.hasFirstCrib || props.myHand} onClick={props.deal}>Deal!</button>
     </h5>
+    <div>hand: <Hand hand={props.myHand || []} /></div>
   </div>
 )
 
