@@ -58,7 +58,9 @@ function updateDeck (remoteDeck) {
 
 
 function updatePlayer (playerNum, remotePlayer) {
-  if(!remotePlayer || remotePlayer === cache[playerNum]) return
+  console.log('>>> Here: ', remotePlayer)
+  if(!remotePlayer || remotePlayer === '{}') return
+  if(remotePlayer === cache[playerNum]) return
   cache[playerNum] = remotePlayer
   console.log('>>> update player: ', remotePlayer)
   store.dispatch({

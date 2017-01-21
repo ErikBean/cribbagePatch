@@ -1,10 +1,6 @@
 const initialState = {
-  player1: {
-    beginGameCut: ''
-  },
-  player2: {
-    beginGameCut: ''
-  }
+  player1: {},
+  player2: {}
 }
 export default (state = initialState, action) => {
   if(!action.payload) return state
