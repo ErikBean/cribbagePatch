@@ -22,7 +22,6 @@ const mapStateToProps = (state, ownProps) => {
   const theirPlayerNum = `player${ownProps.num === '1' ? 2 : 1}`
   const my = state.players[myPlayerNum]
   const their = state.players[theirPlayerNum]
-  console.log(valueOf(my.beginGameCut), valueOf(their.beginGameCut))
   return {
     myHand: my.hand,
     myBGC: my.beginGameCut,

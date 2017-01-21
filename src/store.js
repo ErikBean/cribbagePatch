@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from 'redux'
-import { isEqual, clone, omit, get } from 'lodash'
+import { isEqual, clone, omit, get, set } from 'lodash'
 import deck from './reducers/deck'
 import players from './reducers/players'
 import meta from './reducers/meta'
@@ -24,22 +24,20 @@ let game = gun.get('game');
 // Exposed so the JS console can see it.
 window.game = game;
 
-let cachedDeck = null
 let cache = {}
 window.cache = cache
 function pushDeck (deck) {
-  if(!isEqual(deck, cachedDeck)){
-    cache.deck = clone(deck)
+  if(!isEqual(deck, get(cache, 'deck'))){
+    cache.deck = deck
     game.put({ deck })
   }
 }
 
 function pushPlayer (currentPlayer, playerNum) {
-  if(!isEqual(currentPlayer, cache[playerNum])){
-    console.log('>>> push player: ', currentPlayer, playerNum)
-    cache[playerNum] = clone(currentPlayer)
-    game.path(playerNum).put(currentPlayer)
-  }
+  if(isEqual(currentPlayer, get(cache, playerNum)) return
+  console.log('>>> push player: ', currentPlayer, playerNum)
+  set(cache, playerNum, currentPlayer)
+  game.path(playerNum).put(currentPlayer)
 }
 
 store.subscribe(() => {
@@ -55,10 +53,11 @@ store.subscribe(() => {
 })
 
 game.path('deck').on((remoteDeck) => {
-  console.warn('>>> new remoteDeck: ', remoteDeck)
   const newDeck = omit(remoteDeck, '_')
   if(!isEqual(newDeck, cache.deck)){
+    console.info('>>> new remoteDeck: ', remoteDeck)
     store.dispatch({type: 'UPDATE_DECK', payload: newDeck})
+    cache.deck = newDeck
   }
 })
 
@@ -71,10 +70,9 @@ function assignPlayer (player) {
 }
 
 game.path('player1.beginGameCut').on((cut) => {
-  const cachedCut = get(cache, 'player1.beginGameCut')
-  if(cut === cachedCut) return
+  if(cut === get(cache, 'player1.beginGameCut')) return
+  set(cache, 'player1.beginGameCut', cut)
   assignPlayer('player2')
-  
   store.dispatch({
     type: `BEGIN_GAME_CUT`,
     payload: {
@@ -82,17 +80,12 @@ game.path('player1.beginGameCut').on((cut) => {
       cut: cut
     }
   })
-  cache.player1 = {
-    ...cache.player1,
-    beginGameCut: cut
-  }
 })
 
 game.path('player2.beginGameCut').on((cut) => {
-  const cachedCut = get(cache, 'player2.beginGameCut')
-  if(cut === cachedCut) return
+  if(cut === get(cache, 'player2.beginGameCut')) return
+  set(cache, 'player2.beginGameCut', cut)
   assignPlayer('player1')
-  
   store.dispatch({
     type: `BEGIN_GAME_CUT`,
     payload: {
@@ -100,10 +93,6 @@ game.path('player2.beginGameCut').on((cut) => {
       cut: cut
     }
   })
-  cache.player2 = {
-    ...cache.player1,
-    beginGameCut: cut
-  }
 })
 
 
