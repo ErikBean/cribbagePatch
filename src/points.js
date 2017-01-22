@@ -15,17 +15,11 @@ export function isFifteen(...cards) {
   let sum = cards.map((card) => valueMaxTen(card)).reduce((acc, curr) => (acc+curr), 0)
   return sum === 15
 }
-
-window.doubles = []
-window.triples = []
+let fifteens = {1:[], 2:[], 3:[], 4:[], 5:[]}
+window.fifteens = fifteens
 
 export function getFifteens (hand) {
-  let x2 = []
-  let x3 = []
-  window.doubles.push(x2)
-  window.triples.push(x3)
   // bottom diagonal of matrix, same pairs in reversed order:
-  const isOutsideSparseMatrix = (cardA, cardB) => ( hand.indexOf(cardA) >= hand.indexOf(cardB) )
   const isOutsideMatrix = (...cards) => {
     // indices must be in order! A > B > C > D 
     const indices = cards.map((c) => hand.indexOf(c))
@@ -39,14 +33,33 @@ export function getFifteens (hand) {
     return false
   }
   
-  for(let cardA of hand){
-    for(let cardB of hand){
-      if(isOutsideMatrix(cardA, cardB)) continue
-      if(isFifteen(cardA, cardB)) x2.push([cardA, cardB])
-      for(let cardC of hand){
-        if(isOutsideMatrix(cardA, cardB, cardC)) continue
-        if(isFifteen(cardA, cardB, cardC)) x3.push([cardA, cardB, cardC])
+  function calcFifteens(otherCards){
+    for(let cardX of hand){
+      if(isOutsideMatrix(cardX, ...otherCards)) continue // keep matrix sparse
+      if(isFifteen(cardX, ...otherCards)){
+        console.log('>>> is Fifteen!: ', [cardX, ...otherCards], JSON.stringify(window.fifteens))
+        window.fifteens[otherCards.length + 1].push([cardX, ...otherCards])
+      }
+      if(otherCards.length >= 4) {
+        return
+      } else{
+        calcFifteens([cardX, ...otherCards])
       }
     }
   }
+  
+  for(let seedCard of hand){
+    calcFifteens([seedCard])
+  }
+  
+  // for(let cardA of hand){
+  //   for(let cardB of hand){
+  //     if(isOutsideMatrix(cardA, cardB)) continue
+  //     if(isFifteen(cardA, cardB)) x2.push([cardA, cardB])
+  //     for(let cardC of hand){
+  //       if(isOutsideMatrix(cardA, cardB, cardC)) continue
+  //       if(isFifteen(cardA, cardB, cardC)) x3.push([cardA, cardB, cardC])
+  //     }
+  //   }
+  // }
 }
