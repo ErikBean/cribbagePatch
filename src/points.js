@@ -11,23 +11,31 @@ function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
 }
 
-export function isFifteen(card, otherCard) {
-  return (valueMaxTen(card) + valueMaxTen(otherCard)) === 15
+export function isFifteen(...cards) {
+  let sum = cards.map((card) => valueMaxTen(card)).reduce((acc, curr) => (acc+curr), 0)
+  return sum === 15
 }
 
 window.doubles = []
+window.triples = []
 export function getFifteens (hand) {
   let x2 = []
+  let x3 = []
   window.doubles.push(x2)
-  // const triples = []
+  window.triples.push(x3)
+  const isSameCard = (cardA, cardB) => (hand.indexOf(cardA) === hand.indexOf(cardB)) 
+  // bottom diagonal of matrix, same pairs in reversed order:
+  const isOutsideSparseMatrix = (cardA, cardB) => (hand.indexOf(cardA) > hand.indexOf(cardB))
   for(let cardA of hand){
     for(let cardB of hand){
-      // same card:
-      if(hand.indexOf(cardA) === hand.indexOf(cardB)) continue 
-      // bottom diagonal of matrix, same pairs in reversed order:
-      if(hand.indexOf(cardA) > hand.indexOf(cardB)) continue
-      
+      if(isSameCard(cardA, cardB)) continue 
+      if(isOutsideSparseMatrix(cardA, cardB)) continue
       if(isFifteen(cardA, cardB)) x2.push([cardA, cardB])
+      for(let cardC of hand){
+        if(isSameCard(cardA, cardC) || isSameCard(cardB, cardC)) continue
+        if(isOutsideSparseMatrix(cardA, cardC) || isOutsideSparseMatrix(cardB, cardC)) continue
+        if(isFifteen(cardA, cardB, cardC)) x3.push([cardA, cardB, cardC])
+      }
     }
   }
 }
