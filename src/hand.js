@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { without, includes } from 'lodash'
-import { isFifteen } from './points'
+import { getFifteens } from './points'
 import Card from './card'
 import Line from './line'
 
@@ -32,19 +32,16 @@ export default class Hand extends Component {
         card={card}
         key={card} />
     )
-    const renderLine = (card, otherCard) => {
-      if(isFifteen(card, otherCard)){
-        return (<Line from={card} to={otherCard} key={`${card}+${otherCard}`}/>)
-      }
-    }
+    getFifteens(this.props.hand)
+    
+    // const renderLine = (card, otherCard) => {
+    //   if(isFifteen(card, otherCard)){
+    //     return (<Line from={card} to={otherCard} key={`${card}+${otherCard}`}/>)
+    //   }
+    // }
     return (
       <div>
-        {this.props.hand.map((card) => (
-          <span key={card}>
-            {renderCard(card)}
-            {this.props.hand.map(renderLine.bind(null, card))}
-          </span>
-        ))}
+        {this.props.hand.map(renderCard)}
       </div>
     )
   }
