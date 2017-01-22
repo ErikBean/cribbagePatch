@@ -19,9 +19,9 @@ let fifteens = {1:[], 2:[], 3:[], 4:[], 5:[]}
 window.fifteens = fifteens
 
 export function getFifteens (hand) {
-  // bottom diagonal of matrix, same pairs in reversed order:
-  const isOutsideMatrix = (...cards) => {
-    // indices must be in order! A > B > C > D 
+  const isOutsideMatrix = (...cards) => { //dimensions of matrix = cards.length
+    // Skip over elements outside traingular matrix
+    // Indices must be in order! A > B > C > D 
     const indices = cards.map((c) => hand.indexOf(c))
     for(let i=1; i < indices.length; i++){
       const thisIndex = indices[i]
@@ -32,34 +32,19 @@ export function getFifteens (hand) {
     }
     return false
   }
-  
+  // Compare hand to itelf on 5 axes, to determine all 5-card combos (five-dimensional matrix)
+  // Since matrix is symetric and addition is commutitive, only compute trianglular matrix
   function calcFifteens(otherCards){
+    if(otherCards.length >= 4) return
     for(let cardX of hand){
       if(isOutsideMatrix(cardX, ...otherCards)) continue // keep matrix sparse
-      if(isFifteen(cardX, ...otherCards)){
-        console.log('>>> is Fifteen!: ', [cardX, ...otherCards], JSON.stringify(window.fifteens))
-        window.fifteens[otherCards.length + 1].push([cardX, ...otherCards])
-      }
-      if(otherCards.length >= 4) {
-        return
-      } else{
-        calcFifteens([cardX, ...otherCards])
-      }
+      if(isFifteen(cardX, ...otherCards)) fifteens[otherCards.length + 1].push([cardX, ...otherCards])
+      calcFifteens([cardX, ...otherCards])
     }
   }
   
-  for(let seedCard of hand){
-    calcFifteens([seedCard])
+  for(let card of hand){
+    calcFifteens([card])
   }
-  
-  // for(let cardA of hand){
-  //   for(let cardB of hand){
-  //     if(isOutsideMatrix(cardA, cardB)) continue
-  //     if(isFifteen(cardA, cardB)) x2.push([cardA, cardB])
-  //     for(let cardC of hand){
-  //       if(isOutsideMatrix(cardA, cardB, cardC)) continue
-  //       if(isFifteen(cardA, cardB, cardC)) x3.push([cardA, cardB, cardC])
-  //     }
-  //   }
-  // }
+
 }
