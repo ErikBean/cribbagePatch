@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import { without, includes } from 'lodash'
+import { isFifteen } from './points'
 import Card from './card'
+import Line from './line'
 
 export default class Hand extends Component {
   constructor(props){
     super(props)
     this.state = {
       cards: props.cards,
-      selected: [null, null]
+      selected: [null, null] // Should always be length 2
     }
     this.toggleSelect = this.toggleSelect.bind(this)
   }
@@ -23,14 +25,25 @@ export default class Hand extends Component {
     }
   }
   render() {
+    const renderCard = (card) => (
+      <Card
+        toggleSelect={this.toggleSelect.bind(null,card)}
+        isSelected={includes(this.state.selected, card)}
+        card={card}
+        key={card} />
+    )
+    const renderLine = (card, otherCard) => {
+      if(isFifteen(card, otherCard)){
+        return (<Line from={card} to={otherCard} key={`${card}+${otherCard}`}/>)
+      }
+    }
     return (
       <div>
         {this.props.hand.map((card) => (
-          <Card 
-            toggleSelect={this.toggleSelect.bind(null,card)}
-            isSelected={includes(this.state.selected, card)}
-            card={card}
-            key={card} />
+          <span key={card}>
+            {renderCard(card)}
+            {this.props.hand.map(renderLine.bind(null, card))}
+          </span>
         ))}
       </div>
     )
