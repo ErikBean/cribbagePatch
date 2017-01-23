@@ -1,5 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { difference } from 'lodash'
+window._ = _
 import { createDeck, shuffle, valueOf } from './deck'
 import Hand from './hand'
 
@@ -17,7 +19,7 @@ const Player = (props) => (
       <button hidden={!props.hasFirstCrib || props.myHand} onClick={props.deal}>Deal!</button>
     </h5>
     <div>
-      hand: <Hand hand={props.myHand || []} discard={props.discard}/>
+      hand: <Hand hand={props.myHand || []} discard={props.discard.bind(null, props.myHand)} />
     </div>
   </div>
 )
@@ -37,8 +39,14 @@ const mapStateToProps = (state, ownProps) => {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    discard: ([cardA, cardB]) => {
-      console.info(`discarded ${cardA}, ${cardB}`)
+    discard: (hand, discards) => {
+      dispatch({
+        type: 'GET_HAND',
+        payload: {
+          player: `player${ownProps.num}`,
+          hand: difference(hand, discards)
+        }
+      })
     }
   }
 }

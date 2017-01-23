@@ -15,6 +15,7 @@ export default class Hand extends Component {
     this.discard = this.discard.bind(this)
   }
   toggleSelect (card) {
+    if(this.props.hand.length < 6) return
     const nextSelected = includes(this.state.selected, card) ?
       [ null, ...without(this.state.selected, card) ] :
       [ card, this.state.selected[0] ]
