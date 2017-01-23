@@ -1,5 +1,5 @@
 import { valueOf, getSuit } from './deck'
-import { uniq, difference } from 'lodash'
+import { uniq } from 'lodash'
 
 export default function getPoints(hand){
   //game logic ....
@@ -67,5 +67,14 @@ export function getPairs (hand) {
 }
 
 export function getRuns (hand) {
-  return 0
+  const values = uniq(hand.map(valueOf).sort((a, b) => a > b))
+  const run = []
+  for (let i = 1;i < values.length; i++){
+    const thisVal = values[i]
+    const lastVal = values[i - 1]
+    if(thisVal === (lastVal + 1)){
+      run.length ? run.push(thisVal) : run.push(lastVal, thisVal)
+    }
+  }
+  return run.length > 2 ? run : []
 }

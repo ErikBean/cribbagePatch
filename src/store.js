@@ -94,7 +94,7 @@ window.restart = () => game.put({
   meta: null,
 })
 
-window.getHandWith = (hand, player) => {
+window.getHand = (hand, player) => {
   store.dispatch({
     type: 'GET_HAND',
     payload: {

@@ -10,7 +10,8 @@ export default class Hand extends Component {
     this.state = {
       selected: [null, null], // Should always be length 2
       fifteens: getFifteens(this.props.hand),
-      pairs: getPairs(this.props.hand) // 3 of a kind if any prop has value > 1
+      pairs: getPairs(this.props.hand), // 3 of a kind if any prop has value > 1
+      runs: getRuns(this.props.hand)
     }
     this.toggleSelect = this.toggleSelect.bind(this)
     this.numFifteens = this.numFifteens.bind(this)
@@ -58,7 +59,7 @@ export default class Hand extends Component {
             pairs:{this.numPairs()}
           </li>
           <li>
-            {/* runs:{getRuns(this.props.hand)} */}
+            runs:{JSON.stringify(this.state.runs)}
           </li>
         </ul>
         {this.props.hand.map(renderCard)}
