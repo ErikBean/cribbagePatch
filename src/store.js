@@ -93,3 +93,13 @@ window.restart = () => game.put({
   deck: null,
   meta: null,
 })
+
+window.getHandWith = (hand, player) => {
+  store.dispatch({
+    type: 'GET_HAND',
+    payload: {
+      player: player || 'player1',
+      hand: hand || ['S1','S2','S3','S4','S5','S6']
+    }
+  })
+}

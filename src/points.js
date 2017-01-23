@@ -1,4 +1,5 @@
 import { valueOf, getSuit } from './deck'
+import { uniq, difference } from 'lodash'
 
 export default function getPoints(hand){
   //game logic ....
@@ -50,12 +51,19 @@ export function getFifteens (hand) {
   for(let card of hand){
     calcFifteens([card])
   }
-  window.lastFif = fifteens
   return fifteens
 }
 
 export function getPairs (hand) {
-  return 0
+  const values = hand.map(valueOf).sort()
+  const pairs = {}
+  //if number occurs twice in a row, add to pairs object
+  for (let i = 1;i < values.length; i++){
+    if(values[i] === values[i - 1]){
+      pairs[values[i]] ? pairs[values[i]]++ : pairs[values[i]] = 1
+    }
+  }
+  return pairs
 }
 
 export function getRuns (hand) {

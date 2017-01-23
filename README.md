@@ -23,10 +23,9 @@ Redux should look something like...
 ```
 Refactor TODO:
 1. combine PushDeck and PushPlayers
-2. Combine 'update remote player' functions 
-3. Cards should be a set in gun, not a string. That way we can .map() 
-4. The deal method is pretty fucking weird 
-
+2. Cards should be a set in gun, not a string. That way we can .map() 
+3. The deal method is pretty fucking weird 
+4. Fifteens could be computed faster by converting hand to integers FIRST! 
 
 Rules TODO:
 

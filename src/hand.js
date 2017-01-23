@@ -9,7 +9,8 @@ export default class Hand extends Component {
     super(props)
     this.state = {
       selected: [null, null], // Should always be length 2
-      fifteens: getFifteens(this.props.hand)
+      fifteens: getFifteens(this.props.hand),
+      pairs: getPairs(this.props.hand) // 3 of a kind if any prop has value > 1
     }
     this.toggleSelect = this.toggleSelect.bind(this)
     this.numFifteens = this.numFifteens.bind(this)
@@ -32,6 +33,13 @@ export default class Hand extends Component {
       return acc + curr
     }, 0)
   }
+  numPairs(){
+    return Object.keys(this.state.pairs).map((k) => {
+      return this.state.pairs[k]
+    }).reduce((acc, curr) => {
+      return acc + curr
+    }, 0)
+  }
   render () {
     const renderCard = (card) => (
       <Card
@@ -47,7 +55,7 @@ export default class Hand extends Component {
             Fifteens: {this.numFifteens()}
           </li>
           <li>
-            {/* pairs:{getPairs(this.props.hand)} */}
+            pairs:{this.numPairs()}
           </li>
           <li>
             {/* runs:{getRuns(this.props.hand)} */}
