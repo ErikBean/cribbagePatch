@@ -12,6 +12,7 @@ export default class Hand extends Component {
       selected: [null, null], // Should always be length 2
     }
     this.toggleSelect = this.toggleSelect.bind(this)
+    this.discard = this.discard.bind(this)
   }
   toggleSelect (card) {
     const nextSelected = includes(this.state.selected, card) ?
@@ -21,7 +22,14 @@ export default class Hand extends Component {
       selected: nextSelected
     })
   }
-
+  discard () {
+    const { selected } = this.state
+    if(!selected[0] || !selected[1]) {
+      alert('Plz selct TWO cards for cribber')
+      return
+    }
+    this.props.discard(selected)
+  }
   render () {
     const fifteens = getFifteens(this.props.hand)
     const pairs = getPairs(this.props.hand)
@@ -48,6 +56,10 @@ export default class Hand extends Component {
             card={card}
             key={card} />
         ))}
+        <br />
+        <button onClick={this.discard}>
+          Place in crib
+        </button>
       </div>
     )
   }

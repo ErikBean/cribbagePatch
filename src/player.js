@@ -17,7 +17,7 @@ const Player = (props) => (
       <button hidden={!props.hasFirstCrib || props.myHand} onClick={props.deal}>Deal!</button>
     </h5>
     <div>
-      hand: <Hand hand={props.myHand || []} />
+      hand: <Hand hand={props.myHand || []} discard={props.discard}/>
     </div>
   </div>
 )
@@ -35,8 +35,12 @@ const mapStateToProps = (state, ownProps) => {
     waitingForCut: !my.beginGameCut || !their.beginGameCut
   }
 }
-const mapDispatchToProps = (dispatch, ownProps) => ({
-
-})
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    discard: ([cardA, cardB]) => {
+      console.info(`discarded ${cardA}, ${cardB}`)
+    }
+  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Player)

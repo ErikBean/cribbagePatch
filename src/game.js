@@ -12,6 +12,7 @@ const game = (props) => (
       <button disabled={props.isPlayer1 || props.p2Cut} onClick={props.player2Cut}>Cut</button>
     </div>
     <Player num='1' isCurrentPlayer={props.isPlayer1} deal={props.deal}/>
+    <br />
     <Player num='2' isCurrentPlayer={props.isPlayer2} deal={props.deal}/>
     <br />
     <div id="debugDeck" onClick={(e) => showDeck(e, props.deck)}>
