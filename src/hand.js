@@ -9,35 +9,23 @@ export default class Hand extends Component {
     super(props)
     const fifteens = getFifteens(props.hand)
     const pairs = getPairs(props.hand)
-    console.log('>>> stuff! ! : ', {fifteens, pairs})
     this.state = {
       selected: [null, null], // Should always be length 2
       fifteens, 
       pairs,
       runs: getRuns(props.hand).length,
-      numFifteens: Object.keys(fifteens).map((k) => {
-        return fifteens[k].length
-      }).reduce((acc, curr) => {
-        return acc + curr
-      }, 0),
-      numPairs: Object.keys(pairs).map((k) => {
-        return pairs[k]
-      }).reduce((acc, curr) => {
-        return acc + curr
-      }, 0)
+      numFifteens: sumLengths(fifteens),
+      numPairs: sumValues(pairs)
     }
     this.toggleSelect = this.toggleSelect.bind(this)
   }
   toggleSelect (card) {
-    if (includes(this.state.selected, card)) {
-      this.setState({
-        selected: [null, ...without(this.state.selected, card)]
-      })
-    } else {
-      this.setState({
-        selected: [card, this.state.selected[0]]
-      })
-    }
+    const nextSelected = includes(this.state.selected, card) ?
+      [ null, ...without(this.state.selected, card) ] :
+      [ card, this.state.selected[0] ]
+    this.setState({
+      selected: nextSelected
+    })
   }
   render () {
     const renderCard = (card) => (
@@ -64,4 +52,22 @@ export default class Hand extends Component {
       </div>
     )
   }
+}
+
+// Sum the length of all arrays in obj
+function sumLengths(obj){
+  return Object.keys(obj).map((k) => {
+    return obj[k].length
+  }).reduce((acc, curr) => {
+    return acc + curr
+  }, 0)
+}
+
+// Sum all values in obj
+function sumValues(obj){
+  return Object.keys(obj).map((k) => {
+    return obj[k]
+  }).reduce((acc, curr) => {
+    return acc + curr
+  }, 0)
 }
