@@ -15,27 +15,31 @@ export function isFifteen(...cards) {
   let sum = cards.map((card) => valueMaxTen(card)).reduce((acc, curr) => (acc+curr), 0)
   return sum === 15
 }
-let fifteens = {1:[], 2:[], 3:[], 4:[], 5:[]}
-window.fifteens = fifteens
+
+function isArraySorted (array) {
+  for(let i=1; i < array.length; i++){
+    const thisIndex = array[i]
+    const prevIndex = array[i - 1]
+    if(thisIndex >= prevIndex){
+      return true
+    }
+  }
+  return false
+}
 
 export function getFifteens (hand) {
-  const isOutsideMatrix = (...cards) => { //dimensions of matrix = cards.length
-    // Skip over elements outside traingular matrix
-    // Indices must be in order! A > B > C > D 
+  const fifteens = {1:[], 2:[], 3:[], 4:[], 5:[]} // index = number of cards in combos
+  
+  const isOutsideMatrix = (...cards) => {
+    // Skip over elements outside traingular matrix (dimensions of matrix = cards.length)
+    // Indices must be in order (A > B > C > D) to be strictly trianglular 
     const indices = cards.map((c) => hand.indexOf(c))
-    for(let i=1; i < indices.length; i++){
-      const thisIndex = indices[i]
-      const prevIndex = indices[i - 1]
-      if(thisIndex >= prevIndex){
-        return true
-      }
-    }
-    return false
+    return isArraySorted(indices)
   }
   // Compare hand to itelf on 5 axes, to determine all 5-card combos (five-dimensional matrix)
   // Since matrix is symetric and addition is commutitive, only compute trianglular matrix
   function calcFifteens(otherCards){
-    if(otherCards.length >= 4) return
+    if(otherCards.length >= 5) return
     for(let cardX of hand){
       if(isOutsideMatrix(cardX, ...otherCards)) continue // keep matrix sparse
       if(isFifteen(cardX, ...otherCards)) fifteens[otherCards.length + 1].push([cardX, ...otherCards])
@@ -46,5 +50,14 @@ export function getFifteens (hand) {
   for(let card of hand){
     calcFifteens([card])
   }
+  window.lastFif = fifteens
+  return fifteens
+}
 
+export function getPairs (hand) {
+  return 0
+}
+
+export function getRuns (hand) {
+  return 0
 }
