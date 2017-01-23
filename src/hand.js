@@ -7,15 +7,9 @@ import Line from './line'
 export default class Hand extends Component {
   constructor (props) {
     super(props)
-    const fifteens = getFifteens(props.hand)
-    const pairs = getPairs(props.hand)
+
     this.state = {
       selected: [null, null], // Should always be length 2
-      fifteens, 
-      pairs,
-      runs: getRuns(props.hand).length,
-      numFifteens: sumLengths(fifteens),
-      numPairs: sumValues(pairs)
     }
     this.toggleSelect = this.toggleSelect.bind(this)
   }
@@ -27,28 +21,33 @@ export default class Hand extends Component {
       selected: nextSelected
     })
   }
+
   render () {
-    const renderCard = (card) => (
-      <Card
-        toggleSelect={this.toggleSelect.bind(null, card)}
-        isSelected={includes(this.state.selected, card)}
-        card={card}
-        key={card} />
-    )
+    const fifteens = getFifteens(this.props.hand)
+    const pairs = getPairs(this.props.hand)
+    const runs = getRuns(this.props.hand).length
+    const numFifteens = sumLengths(fifteens)
+    const numPairs = sumValues(pairs)
     return (
       <div>
         <ul>
           <li>
-            Fifteens: {this.state.numFifteens}
+            Fifteens: {numFifteens}
           </li>
           <li>
-            pairs: {this.state.numPairs}
+            pairs: {numPairs}
           </li>
           <li>
-            runs: {this.state.runs}
+            runs: {runs}
           </li>
         </ul>
-        {this.props.hand.map(renderCard)}
+        {this.props.hand.map((card) => (
+          <Card
+            toggleSelect={this.toggleSelect.bind(null, card)}
+            isSelected={includes(this.state.selected, card)}
+            card={card}
+            key={card} />
+        ))}
       </div>
     )
   }
