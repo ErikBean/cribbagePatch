@@ -15,7 +15,7 @@ const game = (props) => (
     <Player num='1' isCurrentPlayer={props.isPlayer1} deal={props.deal}/>
     <br />
     <Player num='2' isCurrentPlayer={props.isPlayer2} deal={props.deal}/>
-    <Crib />
+    <Crib cards={props.crib}/>
     <br />
     <div id="debugDeck" onClick={(e) => showDeck(e, props.deck)}>
       Click to log the deck
@@ -24,23 +24,19 @@ const game = (props) => (
 )
 
 const mapStateToProps = (state) => {
-  const {
-    players: {
-      player1: {
-        beginGameCut: p1Cut
-      },
-      player2: {
-        beginGameCut: p2Cut
-      }
-    },
-    deck
-  } = state
+  const { deck } = state
   const { isPlayer1, isPlayer2 } = state.meta
+  const { player1, player2 } = state.players
+  const { beginGameCut: p1Cut, discards: disc1 } = player1
+  const { beginGameCut: p2Cut, discards: disc2 } = player2
+  const crib = (disc1 || []).concat((disc2 || []))
+  console.log('>>> crab: ', crib)
   return {
     isPlayer1,
     isPlayer2,
     p1Cut,
     p2Cut,
+    crib,
     deck
   }
 }
@@ -76,7 +72,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         hand1[i] = deck[i]
         hand2[i] = deck[i + 6 ]
       }
-      console.log('Ok computd hands, ',{hand1, hand2});
       dispatch({
         type: 'GET_HAND',
         payload: {

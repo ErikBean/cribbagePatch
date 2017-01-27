@@ -86,4 +86,5 @@ export function getRuns (hand) {
       
     }
   }
+  return runs
 }

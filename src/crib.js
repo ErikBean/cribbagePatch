@@ -15,17 +15,4 @@ const Crib = (props) => (
   </div>
 )
 
-const mapStateToProps = (state, ownProps) => {
-  console.log('>>> Here: ', state)
-  const p1Discards = state.players.player1.discards || []
-  const p2Discards = state.players.player2.discards || []
-  const cards = p1Discards.concat(p2Discards)
-  return {
-    cards
-  }
-}
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Crib)
+export default Crib
