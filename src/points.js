@@ -1,5 +1,5 @@
 import { valueOf, getSuit } from './deck'
-import { uniq } from 'lodash'
+import { uniq, size, toPairs } from 'lodash'
 
 export default function getPoints(hand){
   //game logic ....
@@ -54,6 +54,7 @@ export function getFifteens (hand) {
   return fifteens
 }
 
+// TODO: Does not work for 3 of a kind: last and first don't get matched
 export function getPairs (hand) {
   const values = hand.map(valueOf).sort()
   const pairs = {}
@@ -76,5 +77,13 @@ export function getRuns (hand) {
       run.length ? run.push(thisVal) : run.push(lastVal, thisVal)
     }
   }
-  return run.length > 2 ? run : []
+  if(run.length < 3) return [] // no runs
+  const runs = [ run ]
+  const pairs = toPairs(getPairs(hand))
+  if(!pairs.length) return runs // no double run, because no pairs
+  for(let [value, numPairs] of pairs ){
+    if(run.includes(value)){ // has double run
+      
+    }
+  }
 }

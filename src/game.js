@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { createDeck, shuffle } from './deck'
 import { size, clone } from 'lodash'
 import Player from './player'
+import Crib from './crib'
 import store from './store'
 
 const game = (props) => (
@@ -14,6 +15,7 @@ const game = (props) => (
     <Player num='1' isCurrentPlayer={props.isPlayer1} deal={props.deal}/>
     <br />
     <Player num='2' isCurrentPlayer={props.isPlayer2} deal={props.deal}/>
+    <Crib />
     <br />
     <div id="debugDeck" onClick={(e) => showDeck(e, props.deck)}>
       Click to log the deck

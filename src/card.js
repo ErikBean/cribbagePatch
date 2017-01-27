@@ -12,8 +12,9 @@ const Card = (props) => {
     background: `url(../styles/svg-cards/${value}_of_${suit}.svg) no-repeat`,
     backgroundSize: 'contain'
   }
+  const clickHandler = props.toggleSelect ? props.toggleSelect : () => {}
   return (
-    <div onClick={props.toggleSelect} style={style}/>
+    <div onClick={clickHandler} style={style}/>
   )
 }
 export default Card

@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from 'redux'
-import { isEqual, clone, omit, get, set } from 'lodash'
+import _, { isEqual, clone, omit, get, set } from 'lodash'
 import deck from './reducers/deck'
 import players from './reducers/players'
 import meta from './reducers/meta'
@@ -86,6 +86,7 @@ function assignPlayer (player) {
 window.store = store
 window.game = game
 window.cache = cache
+window._ = _
 
 window.restart = () => game.put({
   player1: null,

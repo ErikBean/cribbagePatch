@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { without, includes } from 'lodash'
 import { getFifteens, getRuns, getPairs } from './points'
 import Card from './card'
-import Line from './line'
+import ScoreBoard from './scoreBoard'
 
 export default class Hand extends Component {
   constructor (props) {
@@ -39,17 +39,7 @@ export default class Hand extends Component {
     const numPairs = sumValues(pairs)
     return (
       <div>
-        <ul>
-          <li>
-            Fifteens: {numFifteens}
-          </li>
-          <li>
-            pairs: {numPairs}
-          </li>
-          <li>
-            runs: {runs}
-          </li>
-        </ul>
+        <ScoreBoard cards={this.props.hand} />
         {this.props.hand.map((card) => (
           <Card
             toggleSelect={this.toggleSelect.bind(null, card)}

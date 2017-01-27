@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { difference } from 'lodash'
-window._ = _
 import { createDeck, shuffle, valueOf } from './deck'
 import Hand from './hand'
 
@@ -38,17 +37,21 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    discard: (hand, discards) => {
-      dispatch({
-        type: 'GET_HAND',
-        payload: {
-          player: `player${ownProps.num}`,
-          hand: difference(hand, discards)
-        }
-      })
-    }
+  const player = `player${ownProps.num}`
+  const discard = (hand, discards) => {
+    dispatch({
+      type: 'GET_HAND',
+      payload: {
+        player,
+        hand: difference(hand, discards)
+      }
+    })
+    dispatch({
+      type: 'GET_CRIB_CARDS',
+      payload: { player, discards }
+    })
   }
+  return { discard }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Player)
