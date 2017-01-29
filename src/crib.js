@@ -8,9 +8,8 @@ import Card from './card'
 import ScoreBoard from './scoreBoard'
 
 const Crib = (props) => (
-  <div>
+  <div hidden={!props.cards.lenght}>
     <ScoreBoard cards={props.cards} />
-
     {props.cards.map((card) => <Card key={card} card={card} />)}
   </div>
 )

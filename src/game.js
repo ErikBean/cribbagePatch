@@ -1,96 +1,106 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createDeck, shuffle } from './deck'
 import { size, clone } from 'lodash'
 import Player from './player'
 import Crib from './crib'
-import store from './store'
+import Deck from './deckComponent'
 
-const game = (props) => (
-  <div>
-    <div>
-      <button disabled={props.isPlayer2 || props.p1Cut} onClick={props.player1Cut}>Shuffle and Cut</button>
-      <button disabled={props.isPlayer1 || props.p2Cut} onClick={props.player2Cut}>Cut</button>
-    </div>
-    <Player num='1' isCurrentPlayer={props.isPlayer1} deal={props.deal}/>
-    <br />
-    <Player num='2' isCurrentPlayer={props.isPlayer2} deal={props.deal}/>
-    <Crib cards={props.crib}/>
-    <br />
-    <div id="debugDeck" onClick={(e) => showDeck(e, props.deck)}>
-      Click to log the deck
-    </div>
-  </div>
-)
-
+class Game extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      phase: 'discard'
+    }
+  }
+  componentWillReceiveProps(newProps){
+    if(newProps.crib.length === 4){
+      // TODO: need to prompt player w/o crib to cut deck
+      // TODO: need to prompt player w/ crib to click card
+      this.setState({
+        phase: 'cut'
+      })
+      // const cut = this.props.deck[13]
+      // this.props.getCut(cut)
+    }
+  }
+  render(){
+    const deal = () => {
+      const deck = shuffle(createDeck())
+      const hand1 = []
+      const hand2 = []
+      for (let i = 0; i < 6; i++) {
+        hand1[i] = deck[i]
+        hand2[i] = deck[ i + 6 ]
+      }
+      this.props.updateDeck(deck)
+      this.props.getHand('player1', hand1)
+      this.props.getHand('player2', hand2)
+    }
+    const player1Cut = () => {
+      const deck = shuffle(createDeck())
+      this.props.updateDeck(deck)
+      this.props.assignPlayer('player1')
+      this.props.cutForFirstCrib('player1', deck[0])
+    }
+    const player2Cut = () => {
+      this.props.assignPlayer('player2') // redundant, probably
+      this.props.cutForFirstCrib('player2', this.props.deck[1])
+    }
+    
+    return (
+      <div>
+        <div>
+          <button disabled={this.props.isPlayer2 || this.props.p1BeginGameCut} onClick={player1Cut}>First Cut</button>
+          <button disabled={this.props.isPlayer1 || this.props.p2BeginGameCut} onClick={player2Cut}>Second Cut</button>
+        </div>
+        <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={deal} phase={this.state.phase}/>
+        <br />
+        <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={deal} phase={this.state.phase}/>
+        <Crib cards={this.props.crib} />
+        <Deck deck={this.props.deck} />
+        <br />
+        <div id='debugDeck' onClick={(e) => showDeck(e, this.props.deck)}>
+          Click to log the deck
+        </div>
+      </div>
+    )
+  }
+}
 const mapStateToProps = (state) => {
-  const { deck } = state
+  const { deck, cut } = state
   const { isPlayer1, isPlayer2 } = state.meta
   const { player1, player2 } = state.players
-  const { beginGameCut: p1Cut, discards: disc1 } = player1
-  const { beginGameCut: p2Cut, discards: disc2 } = player2
+  const { beginGameCut: p1BeginGameCut, discards: disc1 } = player1
+  const { beginGameCut: p2BeginGameCut, discards: disc2 } = player2
   const crib = (disc1 || []).concat((disc2 || []))
-  console.log('>>> crab: ', crib)
   return {
     isPlayer1,
     isPlayer2,
-    p1Cut,
-    p2Cut,
+    p1BeginGameCut,
+    p2BeginGameCut,
     crib,
+    cut,
     deck
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    player1Cut: () => {
-      const deck = shuffle(createDeck())
-      dispatch({type: 'UPDATE_DECK', payload: deck})
-      dispatch({type: `ASSIGN_PLAYER`, payload: 'player1'})
-      dispatch({
-        type: `BEGIN_GAME_CUT`,
-        payload: {
-          player: 'player1',
-          cut: deck[1]
-        }
-      })
-    },
-    player2Cut: () => {
-      dispatch({
-        type: `BEGIN_GAME_CUT`,
-        payload: {
-          player: 'player2',
-          cut: store.getState().deck[0]
-        }
-      })
-    },
-    deal: () => {
-      let deck = shuffle(createDeck())
-      dispatch({type: 'UPDATE_DECK', payload: deck})
-      let hand1 = []
-      let hand2 = []  
-      for(let i = 0; i < 6; i++){
-        hand1[i] = deck[i]
-        hand2[i] = deck[i + 6 ]
-      }
-      dispatch({
-        type: 'GET_HAND',
-        payload: {
-          player: 'player1',
-          hand: hand1
-        }
-      })
-      dispatch({
-        type: 'GET_HAND',
-        payload: {
-          player: 'player2',
-          hand: hand2
-        }
-      })
-    }
+    assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
+    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
+    cutForFirstCrib: (player, cut) => dispatch({
+      type: `BEGIN_GAME_CUT`,
+      payload: { player, cut }
+    }),
+    getHand: (player, hand) => dispatch({
+      type: 'GET_HAND',
+      payload: { player, hand }
+    }),
+    getCut: (cut) => dispatch({ type: 'GET_CUT', payload: cut })
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(game)
+export default connect(mapStateToProps, mapDispatchToProps)(Game)
 
 function showDeck (e, deck) {
   e.target.innerHTML = JSON.stringify(deck)

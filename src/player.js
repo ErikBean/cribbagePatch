@@ -17,8 +17,8 @@ const Player = (props) => (
       </div>
       <button hidden={!props.hasFirstCrib || props.myHand} onClick={props.deal}>Deal!</button>
     </h5>
-    <div>
-      hand: <Hand hand={props.myHand || []} discard={props.discard.bind(null, props.myHand)} />
+    <div hidden={!props.myHand}>
+      hand: <Hand hand={props.myHand || []} discard={() => props.discard(props.myHand)} />
     </div>
   </div>
 )

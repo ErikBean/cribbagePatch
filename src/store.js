@@ -3,10 +3,13 @@ import _, { isEqual, clone, omit, get, set } from 'lodash'
 import deck from './reducers/deck'
 import players from './reducers/players'
 import meta from './reducers/meta'
+import cut from './reducers/cut'
+
 const reducer = combineReducers({
   meta,
   deck,
-  players
+  players,
+  cut
 })
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 const store = createStore(reducer, enhancer)
