@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { valueOf, getNumberOrFace, getSuit } from './deck'
 
 const Card = (props) => {
+  if(!props.card) return (<span>???</span>)
   const value = getNumberOrFace(props.card)
   const suit = getSuit(props.card)
   const style = {

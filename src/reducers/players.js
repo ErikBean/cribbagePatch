@@ -6,14 +6,6 @@ export default (state = initialState, action) => {
   if(!action.payload) return state
   const { player, cut, hand, discards, update } = action.payload
   switch (action.type) {
-    case 'BEGIN_GAME_CUT':
-      return {
-        ...state,
-        [player]: {
-          ...state[player],
-          beginGameCut: cut
-        }
-      }
     case 'GET_HAND':
       return {
         ...state,
