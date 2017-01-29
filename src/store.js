@@ -19,10 +19,15 @@ let cache = {}
 
 store.subscribe(() => {
   let newState = store.getState()
-  const { players: { player1, player2 } } = store.getState()
+  const { players: { player1, player2 }, meta } = store.getState()
   pushDeck(newState.deck)
   pushPlayer(player1, 'player1')
   pushPlayer(player2, 'player2')
+  if(meta.firstCut){
+    pushCutForInitialCrib(meta.firstCut, 'firstCut')
+  } else if (meta.secondCut){
+    pushCutForInitialCrib(meta.secondCut, 'secondCut')
+  }
 })
 
 function pushDeck (data) {
@@ -40,6 +45,12 @@ function pushPlayer (data, playerNum) {
   game.path(playerNum).put(currentPlayer)
 }
 
+function pushCutForInitialCrib (data, path) {
+  if(cache[path] === data) return
+  cache[path] = data
+  game.path(path).put(data)
+}
+
 const gun = Gun([
   'https://gun-starter-app-lzlbcefjql.now.sh',
 ]);
@@ -51,6 +62,24 @@ game.path('deck').on((remoteDeck) => updateDeck(remoteDeck))
 
 game.path('player1').on((data) => updatePlayer('player1', data))
 game.path('player2').on((data) => updatePlayer('player2', data))
+
+game.path('firstCut').on((data) => {
+  if(cache.firstCut === data) return
+  cache.firstCut = data
+  store.dispatch({
+    type: `BEGIN_GAME_CUT`,
+    payload: { isFirst: true, cut: data }
+  })
+})
+
+game.path('secondCut').on((data) => {
+  if(cache.secondCut === data) return
+  cache.secondCut = data
+  store.dispatch({
+    type: `BEGIN_GAME_CUT`,
+    payload: { isFirst: false, cut: data }
+  })
+})
 
 function updateDeck (remoteDeck) {
   if(!remoteDeck || remoteDeck === cache.deck) return
@@ -72,9 +101,6 @@ function updatePlayer (playerNum, remotePlayer) {
       update: JSON.parse(remotePlayer)
     }
   })
-  if(JSON.parse(remotePlayer).beginGameCut){
-    playerNum === 'player1' ? assignPlayer('player2') : assignPlayer('player1')
-  }
 }
 
 function assignPlayer (player) {
@@ -96,6 +122,8 @@ window.restart = () => game.put({
   player2: null,
   deck: null,
   meta: null,
+  firstCut: null,
+  secondCut: null
 })
 
 window.getHand = (hand, player) => {

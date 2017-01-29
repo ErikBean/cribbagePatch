@@ -11,7 +11,7 @@ class Game extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      phase: 'cutForFirstCrib'
+      hasAlreadyCut: false
     }
   }
   componentWillReceiveProps (newProps) {
@@ -19,22 +19,13 @@ class Game extends Component {
       p1Val = valueOf(newProps.player1.beginGameCut)
       p2Val = valueOf(newProps.player2.beginGameCut)
       console.log('>>> Here: ', p1Val, p2Val)
-      if (p1Val > p2Val) {
-        assignCrib('player1')
-      } else if (p1Val < p2Val) {
-        assignCrib('player2')
+      if (p1Val < p2Val) {
+        this.props.assignPlayer('player1')
+      } else if (p1Val > p2Val) {
+        this.props.assignPlayer('player2') 
       } else {
         alert('tied!')
       }
-    }
-    if (newProps.crib.length === 4) {
-      // TODO: need to prompt player w/o crib to cut deck
-      // TODO: need to prompt player w/ crib to click card
-      this.setState({
-        phase: 'cut'
-      })
-      // const cut = this.props.deck[13]
-      // this.props.getCut(cut)
     }
   }
   render () {
@@ -53,33 +44,34 @@ class Game extends Component {
     const doFirstCut = () => {
       const deck = shuffle(createDeck())
       this.props.updateDeck(deck)
-      this.props.assignPlayer('player1')
       this.props.cutForFirstCrib(true, deck[0])
+      this.setState({
+        hasAlreadyCut: true
+      })
     }
     const doSecondCut = () => {
-      this.props.assignPlayer('player2') // redundant, probably
       this.props.cutForFirstCrib(false, this.props.deck[1])
       this.setState({
-        phase: 'deal'
+        hasAlreadyCut: true
       })
     }
 
     return (
       <div>
-        <div hidden={this.state.phase !== 'cutForFirstCrib'}>
-          <button disabled={this.props.firstCut} onClick={doFirstCut}>
+        <div hidden={this.props.player1.hand || this.props.player2.hand}>
+          <button disabled={this.props.firstCut || this.state.hasAlreadyCut} onClick={doFirstCut}>
             First Cut
           </button>
           <Card card={this.props.firstCut} />
-          <button disabled={!this.props.firstCut} onClick={doSecondCut}>
+          <button disabled={!this.props.firstCut || this.props.secondCut || this.state.hasAlreadyCut} onClick={doSecondCut}>
             Second Cut
           </button>
           <Card card={this.props.secondCut} />
         </div>
-        <div hidden={this.state.phase === 'cutForFirstCrib'}>
-          <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={deal} phase={this.state.phase} />
+        <div>
+          <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={deal} />
           <br />
-          <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={deal} phase={this.state.phase} />
+          <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={deal} />
           <Crib cards={this.props.crib} />
           <Deck deck={this.props.deck} />
           <br />
@@ -113,7 +105,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
-    assignCrib: (player) => dispatch({type: `ASSIGN_CRIB`, payload: player}),
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
     cutForFirstCrib: (isFirst, cut) => dispatch({
       type: `BEGIN_GAME_CUT`,
