@@ -8,8 +8,6 @@ const Player = (props) => (
   <div>
     <span><b>Player {props.num}</b></span>
     <span hidden={!props.isCurrentPlayer}> ( This is you ) </span>
-
-    <div hidden={props.myHand}>cut for first crib: {props.myBGC}</div>
     <h5 hidden={!props.isCurrentPlayer || props.waitingForCut}>
       <div hidden={props.myHand}>
         {props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'}
@@ -24,16 +22,11 @@ const Player = (props) => (
 )
 
 const mapStateToProps = (state, ownProps) => {
-  const myPlayerNum = `player${ownProps.num}`
-  const theirPlayerNum = `player${ownProps.num === '1' ? 2 : 1}`
-  const my = state.players[myPlayerNum]
-  const their = state.players[theirPlayerNum]
+  const myHand = state.players[`player${ownProps.num}`].hand
   return {
-    // myHand: my.hand,
-    // myBGC: my.beginGameCut,
-    // theirCut: their.beginGameCut,
-    // hasFirstCrib: valueOf(my.beginGameCut) < valueOf(their.beginGameCut),
-    // waitingForCut: !my.beginGameCut || !their.beginGameCut
+    myHand,
+    hasFirstCrib: ( ownProps.num === '1' && ownProps.isCurrentPlayer),
+    waitingForCut: !state.meta.firstCut || !state.meta.secondCut
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

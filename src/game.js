@@ -22,7 +22,6 @@ class Game extends Component {
   }
   componentWillReceiveProps(newProps){
     const isNotAssignedPlayer = ( !this.props.isPlayer1 && !this.props.isPlayer2 )
-    console.log('>>> Here: ', newProps, isNotAssignedPlayer, )
     if(this.state.hasFirstCut && newProps.secondCut && isNotAssignedPlayer){
       // Assign players here:
       this.assignPlayerBasedOnCuts(this.state.myCut, newProps.secondCut)
