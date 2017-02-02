@@ -1,5 +1,6 @@
 import { createStore, combineReducers } from 'redux'
 import _, { isEqual, clone, omit, get, set } from 'lodash'
+import { valueOf } from './deck'
 import deck from './reducers/deck'
 import players from './reducers/players'
 import meta from './reducers/meta'
@@ -18,38 +19,41 @@ export default store
 let cache = {}
 
 store.subscribe(() => {
-  let newState = store.getState()
-  const { players: { player1, player2 }, meta } = store.getState()
-  pushDeck(newState.deck)
-  pushPlayer(player1, 'player1')
-  pushPlayer(player2, 'player2')
+  const { players: { player1, player2 }, meta, deck } = store.getState()
+  push(JSON.stringify(player1), 'player1')
+  push(JSON.stringify(player2), 'player2')
   if(meta.firstCut){
-    pushCutForInitialCrib(meta.firstCut, 'firstCut')
-  } else if (meta.secondCut){
-    pushCutForInitialCrib(meta.secondCut, 'secondCut')
+    push(meta.firstCut, 'firstCut')
+  } 
+  if (meta.secondCut){
+    push(meta.secondCut, 'secondCut')
+  }
+  if(deck){
+    push(JSON.stringify(deck), 'deck')
   }
 })
 
-function pushDeck (data) {
-  const deck = JSON.stringify(data)
-  if(deck === cache.deck) return
-  cache.deck = deck
-  game.path('deck').put(deck)
-}
-
-function pushPlayer (data, playerNum) {
-  const currentPlayer = JSON.stringify(data)
-  if(currentPlayer === '{}' || currentPlayer === cache[playerNum]) return
-  cache[playerNum] = currentPlayer
-  console.log('>>> push player: ', currentPlayer, playerNum)
-  game.path(playerNum).put(currentPlayer)
-}
-
-function pushCutForInitialCrib (data, path) {
+function push (data, path) {
   if(cache[path] === data) return
   cache[path] = data
   game.path(path).put(data)
 }
+
+
+// function pushDeck (data) {
+//   const deck = JSON.stringify(data)
+//   if(deck === cache.deck) return
+//   cache.deck = deck
+//   game.path('deck').put(deck)
+// }
+// 
+// function pushPlayer (data, playerNum) {
+//   const currentPlayer = JSON.stringify(data)
+//   if(currentPlayer === '{}' || currentPlayer === cache[playerNum]) return
+//   cache[playerNum] = currentPlayer
+//   console.log('>>> push player: ', currentPlayer, playerNum)
+//   game.path(playerNum).put(currentPlayer)
+// }
 
 const gun = Gun([
   'https://gun-starter-app-lzlbcefjql.now.sh',

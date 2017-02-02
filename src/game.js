@@ -11,67 +11,84 @@ class Game extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      hasAlreadyCut: false
+      hasAlreadyCut: false,
+      hasFirstCut: null,
+      myCut: null
+    }
+    this.doSecondCut = this.doSecondCut.bind(this)
+    this.doFirstCut = this.doFirstCut.bind(this)
+    this.deal = this.deal.bind(this)
+    this.assignPlayerBasedOnCuts = this.assignPlayerBasedOnCuts.bind(this)
+  }
+  componentWillReceiveProps(newProps){
+    const isNotAssignedPlayer = ( !this.props.isPlayer1 && !this.props.isPlayer2 )
+    console.log('>>> Here: ', newProps, isNotAssignedPlayer, )
+    if(this.state.hasFirstCut && newProps.secondCut && isNotAssignedPlayer){
+      // Assign players here:
+      this.assignPlayerBasedOnCuts(this.state.myCut, newProps.secondCut)
     }
   }
-  componentWillReceiveProps (newProps) {
-    if (newProps.player1.beginGameCut && newProps.player2.beginGameCut) {
-      p1Val = valueOf(newProps.player1.beginGameCut)
-      p2Val = valueOf(newProps.player2.beginGameCut)
-      console.log('>>> Here: ', p1Val, p2Val)
-      if (p1Val < p2Val) {
-        this.props.assignPlayer('player1')
-      } else if (p1Val > p2Val) {
-        this.props.assignPlayer('player2') 
-      } else {
-        alert('tied!')
-      }
+  assignPlayerBasedOnCuts(myCut, theirCut){
+    if(valueOf(myCut) < valueOf(theirCut)){
+      this.props.assignPlayer('player1')
+    } else if(valueOf(myCut) > valueOf(theirCut)){
+      this.props.assignPlayer('player2')
+    } else{
+      alert('tie!')
     }
+  }
+  doFirstCut(){
+    const deck = shuffle(createDeck())
+    this.props.updateDeck(deck)
+    const myCut = deck[0]
+    this.props.cutForFirstCrib(true, myCut)
+    this.setState({
+      hasAlreadyCut: true,
+      hasFirstCut: true,
+      myCut,
+    })
+    // then wait for remote player to make second cut
+  }
+  doSecondCut() {
+    const myCut = this.props.deck[1]
+    this.props.cutForFirstCrib(false, myCut)
+    this.setState({
+      hasAlreadyCut: true,
+      hasFirstCut: false,
+      myCut
+    })
+    // Assign players here:
+    this.assignPlayerBasedOnCuts(myCut, this.props.firstCut)
+  }
+  deal(){
+    const deck = shuffle(createDeck())
+    const hand1 = []
+    const hand2 = []
+    for (let i = 0; i < 6; i++) {
+      hand1[i] = deck[i]
+      hand2[i] = deck[ i + 6 ]
+    }
+    this.props.updateDeck(deck)
+    this.props.getHand('player1', hand1)
+    this.props.getHand('player2', hand2)
   }
   render () {
-    const deal = () => {
-      const deck = shuffle(createDeck())
-      const hand1 = []
-      const hand2 = []
-      for (let i = 0; i < 6; i++) {
-        hand1[i] = deck[i]
-        hand2[i] = deck[ i + 6 ]
-      }
-      this.props.updateDeck(deck)
-      this.props.getHand('player1', hand1)
-      this.props.getHand('player2', hand2)
-    }
-    const doFirstCut = () => {
-      const deck = shuffle(createDeck())
-      this.props.updateDeck(deck)
-      this.props.cutForFirstCrib(true, deck[0])
-      this.setState({
-        hasAlreadyCut: true
-      })
-    }
-    const doSecondCut = () => {
-      this.props.cutForFirstCrib(false, this.props.deck[1])
-      this.setState({
-        hasAlreadyCut: true
-      })
-    }
-
     return (
       <div>
         <div hidden={this.props.player1.hand || this.props.player2.hand}>
-          <button disabled={this.props.firstCut || this.state.hasAlreadyCut} onClick={doFirstCut}>
+          <button disabled={this.props.firstCut || this.state.hasAlreadyCut} onClick={this.doFirstCut}>
             First Cut
           </button>
           <Card card={this.props.firstCut} />
-          <button disabled={!this.props.firstCut || this.props.secondCut || this.state.hasAlreadyCut} onClick={doSecondCut}>
+          <button disabled={!this.props.firstCut || this.props.secondCut || this.state.hasAlreadyCut} onClick={this.doSecondCut}>
             Second Cut
           </button>
           <Card card={this.props.secondCut} />
         </div>
         <div>
-          <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={deal} />
+          <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={this.deal} />
           <br />
-          <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={deal} />
+          <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={this.deal} />
           <Crib cards={this.props.crib} />
           <Deck deck={this.props.deck} />
           <br />

@@ -29,11 +29,11 @@ const mapStateToProps = (state, ownProps) => {
   const my = state.players[myPlayerNum]
   const their = state.players[theirPlayerNum]
   return {
-    myHand: my.hand,
-    myBGC: my.beginGameCut,
-    theirCut: their.beginGameCut,
-    hasFirstCrib: valueOf(my.beginGameCut) < valueOf(their.beginGameCut),
-    waitingForCut: !my.beginGameCut || !their.beginGameCut
+    // myHand: my.hand,
+    // myBGC: my.beginGameCut,
+    // theirCut: their.beginGameCut,
+    // hasFirstCrib: valueOf(my.beginGameCut) < valueOf(their.beginGameCut),
+    // waitingForCut: !my.beginGameCut || !their.beginGameCut
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

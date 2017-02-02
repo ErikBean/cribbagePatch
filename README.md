@@ -4,12 +4,16 @@ real time cribbage game
 Redux should look something like... 
 ```javascript
 {
+  meta: {
+    firstCut: 'H1'
+    secondCut: 'H2'
+  }
   cards: {
     H1: new Symbol('H1')
     H2: new Symbol('H2')
   },
   game:{
-    deck: [deck.H13, deck.D2, '...' ], // TODO
+    deck: ['H5', 'C2', '...'], // TODO
     playedCards: ['H1', 'C13', '...'],
   },
   player1:{
