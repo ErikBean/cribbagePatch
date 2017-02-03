@@ -4,7 +4,7 @@ import { createDeck, shuffle, valueOf } from './deck'
 import { size, clone } from 'lodash'
 import Player from './player'
 import Crib from './crib'
-import Deck from './deckComponent'
+import DeckSlider from './deckSlider'
 import Card from './card'
 
 class Game extends Component {
@@ -89,7 +89,10 @@ class Game extends Component {
           <br />
           <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={this.deal} />
           <Crib cards={this.props.crib} />
-          <Deck deck={this.props.deck} />
+          <DeckSlider 
+            deck={this.props.deck} 
+            isHidden={this.props.crib.length !== 4}
+            isMyCrib={this.props.isMyCrib} />
           <br />
           <div id='debugDeck' onClick={(e) => showDeck(e, this.props.deck)}>
             Click to log the deck
@@ -100,8 +103,8 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { deck, cut } = state
-  const { isPlayer1, isPlayer2, firstCut, secondCut } = state.meta
+  const { deck } = state
+  const { isPlayer1, isPlayer2, firstCut, secondCut, isMyCrib } = state.meta
   const { player1, player2 } = state.players
   const { discards: disc1 } = player1
   const { discards: disc2 } = player2
@@ -114,7 +117,7 @@ const mapStateToProps = (state) => {
     firstCut,
     secondCut,
     crib,
-    cut,
+    isMyCrib,
     deck
   }
 }
@@ -129,8 +132,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     getHand: (player, hand) => dispatch({
       type: 'GET_HAND',
       payload: { player, hand }
-    }),
-    getCut: (cut) => dispatch({ type: 'GET_CUT', payload: cut })
+    })
   }
 }
 

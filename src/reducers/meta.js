@@ -17,12 +17,14 @@ export default (state = initialState, action) => {
         case 'player1':
           return {
             ...state,
-            isPlayer1: true
+            isPlayer1: true,
+            isMyCrib: true
           }
         case 'player2': 
           return {
             ...state,
-            isPlayer2: true
+            isPlayer2: true,
+            isMyCrib: false
           }
         default: 
           return state

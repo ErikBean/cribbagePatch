@@ -5,9 +5,8 @@ import { createDeck, shuffle, valueOf } from './deck'
 import Hand from './hand'
 
 const Player = (props) => (
-  <div>
+  <div hidden={!props.isCurrentPlayer}>
     <span><b>Player {props.num}</b></span>
-    <span hidden={!props.isCurrentPlayer}> ( This is you ) </span>
     <h5 hidden={!props.isCurrentPlayer || props.waitingForCut}>
       <div hidden={props.myHand}>
         {props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'}
@@ -16,7 +15,7 @@ const Player = (props) => (
       <button hidden={!props.hasFirstCrib || props.myHand} onClick={props.deal}>Deal!</button>
     </h5>
     <div hidden={!props.myHand}>
-      hand: <Hand hand={props.myHand || []} discard={() => props.discard(props.myHand)} />
+      hand: <Hand hand={props.myHand || []} discard={(discards) => props.discard(props.myHand, discards)} />
     </div>
   </div>
 )
@@ -40,7 +39,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       }
     })
     dispatch({
-      type: 'GET_CRIB_CARDS',
+      type: 'DISCARD',
       payload: { player, discards }
     })
   }

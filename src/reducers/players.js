@@ -14,7 +14,7 @@ export default (state = initialState, action) => {
           hand
         }
       }
-    case 'GET_CRIB_CARDS':
+    case 'DISCARD':
       return {
         ...state,
         [player]: {
