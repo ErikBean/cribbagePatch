@@ -8,6 +8,7 @@ class DeckSlider extends Component{
   constructor(props){
     super(props)    
     this.state = {
+      hasBeenCut: false,
       cutIndex: 0
     }
     this.changeCutIndex = this.changeCutIndex.bind(this)
@@ -15,7 +16,9 @@ class DeckSlider extends Component{
     this.doCut = this.doCut.bind(this)
   }
   selectCutIndex(){
-    
+    this.setState({
+      hasBeenCut: true
+    })
     this.props.selectCutIndex(this.state.cutIndex)
   }
   changeCutIndex(e){
@@ -33,18 +36,21 @@ class DeckSlider extends Component{
         <div hidden={this.props.cut} >
           <span hidden={this.props.isMyCrib}>After putting cards in crib, cut the deck:</span>
           <span hidden={!this.props.isMyCrib || this.props.cutIndex}>Waiting for other player to cut the deck</span>
-          <input 
+          <input
             type='range'
             min='0' max='40'
             hidden={this.props.isMyCrib}
             disabled={this.props.cutIndex}
             onChange={this.changeCutIndex}/>
-          <input 
-            type="checkbox"
+          <button 
             hidden={this.props.isMyCrib}
-            checked={this.props.cutIndex}
-            onChange={() => this.props.selectCutIndex(this.state.cutIndex)} />
-          <button disabled={!this.props.isMyCrib || !this.props.cutIndex} onClick={this.doCut}>
+            disabled={this.props.hasBeenCut}
+            onClick={this.selectCutIndex}>
+            Cut the deck!
+          </button>
+          <button 
+            disabled={!this.props.isMyCrib || !this.props.cutIndex}
+            onClick={this.doCut}>
             Cut 5th Card
           </button>
         </div>

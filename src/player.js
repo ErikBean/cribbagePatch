@@ -20,7 +20,7 @@ const Player = (props) => (
       <Hand
         hand={props.myHand} 
         hasCut={props.hasCut}
-        discard={(discards) => props.discard(props.myHand, discards)} />
+        discard={props.discard} />
     </div>
   </div>
 )
@@ -38,20 +38,16 @@ const mapStateToProps = (state, ownProps) => {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   const player = `player${ownProps.num}`
-  const discard = (hand, discards) => {
-    dispatch({
-      type: 'GET_HAND',
-      payload: {
-        player,
-        hand: difference(hand, discards)
-      }
-    })
-    dispatch({
-      type: 'DISCARD',
-      payload: { player, discards }
-    })
-  }
-  return { discard }
+  const playPegCard = (pegCard) => dispatch({
+    type: 'PLAY_PEG_CARD',
+    payload: { player, pegCard }
+  })
+  const discard = (discards) => dispatch({
+    type: 'DISCARD',
+    payload: { player, discards }
+  })
+  
+  return { discard, playPegCard }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Player)
