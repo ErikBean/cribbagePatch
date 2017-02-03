@@ -36,18 +36,21 @@ class DeckSlider extends Component{
           <input 
             type='range'
             min='0' max='40'
-            disabled={this.props.isMyCrib || this.props.cutIndex} 
+            hidden={this.props.isMyCrib}
+            disabled={this.props.cutIndex}
             onChange={this.changeCutIndex}/>
           <input 
             type="checkbox"
-            disabled={this.props.isMyCrib}
+            hidden={this.props.isMyCrib}
             checked={this.props.cutIndex}
             onChange={() => this.props.selectCutIndex(this.state.cutIndex)} />
           <button disabled={!this.props.isMyCrib || !this.props.cutIndex} onClick={this.doCut}>
             Cut 5th Card
           </button>
         </div>
-        {!this.props.cut ? <div/> : <Card card={this.props.cut} hidden={!this.props.cut}/>}
+        <div hidden={!this.props.cut}>
+          <Card card={this.props.cut} isOnDeck />
+        </div>
       </div>
     )
   }

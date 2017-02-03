@@ -9,7 +9,8 @@ const Card = (props) => {
     display: 'inline-block',
     border: props.isSelected ? '3px solid green' : 'none',
     height: '200px',
-    width: '150px',
+    width: '140px',
+    boxShadow: props.isOnDeck ? '10px 10px 10px black' : 'none',
     background: `url(../styles/svg-cards/${value}_of_${suit}.svg) no-repeat`,
     backgroundSize: 'contain'
   }
