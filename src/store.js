@@ -6,21 +6,16 @@ import players from './reducers/players'
 import meta from './reducers/meta'
 import cut from './reducers/cut'
 import cutIndex from './reducers/cutIndex'
+import reducers from './reducers'
+const paths = Object.keys(reducers) // loop through this for push/updateStore
 
-const reducer = combineReducers({
-  cut,
-  cutIndex,
-  deck,
-  meta,
-  players
-})
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-const store = createStore(reducer, enhancer)
+const store = createStore(combineReducers(reducers), enhancer)
 export default store
 
-let cache = {}
+const cache = {}
 
-store.subscribe(() => {
+store.subscribe(() => { // TODO: use paths instead of getState()
   const { players, meta, deck, cut, cutIndex } = store.getState()
   const { player1, player2, crib } = players
   const { firstCut, secondCut } = meta

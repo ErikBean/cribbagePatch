@@ -37,16 +37,6 @@ export default (state = initialState, action) => {
         ...state,
         playedCards: state.playedCards.concat(pegCard)
       }
-    case 'CLEAR_PLAYED_CARDS':
-     return {
-       ...state,
-       playedCards: []
-     }
-    case 'UPDATE_PLAYER':
-      return {
-        ...state,
-        [player]: update
-      }
     default:
       return state
   }
