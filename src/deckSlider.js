@@ -31,8 +31,8 @@ class DeckSlider extends Component{
     return (
       <div hidden={this.props.isHidden}>
         <div hidden={this.props.cut} >
-          <span hidden={this.props.myCrib}>After putting cards in crib, cut the deck:</span>
-          <span hidden={!this.props.myCrib || this.props.cutIndex}>Waiting for other player to cut the deck</span>
+          <span hidden={this.props.isMyCrib}>After putting cards in crib, cut the deck:</span>
+          <span hidden={!this.props.isMyCrib || this.props.cutIndex}>Waiting for other player to cut the deck</span>
           <input 
             type='range'
             min='0' max='40'

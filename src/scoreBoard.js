@@ -20,27 +20,52 @@ function sumValues(obj){
   }, 0)
 }
 
-const ScoreBoard = (props) => {
-  const fifteens = getFifteens(props.cards)
-  const pairs = getPairs(props.cards)
-  const runs = getRuns(props.cards).length
-  const numFifteens = sumLengths(fifteens)
-  const numPairs = sumValues(pairs)
-  return (
-    <div>
-      <ul>
-        <li>
-          Fifteens: {numFifteens}
-        </li>
-        <li>
-          pairs: {numPairs}
-        </li>
-        <li>
-          runs: {runs}
-        </li>
-      </ul>
-    </div>
-  )
+export default class ScoreBoard extends Component {
+  constructor(props){
+    super(props)
+    console.log('>>> constuctor! ', props.cards)
+    const fifteens = getFifteens(props.cards)
+    const pairs = getPairs(props.cards)
+    
+    this.state = {
+      pairs,
+      fifteens,
+      numPairs: sumValues(pairs),
+      numFifteens: sumLengths(fifteens),
+      runs: getRuns(props.cards).length
+    }
+  }
+  componentWillReceiveProps(newProps){
+    console.log('>>> ScoreBoard GETTING PROPS: ', newProps)
+    const { cards } = newProps
+    const fifteens = getFifteens(cards)
+    const pairs = getPairs(cards)
+    
+    this.setState({
+      pairs,
+      fifteens,
+      numPairs: sumValues(pairs),
+      numFifteens: sumLengths(fifteens),
+      runs: getRuns(cards).length
+    })
+  }
+  render(){
+    return (
+      <div>
+        <ul>
+          <li>
+            Fifteens: {this.state.numFifteens}
+          </li>
+          <li>
+            pairs: {this.state.numPairs}
+          </li>
+          <li>
+            runs: {this.state.runs}
+          </li>
+        </ul>
+      </div>
+    )
+  }
 }
 
-export default ScoreBoard
+// export default ScoreBoard

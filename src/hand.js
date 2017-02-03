@@ -33,15 +33,11 @@ export default class Hand extends Component {
     this.props.discard(selected)
   }
   render () {
-    const fifteens = getFifteens(this.props.hand)
-    const pairs = getPairs(this.props.hand)
-    const runs = getRuns(this.props.hand).length
-    const numFifteens = sumLengths(fifteens)
-    const numPairs = sumValues(pairs)
     return (
       <div>
         <ScoreBoard cards={this.props.hand} />
-        {this.props.hand.map((card) => (
+        {(this.props.hasCut ? this.props.hand.slice(0,4) : this.props.hand)
+          .map((card) => (
           <Card
             toggleSelect={this.toggleSelect.bind(null, card)}
             isSelected={includes(this.state.selected, card)}
@@ -55,22 +51,4 @@ export default class Hand extends Component {
       </div>
     )
   }
-}
-
-// Sum the length of all arrays in obj
-function sumLengths(obj){
-  return Object.keys(obj).map((k) => {
-    return obj[k].length
-  }).reduce((acc, curr) => {
-    return acc + curr
-  }, 0)
-}
-
-// Sum all values in obj
-function sumValues(obj){
-  return Object.keys(obj).map((k) => {
-    return obj[k]
-  }).reduce((acc, curr) => {
-    return acc + curr
-  }, 0)
 }
