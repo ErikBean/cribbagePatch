@@ -27,7 +27,7 @@ Redux should look something like...
 ```
 Refactor TODO:
 1. Points does not account for cutting a jack, or the right jack
-2. 
+2. Not correctly showing the crib, has cut card too
 3. 
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 

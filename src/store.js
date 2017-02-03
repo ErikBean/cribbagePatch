@@ -24,24 +24,26 @@ store.subscribe(() => {
   const { players, meta, deck, cut, cutIndex } = store.getState()
   const { player1, player2, crib } = players
   const { firstCut, secondCut } = meta
-
-  push(player1.hand, 'player1Hand')
-  push(player2.hand, 'player2Hand')
-  push(deck, 'deck')
-  push(firstCut, 'firstCut')
-  push(secondCut, 'secondCut')
-  push(cut, 'cut')
-  push(cutIndex, 'cutIndex')
-  push(crib, 'crib')
+  const player1Hand = player1.hand
+  const player2Hand = player2.hand
+  push({ player1Hand })
+  push({ player2Hand })
+  push({ deck })
+  push({ firstCut })
+  push({ secondCut })
+  push({ cut })
+  push({ cutIndex })
+  push({ crib })
 })
 
-function push (data, path) {
+function push (container, path = Object.keys(container)[0], data = container[path]) {
   if (isNull(data) || isUndefined(data) || isEmpty(data)) return
   if (isEqual(cache[path], data)) return
-  if(isObject(data) || isArray(data)){
-    cache[path] = JSON.stringify(data)
-    game.path(path).put(JSON.stringify(data))
-  } else{
+  if (isObject(data) || isArray(data)) {
+    const jsonData = JSON.stringify(data)
+    cache[path] = jsonData
+    game.path(path).put(jsonData)
+  } else {
     cache[path] = data
     game.path(path).put(data)
   }
@@ -54,71 +56,48 @@ const gun = Gun([
 // Reads key 'game'.
 let game = gun.get('game')
 
-game.path('deck').on((deck) => {
-  console.info('>>> update deck: ', deck, cache['deck'], isEqual(deck, cache['deck']))
-  const action = { type: 'UPDATE_DECK', payload: JSON.parse(deck)}
-  updateStore({ deck })(action)
-})
+// TODO: Generalize this with an array of path strings
+// Or just gun.map() over all paths in game :) 
+game.path('deck').on((deck) => updateStore({ deck }))
 
-game.path('player1Hand').on((hand) => updateHand('player1', hand))
-game.path('player2Hand').on((hand) => updateHand('player2', hand))
+game.path('player1Hand').on((player1Hand) => updateStore({ player1Hand }))
+game.path('player2Hand').on((player2Hand) => updateStore({ player2Hand }))
 
-function updateHand (playerNum, hand) {
-  const action = {
-    type: 'GET_HAND',
-    payload: {
-      player: playerNum,
-      hand: JSON.parse(hand)
-    }
-  }
-  updateStore({ [playerNum]: hand })(action)
+game.path('firstCut').on((firstCut) => updateStore({ firstCut }))
+game.path('secondCut').on((secondCut) => updateStore({ secondCut }))
+
+game.path('cutIndex').on((cutIndex) => updateStore({ cutIndex }))
+game.path('cut').on((cut) => updateStore({ cut }))
+game.path('crib').on((crib) => updateStore({ crib }))
+
+
+function updateStore (container, path = Object.keys(container)[0], data = container[path]) {
+  if (isNull(data) || isUndefined(data) || isEmpty(data)) return
+  if (isEqual(cache[path], data)) return
+  cache[path] = data
+  const action = createAction(path, data)
+  store.dispatch(action)
 }
 
-game.path('firstCut').on((firstCut) => {
-  const action = {
-    type: `BEGIN_GAME_CUT`,
-    payload: { isFirst: true, cut: firstCut }
+function createAction (path, data) {
+  const actionFor = (type, payload) => ({ type, payload}) // This could also parse JSON
+  const factories = { // keys are paths in gun
+    deck: (deck) => actionFor('UPDATE_DECK', JSON.parse(deck)),
+    player1Hand: (hand) => actionFor('GET_HAND', {
+      player: 'player1',
+      hand: JSON.parse(hand)
+    }),
+    player2Hand: (hand) => actionFor('GET_HAND', {
+      player: 'player2',
+      hand:  JSON.parse(hand)
+    }),
+    firstCut: (cut) => actionFor('BEGIN_GAME_CUT', { isFirst: true, cut }),
+    secondCut: (cut) => actionFor('BEGIN_GAME_CUT', { isFirst: false, cut }),
+    cut: (cut) => actionFor('GET_CUT', cut),
+    cutIndex: (cutIndex) => actionFor('GET_CUT_INDEX', cutIndex),
+    crib: (crib) => actionFor('GET_OPPONENT_DISCARDS', { discards: JSON.parse(crib) })
   }
-  updateStore({ firstCut })(action)
-})
-
-game.path('secondCut').on((secondCut) => {
-  const action = {
-    type: `BEGIN_GAME_CUT`,
-    payload: { isFirst: false, cut: secondCut }
-  }
-  updateStore({ secondCut })(action)
-})
-game.path('cutIndex').on((cutIndex) => {
-  const action = {
-    type: 'GET_CUT_INDEX',
-    payload: cutIndex
-  }
-  updateStore({ cutIndex })(action)
-})
-game.path('cut').on((cut) => {
-  const action = {
-    type: 'GET_CUT',
-    payload: cut
-  }
-  updateStore({ cut })(action)
-})
-
-game.path('crib').on((crib) => {
-  const action = {
-    type: 'GET_OPPONENT_DISCARDS',
-    payload: { discards: JSON.parse(crib) }
-  }
-  updateStore({ crib })(action)
-})
-
-function updateStore (container) {
-  const path = Object.keys(container)[0]
-  let data = container[path]
-  if (isNull(data) || isUndefined(data) || isEmpty(data)) return () => {}
-  if (isEqual(cache[path], data)) return () => {}
-  cache[path] = data
-  return store.dispatch
+  return factories[path](data)
 }
 
 // Debug helpers
