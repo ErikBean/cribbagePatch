@@ -26,7 +26,7 @@ const Player = (props) => (
 )
 
 const mapStateToProps = (state, ownProps) => {
-  const myHand = state.players[`player${ownProps.num}`].hand || []
+  const myHand = state[`player${ownProps.num}Hand`] || []
   const cut = state.cut || []
   return {
     myHand,
@@ -38,14 +38,17 @@ const mapStateToProps = (state, ownProps) => {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   const player = `player${ownProps.num}`
-  const playPegCard = (pegCard) => dispatch({
-    type: 'PLAY_PEG_CARD',
-    payload: { player, pegCard }
-  })
-  const discard = (discards) => dispatch({
-    type: 'DISCARD',
-    payload: { player, discards }
-  })
+  const playPegCard = (pegCard) => {}
+  const discard = (discards) =>{
+    dispatch({
+      type: `${player.toUpperCase()}_DISCARD`,
+      payload: discards
+    })
+    dispatch({
+      type: 'ADD_TO_CRIB',
+      payload: discards
+    })
+  }
   
   return { discard, playPegCard }
 }

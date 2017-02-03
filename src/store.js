@@ -1,26 +1,20 @@
 import { createStore, combineReducers } from 'redux'
 import _, { isEmpty, isNull, isUndefined, isEqual, isObject, isArray} from 'lodash'
-import { valueOf } from './deck'
-import deck from './reducers/deck'
-import players from './reducers/players'
-import meta from './reducers/meta'
-import cut from './reducers/cut'
-import cutIndex from './reducers/cutIndex'
 import reducers from './reducers'
+
 const paths = Object.keys(reducers) // loop through this for push/updateStore
 
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 const store = createStore(combineReducers(reducers), enhancer)
+
 export default store
 
 const cache = {}
 
-store.subscribe(() => { // TODO: use paths instead of getState()
-  const { players, meta, deck, cut, cutIndex } = store.getState()
-  const { player1, player2, crib } = players
+store.subscribe(() => { // TODO: can use paths instead of getState()
+  const { players, meta, deck, cut, cutIndex, player1Hand, player2Hand, crib } = store.getState()
   const { firstCut, secondCut } = meta
-  const player1Hand = player1.hand
-  const player2Hand = player2.hand
+  
   push({ player1Hand })
   push({ player2Hand })
   push({ deck })
@@ -52,7 +46,7 @@ const gun = Gun([
 let game = gun.get('game')
 
 // TODO: Generalize this with an array of path strings
-// Or just gun.map() over all paths in game :) 
+// Or just gun.map() over all paths in game :)
 game.path('deck').on((deck) => updateStore({ deck }))
 
 game.path('player1Hand').on((player1Hand) => updateStore({ player1Hand }))
@@ -65,7 +59,6 @@ game.path('cutIndex').on((cutIndex) => updateStore({ cutIndex }))
 game.path('cut').on((cut) => updateStore({ cut }))
 game.path('crib').on((crib) => updateStore({ crib }))
 
-
 function updateStore (container, path = Object.keys(container)[0], data = container[path]) {
   if (isNull(data) || isUndefined(data) || isEmpty(data)) return
   if (isEqual(cache[path], data)) return
@@ -75,22 +68,16 @@ function updateStore (container, path = Object.keys(container)[0], data = contai
 }
 
 function createAction (path, data) {
-  const actionFor = (type, payload) => ({ type, payload}) // This could also parse JSON
+  const actionFor = (type, payload) => ({ type, payload}) // This could also parse JSON, for more abstraction
   const factories = { // keys are paths in gun
     deck: (deck) => actionFor('UPDATE_DECK', JSON.parse(deck)),
-    player1Hand: (hand) => actionFor('GET_HAND', {
-      player: 'player1',
-      hand: JSON.parse(hand)
-    }),
-    player2Hand: (hand) => actionFor('GET_HAND', {
-      player: 'player2',
-      hand:  JSON.parse(hand)
-    }),
+    player1Hand: (hand) => actionFor('GET_PLAYER1_HAND', JSON.parse(hand)),
+    player2Hand: (hand) => actionFor('GET_PLAYER2_HAND', JSON.parse(hand)),
     firstCut: (cut) => actionFor('BEGIN_GAME_CUT', { isFirst: true, cut }),
     secondCut: (cut) => actionFor('BEGIN_GAME_CUT', { isFirst: false, cut }),
     cut: (cut) => actionFor('GET_CUT', cut),
     cutIndex: (cutIndex) => actionFor('GET_CUT_INDEX', cutIndex),
-    crib: (crib) => actionFor('GET_OPPONENT_DISCARDS', { discards: JSON.parse(crib) })
+    crib: (crib) => actionFor('ADD_TO_CRIB', JSON.parse(crib))
   }
   return factories[path](data)
 }
@@ -115,10 +102,7 @@ window.restart = () => game.put({
 
 window.getHand = (hand, player) => {
   store.dispatch({
-    type: 'GET_HAND',
-    payload: {
-      player: player || 'player1',
-      hand: hand || ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
-    }
+    type: `GET_${player.toUpperCase()}_HAND`,
+    payload: hand || ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
   })
 }

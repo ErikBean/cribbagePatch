@@ -74,7 +74,7 @@ class Game extends Component {
   render () {
     return (
       <div>
-        <div hidden={this.props.doneCutForFirstCrib}>
+        <div hidden={this.props.doneFirstDeal}>
           <button disabled={this.props.firstCut || this.state.hasAlreadyCut} onClick={this.doFirstCut}>
             First Cut
           </button>
@@ -88,10 +88,10 @@ class Game extends Component {
           <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={this.deal} />
           <br />
           <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={this.deal} />
-          <Crib cards={this.props.crib.concat(this.props.cut || [])} />
+          <Crib cards={(this.props.crib || []).concat(this.props.cut || [])} />
           <DeckSlider 
             deck={this.props.deck} 
-            isHidden={this.props.crib.length !== 4}
+            isHidden={!this.props.crib || this.props.crib.length !== 4}
             isMyCrib={this.props.isMyCrib} />
           <br />
           <div id='debugDeck' onClick={(e) => showDeck(e, this.props.deck)}>
@@ -103,14 +103,13 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { deck, cut } = state
+  const { deck, cut, crib, player1Hand, player2Hand } = state
   const { isPlayer1, isPlayer2, firstCut, secondCut, isMyCrib } = state.meta
-  const { player1, player2, crib } = state.players
-  const doneCutForFirstCrib = player1.hand || player2.hand
+  const doneFirstDeal = player1Hand || player2Hand
   return {
     firstCut,
     secondCut,
-    doneCutForFirstCrib,
+    doneFirstDeal,
     isPlayer1,
     isPlayer2,
     isMyCrib,
@@ -128,8 +127,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       payload: { isFirst, cut }
     }),
     getHand: (player, hand) => dispatch({
-      type: 'GET_HAND',
-      payload: { player, hand }
+      type: `GET_${player.toUpperCase()}_HAND`,
+      payload: hand
     })
   }
 }
