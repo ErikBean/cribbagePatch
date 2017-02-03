@@ -26,9 +26,9 @@ Redux should look something like...
 }
 ```
 Refactor TODO:
-1. combine PushDeck and PushPlayers
-2. Cards should be a set in gun, not a string. That way we can .map() 
-3. The deal method is pretty fucking weird 
+1. Points does not account for cutting a jack, or the right jack
+2. 
+3. 
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 
 Rules TODO:
@@ -37,7 +37,7 @@ Rules TODO:
 2. DONE! choose crib - each player chooses random index for first crib
 3. DONE! client machine with lower number randomizes deck Array, and 
 remove 6 cards from top into hand array for each player, push all this to gun
-5. Each player selects 2 cards for crib
-6. player w/o crib selects slot in array to beginGameCut the deck, move card to game.beginGameCut
-7. Compute score of hands
+5. DONE! Each player selects 2 cards for crib
+6. DONE! player w/o crib selects slot in array to beginGameCut the deck, move card to game.beginGameCut
+7. DONE! Compute score of hands
 8. Player w/o crib has to select card to lead, copy this from hand to playedCards

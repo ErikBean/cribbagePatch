@@ -1,13 +1,6 @@
 import { valueOf, getSuit } from './deck'
 import { uniq, size, toPairs, times } from 'lodash'
 
-export default function getPoints (hand) {
-  // game logic ....
-  const values = hand.map(valueOf)
-  const suits = hand.map(getSuit)
-  const fifteens = getFifteens(values)
-}
-
 function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
 }
@@ -89,12 +82,16 @@ export function getRuns (hand) {
   const pairs = toPairs(getPairs(hand))
   if (!pairs.length) return [ run ] // no double run, because no pairs
   // compute doubles:
-  let runs = []
+  let multiRuns = []
   for (let [value, numPairs] of pairs) {
-    if (run.includes(parseInt(value))) { // has double run
-      const duplicates = numPairs + 1
-      runs = runs.concat(times(duplicates, () => run))
+    if (run.includes(parseInt(value))) {
+      switch(numPairs){
+        case 1:
+          multiRuns = multiRuns.concat(times(2, () => run)) // double run
+        case 3:
+          multiRuns = multiRuns.concat(times(3, () => run)) // triple run
+      }
     }
   }
-  return runs
+  return multiRuns
 }

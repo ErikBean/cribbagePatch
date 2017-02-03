@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { without, includes } from 'lodash'
 import { getFifteens, getRuns, getPairs } from './points'
 import Card from './card'
-import ScoreBoard from './scoreBoard'
 
 export default class Hand extends Component {
   constructor (props) {
@@ -35,9 +34,7 @@ export default class Hand extends Component {
   render () {
     return (
       <div>
-        <ScoreBoard cards={this.props.hand} />
-        {(this.props.hasCut ? this.props.hand.slice(0,4) : this.props.hand)
-          .map((card) => (
+        {this.props.hand.map((card) => (
           <Card
             toggleSelect={this.toggleSelect.bind(null, card)}
             isSelected={includes(this.state.selected, card)}

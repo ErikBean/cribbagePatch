@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { difference } from 'lodash'
 import { createDeck, shuffle, valueOf } from './deck'
 import Hand from './hand'
+import ScoreBoard from './scoreBoard'
 
 const Player = (props) => (
   <div hidden={!props.isCurrentPlayer}>
@@ -15,7 +16,11 @@ const Player = (props) => (
       <button hidden={!props.hasFirstCrib || props.myHand.length} onClick={props.deal}>Deal!</button>
     </h5>
     <div hidden={!props.myHand.length}>
-      hand: <Hand hasCut={props.hasCut} hand={props.myHand} discard={(discards) => props.discard(props.myHand, discards)} />
+      <ScoreBoard cards={props.myHandWithCut} />
+      <Hand
+        hand={props.myHand} 
+        hasCut={props.hasCut}
+        discard={(discards) => props.discard(props.myHand, discards)} />
     </div>
   </div>
 )
@@ -24,7 +29,8 @@ const mapStateToProps = (state, ownProps) => {
   const myHand = state.players[`player${ownProps.num}`].hand || []
   const cut = state.cut || []
   return {
-    myHand: myHand.concat(cut),
+    myHand,
+    myHandWithCut: myHand.concat(cut),
     hasCut: cut.length > 0,
     hasFirstCrib: ( ownProps.num === '1' && ownProps.isCurrentPlayer),
     waitingForCut: !state.meta.firstCut || !state.meta.secondCut

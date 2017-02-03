@@ -23,32 +23,26 @@ function sumValues(obj){
 export default class ScoreBoard extends Component {
   constructor(props){
     super(props)
-    console.log('>>> constuctor! ', props.cards)
-    const fifteens = getFifteens(props.cards)
-    const pairs = getPairs(props.cards)
-    
-    this.state = {
-      pairs,
-      fifteens,
-      numPairs: sumValues(pairs),
-      numFifteens: sumLengths(fifteens),
-      runs: getRuns(props.cards).length
-    }
+    this.state = {}
+    this.computePoints = this.computePoints.bind(this)
   }
   componentWillReceiveProps(newProps){
-    console.log('>>> ScoreBoard GETTING PROPS: ', newProps)
-    const { cards } = newProps
+    this.computePoints(newProps.cards)
+  }
+  computePoints(cards){
     const fifteens = getFifteens(cards)
     const pairs = getPairs(cards)
-    
+    const runs = getRuns(cards)
     this.setState({
       pairs,
       fifteens,
+      runs,
       numPairs: sumValues(pairs),
       numFifteens: sumLengths(fifteens),
-      runs: getRuns(cards).length
+      numRuns: runs.length
     })
   }
+
   render(){
     return (
       <div>
@@ -60,7 +54,7 @@ export default class ScoreBoard extends Component {
             pairs: {this.state.numPairs}
           </li>
           <li>
-            runs: {this.state.runs}
+            runs: {this.state.numRuns}
           </li>
         </ul>
       </div>
