@@ -33,16 +33,27 @@ export default class Hand extends Component {
   }
   render () {
     const hasDiscarded = this.props.hand.length <= 4
-    let clickHandler = hasDiscarded ? this.props.playCard : this.toggleSelect
+    const clickHandler = hasDiscarded ? this.props.playCard : this.toggleSelect
+    const outerBorder = {
+      border: hasDiscarded ? '1px solid black' : 'none'
+    }
     return (
-      <div>
-        {this.props.hand.map((card) => (
-          <Card
-            clickHandler={() => clickHandler(card)}
-            isSelected={includes(this.state.selected, card)}
-            card={card}
-            key={card} />
-        ))}
+      <div style={outerBorder}>
+        <div id="hand" style={outerBorder}>
+          Hand: <br/>
+          {this.props.hand.map((card) => (
+            <Card
+              clickHandler={() => clickHandler(card)}
+              isSelected={includes(this.state.selected, card)}
+              // highlightOnHover={hasDiscarded}
+              card={card}
+              key={card} />
+          ))}
+        </div>
+        <div id="played" style={outerBorder}>
+          Played: <br />
+          {this.props.played.map((card) => <Card key={card} card={card} />)}
+        </div>
         <br />
         <button onClick={this.discard}>
           Place in crib

@@ -1,33 +1,9 @@
 # cribbagePatch
 real time cribbage game
 
-Redux should look something like... 
-```javascript
-{
-  meta: {
-    firstCut: 'H1'
-    secondCut: 'H2'
-  }
-  cards: {
-    H1: new Symbol('H1')
-    H2: new Symbol('H2')
-  },
-  game:{
-    deck: ['H5', 'C2', '...'], // TODO
-    playedCards: ['H1', 'C13', '...'],
-  },
-  player1:{
-    beginGameCut: '3H',
-    hand: ['C10', 'D12', '...' ], // should I remove things from here before the end of the round? 
-    crib: []
-    totalPoints: 43
-  },
-  player2: 'Same  structure as player1'
-}
-```
 Refactor TODO:
 1. Points does not account for cutting a jack, or the right jack
-2. Not correctly showing the crib, has cut card too
+2. hand.length is not good enough for hiding things after pegging done
 3. 
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 
