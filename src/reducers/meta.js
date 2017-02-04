@@ -6,12 +6,22 @@ const initialState = {
 }
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'BEGIN_GAME_CUT':
-      const key = action.payload.isFirst ? 'firstCut' : 'secondCut'
+    case 'FIRST_CUT':
+    {
+      const { cut, isLocal } = action.payload
       return {
         ...state,
-        [key]: action.payload.cut
+        firstCut: { cut, isLocal }
       }
+    }
+    case 'SECOND_CUT':
+    {
+      const { cut, isLocal } = action.payload
+      return {
+        ...state,
+        secondCut: { cut, isLocal }
+      }
+    }  
     case 'ASSIGN_PLAYER':
       switch(action.payload){
         case 'player1':

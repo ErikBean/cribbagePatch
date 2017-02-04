@@ -13,7 +13,9 @@ const cache = {}
 
 store.subscribe(() => { // TODO: can use paths instead of getState()
   const { players, meta, deck, cut, cutIndex, player1Hand, player2Hand, crib } = store.getState()
-  const { firstCut, secondCut } = meta
+  const { firstCut: cut1, secondCut: cut2 } = meta 
+  const { cut: firstCut } = cut1 || {} // don't push isLocal, because that would lie to other player
+  const { cut: secondCut } = cut2 || {}
   
   push({ player1Hand })
   push({ player2Hand })
@@ -73,8 +75,8 @@ function createAction (path, data) {
     deck: (deck) => actionFor('UPDATE_DECK', JSON.parse(deck)),
     player1Hand: (hand) => actionFor('GET_PLAYER1_HAND', JSON.parse(hand)),
     player2Hand: (hand) => actionFor('GET_PLAYER2_HAND', JSON.parse(hand)),
-    firstCut: (cut) => actionFor('BEGIN_GAME_CUT', { isFirst: true, cut }),
-    secondCut: (cut) => actionFor('BEGIN_GAME_CUT', { isFirst: false, cut }),
+    firstCut: (cut) => actionFor('FIRST_CUT', { isLocal: false, cut }),
+    secondCut: (cut) => actionFor('SECOND_CUT', { isLocal: false, cut }),
     cut: (cut) => actionFor('GET_CUT', cut),
     cutIndex: (cutIndex) => actionFor('GET_CUT_INDEX', cutIndex),
     crib: (crib) => actionFor('ADD_TO_CRIB', JSON.parse(crib))
@@ -88,17 +90,20 @@ window.game = game
 window.cache = cache
 window._ = _
 
-window.restart = () => game.put({
-  player1Hand: null,
-  player2Hand: null,
-  deck: null,
-  meta: null,
-  firstCut: null,
-  secondCut: null,
-  cut: null,
-  crib: null,
-  cutIndex: null
-})
+window.restart = () =>{
+  window.localStorage.clear()
+  game.put({
+    player1Hand: null,
+    player2Hand: null,
+    deck: null,
+    meta: null,
+    firstCut: null,
+    secondCut: null,
+    cut: null,
+    crib: null,
+    cutIndex: null
+  })
+}
 
 window.getHand = (hand, player) => {
   store.dispatch({

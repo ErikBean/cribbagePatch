@@ -6,58 +6,58 @@ import Player from './player'
 import Crib from './crib'
 import DeckSlider from './deckSlider'
 import Card from './card'
-
+function assignPlayerBasedOnCuts(myCut, theirCut, assign){
+  if(valueOf(myCut) < valueOf(theirCut)){
+    assign('player1')
+  } else if(valueOf(myCut) > valueOf(theirCut)){
+    assign('player2')
+  } else{
+    alert('tie!')
+  }
+}
 class Game extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      hasAlreadyCut: false,
-      hasFirstCut: null,
-      myCut: null
-    }
     this.doSecondCut = this.doSecondCut.bind(this)
     this.doFirstCut = this.doFirstCut.bind(this)
     this.deal = this.deal.bind(this)
-    this.assignPlayerBasedOnCuts = this.assignPlayerBasedOnCuts.bind(this)
+  }
+  componentWillMount(){
+    const stored = {
+      firstCut: window.localStorage.getItem('firstCut'),
+      secondCut: window.localStorage.getItem('secondCut')
+    }
+    let myStoredCut = stored.firstCut || stored.secondCut
+    let theirCut = (myStoredCut === stored.firstCut) ? this.props.secondCut : this.props.firstCut
+    if(myStoredCut && theirCut){
+      assignPlayerBasedOnCuts(myStoredCut, theirCut, this.props.assignPlayer)
+    }
   }
   componentWillReceiveProps(newProps){
-    const isNotAssignedPlayer = ( !this.props.isPlayer1 && !this.props.isPlayer2 )
-    if(this.state.hasFirstCut && newProps.secondCut && isNotAssignedPlayer){
+    const isNotAssignedPlayer = ( !newProps.isPlayer1 && !newProps.isPlayer2 )
+    if(isNotAssignedPlayer && newProps.firstCut && newProps.secondCut){
+      const myCut = newProps.hasFirstCut ? newProps.firstCut : newProps.secondCut
+      const theirCut = newProps.hasFirstCut ? newProps.secondCut : newProps.firstCut
       // Assign players here:
-      this.assignPlayerBasedOnCuts(this.state.myCut, newProps.secondCut)
+      assignPlayerBasedOnCuts(myCut, theirCut, this.props.assignPlayer)
     }
   }
-  assignPlayerBasedOnCuts(myCut, theirCut){
-    if(valueOf(myCut) < valueOf(theirCut)){
-      this.props.assignPlayer('player1')
-    } else if(valueOf(myCut) > valueOf(theirCut)){
-      this.props.assignPlayer('player2')
-    } else{
-      alert('tie!')
-    }
-  }
+
   doFirstCut(){
     const deck = shuffle(createDeck())
     this.props.updateDeck(deck)
     const myCut = deck[0]
     this.props.cutForFirstCrib(true, myCut)
-    this.setState({
-      hasAlreadyCut: true,
-      hasFirstCut: true,
-      myCut,
-    })
+    window.localStorage.setItem('firstCut', myCut)
     // then wait for remote player to make second cut
   }
   doSecondCut() {
     const myCut = this.props.deck[1]
+    const theirCut = this.props.firstCut
     this.props.cutForFirstCrib(false, myCut)
-    this.setState({
-      hasAlreadyCut: true,
-      hasFirstCut: false,
-      myCut
-    })
+    window.localStorage.setItem('secondCut', myCut)
     // Assign players here:
-    this.assignPlayerBasedOnCuts(myCut, this.props.firstCut)
+    assignPlayerBasedOnCuts(myCut, theirCut, this.props.assignPlayer)
   }
   deal(){
     const deck = shuffle(createDeck())
@@ -75,11 +75,11 @@ class Game extends Component {
     return (
       <div>
         <div hidden={this.props.doneFirstDeal}>
-          <button disabled={this.props.firstCut || this.state.hasAlreadyCut} onClick={this.doFirstCut}>
+          <button disabled={this.props.firstCut} onClick={this.doFirstCut}>
             First Cut
           </button>
           <Card card={this.props.firstCut} />
-          <button disabled={!this.props.firstCut || this.props.secondCut || this.state.hasAlreadyCut} onClick={this.doSecondCut}>
+          <button disabled={this.props.secondCut || this.props.hasFirstCut} onClick={this.doSecondCut}>
             Second Cut
           </button>
           <Card card={this.props.secondCut} />
@@ -88,13 +88,13 @@ class Game extends Component {
           <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={this.deal} />
           <br />
           <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={this.deal} />
-          <Crib cards={(this.props.crib || []).concat(this.props.cut || [])} />
+          <Crib visibleCards={this.props.crib || []} cards={(this.props.crib || []).concat(this.props.cut || [])} />
           <DeckSlider 
             deck={this.props.deck} 
             isHidden={!this.props.crib || this.props.crib.length !== 4}
             isMyCrib={this.props.isMyCrib} />
           <br />
-          <div id='debugDeck' onClick={(e) => showDeck(e, this.props.deck)}>
+          <div id='debugDeck' onClick={(e) => (e, deck) => { e.target.innerHTML = JSON.stringify(deck) }}>
             Click to log the deck
           </div>
         </div>
@@ -105,10 +105,14 @@ class Game extends Component {
 const mapStateToProps = (state) => {
   const { deck, cut, crib, player1Hand, player2Hand } = state
   const { isPlayer1, isPlayer2, firstCut, secondCut, isMyCrib } = state.meta
+  const { cut: cut1, isLocal: hasFirstCut } = firstCut || {}
+  const { cut: cut2, isLocal: hasSecondCut } = secondCut || {}
   const doneFirstDeal = player1Hand || player2Hand
   return {
-    firstCut,
-    secondCut,
+    firstCut: cut1,
+    secondCut: cut2,
+    hasFirstCut,
+    hasSecondCut,
     doneFirstDeal,
     isPlayer1,
     isPlayer2,
@@ -123,8 +127,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
     cutForFirstCrib: (isFirst, cut) => dispatch({
-      type: `BEGIN_GAME_CUT`,
-      payload: { isFirst, cut }
+      type: isFirst ? `FIRST_CUT` : 'SECOND_CUT',
+      payload: { isLocal: true, cut }
     }),
     getHand: (player, hand) => dispatch({
       type: `GET_${player.toUpperCase()}_HAND`,
@@ -134,7 +138,3 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game)
-
-function showDeck (e, deck) {
-  e.target.innerHTML = JSON.stringify(deck)
-}
