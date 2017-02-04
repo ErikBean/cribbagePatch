@@ -85,9 +85,9 @@ class Game extends Component {
           <Card card={this.props.secondCut} />
         </div>
         <div>
-          <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={this.deal} />
+          <Player num='1' isCurrentPlayer={this.props.isPlayer1} deal={this.deal} cut={this.props.cut} />
           <br />
-          <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={this.deal} />
+          <Player num='2' isCurrentPlayer={this.props.isPlayer2} deal={this.deal} cut={this.props.cut} />
           <Crib visibleCards={this.props.crib || []} cards={(this.props.crib || []).concat(this.props.cut || [])} />
           <DeckSlider 
             deck={this.props.deck} 

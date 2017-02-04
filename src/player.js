@@ -19,26 +19,31 @@ const Player = (props) => (
       <ScoreBoard cards={props.myHandWithCut} />
       <Hand
         hand={props.myHand} 
-        hasCut={props.hasCut}
-        discard={props.discard} />
+        discard={props.discard}
+        playCard={props.playPegCard} />
     </div>
   </div>
 )
 
 const mapStateToProps = (state, ownProps) => {
   const myHand = state[`player${ownProps.num}Hand`] || []
-  const cut = state.cut || []
+  const cut = ownProps.cut || []
   return {
     myHand,
     myHandWithCut: myHand.concat(cut),
-    hasCut: cut.length > 0,
     hasFirstCrib: ( ownProps.num === '1' && ownProps.isCurrentPlayer),
     waitingForCut: !state.meta.firstCut || !state.meta.secondCut
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   const player = `player${ownProps.num}`
-  const playPegCard = (pegCard) => {}
+  const playPegCard = (pegCard) => {
+    if(!ownProps.cut) return
+    dispatch({
+      type: 'PEG_CARD',
+      payload: pegCard
+    })
+  }
   const discard = (discards) =>{
     dispatch({
       type: `${player.toUpperCase()}_DISCARD`,

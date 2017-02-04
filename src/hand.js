@@ -32,11 +32,13 @@ export default class Hand extends Component {
     this.props.discard(selected)
   }
   render () {
+    const hasDiscarded = this.props.hand.length <= 4
+    let clickHandler = hasDiscarded ? this.props.playCard : this.toggleSelect
     return (
       <div>
         {this.props.hand.map((card) => (
           <Card
-            toggleSelect={this.toggleSelect.bind(null, card)}
+            clickHandler={() => clickHandler(card)}
             isSelected={includes(this.state.selected, card)}
             card={card}
             key={card} />
