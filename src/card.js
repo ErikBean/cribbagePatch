@@ -7,7 +7,7 @@ const Card = (props) => {
   const suit = getSuit(props.card)
   const style = {
     display: 'inline-block',
-    border: props.isSelected ? '3px solid green' : 'none',
+    border: props.isSelected ? '3px solid red' : 'none',
     height: '200px',
     width: '140px',
     boxShadow: props.isOnDeck ? '10px 10px 10px black' : 'none',

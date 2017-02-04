@@ -3,19 +3,29 @@ import { without, includes } from 'lodash'
 import { getFifteens, getRuns, getPairs } from './points'
 import Card from './card'
 
-export default class Hand extends Component {
+export default class Set extends Component {
   constructor (props) {
     super(props)
-
     this.state = {
       selected: [null, null], // Should always be length 2
+      hasActionsAvailable: ( props.discard || props.playCard ),
+      hasDiscarded: props.cards.length <= 4
     }
+    
     this.toggleSelect = this.toggleSelect.bind(this)
     this.discard = this.discard.bind(this)
   }
   
+  componentWillReceiveProps(props){
+    this.setState({
+      ...this.state,
+      hasActionsAvailable: ( props.discard || props.playCard ),
+      hasDiscarded: props.cards.length <= 4
+    })
+  }
+  
   toggleSelect (card) {
-    if(this.props.hand.length < 6) return
+    if(this.state.hasDiscarded) return
     const nextSelected = includes(this.state.selected, card) ?
       [ null, ...without(this.state.selected, card) ] :
       [ card, this.state.selected[0] ]
@@ -31,31 +41,36 @@ export default class Hand extends Component {
     }
     this.props.discard(selected)
   }
+  handleClick(card){
+    if(!this.state.hasActionsAvailable) return
+    else if(this.state.hasDiscarded){
+      this.props.playCard(card)
+    } else{
+      this.toggleSelect(card)
+    }
+  }
   render () {
-    const hasDiscarded = this.props.hand.length <= 4
-    const clickHandler = hasDiscarded ? this.props.playCard : this.toggleSelect
     const outerBorder = {
-      border: hasDiscarded ? '1px solid black' : 'none'
+      border: this.state.hasDiscarded ? '1px solid black' : 'none'
+    }
+    const colorHand = {
+      backgroundColor: this.state.hasActionsAvailable ? 'blue' : 'red'
     }
     return (
       <div style={outerBorder}>
-        <div id="hand" style={outerBorder}>
-          Hand: <br/>
-          {this.props.hand.map((card) => (
+        <div id="cardset" style={colorHand}>
+          <br/>
+          {this.props.cards.map((card) => (
             <Card
-              clickHandler={() => clickHandler(card)}
+              clickHandler={() => this.handleClick(card)}
               isSelected={includes(this.state.selected, card)}
-              // highlightOnHover={hasDiscarded}
+              // highlightOnHover={state.hasDiscarded}
               card={card}
               key={card} />
           ))}
         </div>
-        <div id="played" style={outerBorder}>
-          Played: <br />
-          {this.props.played.map((card) => <Card key={card} card={card} />)}
-        </div>
         <br />
-        <button onClick={this.discard}>
+        <button onClick={this.discard} hidden={this.state.hasDiscarded}>
           Place in crib
         </button>
       </div>

@@ -2,25 +2,28 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { without } from 'lodash'
 import { createDeck, shuffle, valueOf } from './deck'
-import Hand from './hand'
+import Set from './set'
 import ScoreBoard from './scoreBoard'
 
 const Player = (props) => {
   const cribWinnerMsg = props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
   return (
-    <div hidden={!props.isCurrentPlayer}>
-      <h2>Player {props.num}</h2>
-      <div id="deal-hands" hidden={props.isDoneDealing || props.noCuts}>
-        <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
-        <button hidden={!props.hasFirstCrib} onClick={props.deal}> Deal! </button>
+    <div id='player-container'>
+      <h2>Player {props.num} {props.isCurrentPlayer ?  '(This is You)' : ''}</h2>
+      <div id='player-hand' hidden={!props.isCurrentPlayer}>
+        Your Hand: 
+        <div id="deal-hands" hidden={props.isDoneDealing || props.noCuts}>
+          <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
+          <button hidden={!props.hasFirstCrib} onClick={props.deal}> Deal! </button>
+        </div>
+        <div hidden={!props.isDoneDealing}>
+          <ScoreBoard cards={props.myHandWithCut} />
+          <Set cards={props.hand} discard={props.discard} playCard={(card) => props.playPegCard(card, props.hand)} />
+        </div>
       </div>
-      <div hidden={!props.isDoneDealing}>
-        <ScoreBoard cards={props.myHandWithCut} />
-        <Hand
-          hand={props.hand}
-          played={props.played}
-          discard={props.discard}
-          playCard={(card) => props.playPegCard(card, props.hand)} />
+      <div id="played-cards" hidden={!props.cut}>
+        On the Table:
+        <Set cards={props.played} />
       </div>
     </div>
   )

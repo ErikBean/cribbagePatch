@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { difference } from 'lodash'
 import { createDeck, shuffle, valueOf } from './deck'
 import { getFifteens, getRuns, getPairs } from './points'
-import Hand from './hand'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
