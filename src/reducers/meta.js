@@ -7,21 +7,15 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'FIRST_CUT':
-    {
-      const { cut, isLocal } = action.payload
       return {
         ...state,
-        firstCut: { cut, isLocal }
+        firstCut: action.payload
       }
-    }
     case 'SECOND_CUT':
-    {
-      const { cut, isLocal } = action.payload
       return {
         ...state,
-        secondCut: { cut, isLocal }
+        secondCut: action.payload
       }
-    }  
     case 'ASSIGN_PLAYER':
       switch(action.payload){
         case 'player1':

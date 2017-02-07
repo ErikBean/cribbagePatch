@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createDeck, shuffle, valueOf } from './deck'
-import { size, clone } from 'lodash'
+import { isNull } from 'lodash'
 import Player from './player'
 import Crib from './crib'
 import DeckSlider from './deckSlider'
@@ -105,12 +105,12 @@ class Game extends Component {
 const mapStateToProps = (state) => {
   const { deck, cut, crib, player1Hand, player2Hand } = state
   const { isPlayer1, isPlayer2, firstCut, secondCut, isMyCrib } = state.meta
-  const { cut: cut1, isLocal: hasFirstCut } = firstCut || {}
-  const { cut: cut2, isLocal: hasSecondCut } = secondCut || {}
   const doneFirstDeal = player1Hand || player2Hand
+  const hasFirstCut = !isNull(window.localStorage.getItem('firstCut'))
+  const hasSecondCut = !isNull(window.localStorage.getItem('secondCut'))
   return {
-    firstCut: cut1,
-    secondCut: cut2,
+    firstCut,
+    secondCut,
     hasFirstCut,
     hasSecondCut,
     doneFirstDeal,
@@ -128,7 +128,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
     cutForFirstCrib: (isFirst, cut) => dispatch({
       type: isFirst ? `FIRST_CUT` : 'SECOND_CUT',
-      payload: { isLocal: true, cut }
+      payload: cut
     }),
     getHand: (player, hand) => dispatch({
       type: `GET_${player.toUpperCase()}_HAND`,

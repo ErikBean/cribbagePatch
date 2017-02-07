@@ -11,11 +11,22 @@ export default store
 
 const cache = {}
 
+const topics = [ // does this NEED to be flat? No, but it makes things easier for now
+  'cut',
+  'cutIndex',
+  'crib',
+  'deck',
+  'firstCut',
+  'player1Hand',
+  'player2Hand',
+  'player1Played',
+  'player2Played',
+  'secondCut',
+]
+
 store.subscribe(() => { // TODO: can use paths instead of getState()
   const { players, meta, deck, cut, cutIndex, player1Hand, player2Hand, crib } = store.getState()
-  const { firstCut: cut1, secondCut: cut2 } = meta 
-  const { cut: firstCut } = cut1 || {} // don't push isLocal, because that would lie to other player
-  const { cut: secondCut } = cut2 || {}
+  const { firstCut, secondCut } = meta 
   
   push({ player1Hand })
   push({ player2Hand })
@@ -75,8 +86,8 @@ function createAction (path, data) {
     deck: (deck) => actionFor('UPDATE_DECK', JSON.parse(deck)),
     player1Hand: (hand) => actionFor('GET_PLAYER1_HAND', JSON.parse(hand)),
     player2Hand: (hand) => actionFor('GET_PLAYER2_HAND', JSON.parse(hand)),
-    firstCut: (cut) => actionFor('FIRST_CUT', { isLocal: false, cut }),
-    secondCut: (cut) => actionFor('SECOND_CUT', { isLocal: false, cut }),
+    firstCut: (cut) => actionFor('FIRST_CUT', cut),
+    secondCut: (cut) => actionFor('SECOND_CUT', cut),
     cut: (cut) => actionFor('GET_CUT', cut),
     cutIndex: (cutIndex) => actionFor('GET_CUT_INDEX', cutIndex),
     crib: (crib) => actionFor('ADD_TO_CRIB', JSON.parse(crib))
