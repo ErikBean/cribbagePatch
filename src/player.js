@@ -12,16 +12,19 @@ const Player = (props) => {
       <h2>Player {props.num} {props.isCurrentPlayer ?  '(This is You)' : ''}</h2>
       <div id='player-hand' hidden={!props.isCurrentPlayer}>
         Your Hand: 
-        <div id="deal-hands" hidden={props.isDoneDealing || props.noCuts}>
+        <div id='deal-hands' hidden={props.isDoneDealing || props.noCuts}>
           <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
-          <button hidden={!props.hasFirstCrib} onClick={props.deal}> Deal! </button>
+          <button id='deal-button' hidden={!props.hasFirstCrib} onClick={props.deal}> Deal! </button>
         </div>
         <div hidden={!props.isDoneDealing}>
           <ScoreBoard cards={props.myHandWithCut} />
-          <Set cards={props.hand} discard={props.discard} playCard={(card) => props.playPegCard(card, props.hand)} />
+          <Set 
+            cards={props.hand} 
+            discard={props.discard} 
+            playCard={(card) => props.playPegCard(card, props.hand)} />
         </div>
       </div>
-      <div id="played-cards" hidden={!props.cut}>
+      <div id='played-cards' hidden={!props.cut}>
         On the Table:
         <Set cards={props.played} />
       </div>
@@ -30,11 +33,12 @@ const Player = (props) => {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { firstCut, secondCut, isPlayer1, isPlayer2 } = state.meta
+  const { firstCut, secondCut } = state
+  const { isPlayer1, isPlayer2 } = state.meta
   const hand = state[`player${ownProps.num}Hand`] || []
   const played = state[`player${ownProps.num}Played`] || []
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
-  const isDoneDealing = hand.length || played.length
+  const isDoneDealing = !!(hand.length || played.length)
   const noCuts = !firstCut && !secondCut
   return {
     hand,

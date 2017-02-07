@@ -94,7 +94,7 @@ class Game extends Component {
             isHidden={!this.props.crib || this.props.crib.length !== 4}
             isMyCrib={this.props.isMyCrib} />
           <br />
-          <div id='debugDeck' onClick={(e) => (e, deck) => { e.target.innerHTML = JSON.stringify(deck) }}>
+          <div id='debugDeck' onClick={(e) => { e.target.innerHTML = JSON.stringify(props.deck) }}>
             Click to log the deck
           </div>
         </div>
@@ -103,8 +103,8 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { deck, cut, crib, player1Hand, player2Hand } = state
-  const { isPlayer1, isPlayer2, firstCut, secondCut, isMyCrib } = state.meta
+  const { deck, cut, crib, player1Hand, player2Hand, firstCut, secondCut } = state
+  const { isPlayer1, isPlayer2, isMyCrib } = state.meta
   const doneFirstDeal = player1Hand || player2Hand
   const hasFirstCut = !isNull(window.localStorage.getItem('firstCut'))
   const hasSecondCut = !isNull(window.localStorage.getItem('secondCut'))

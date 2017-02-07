@@ -2,9 +2,10 @@
 real time cribbage game
 
 Refactor TODO:
+0. BUG: peg card starts inf loop cycle
 1. Points does not account for cutting a jack, or the right jack
 2. hand.length is not good enough for hiding things after pegging done
-3. 
+3. can look in localStorage on page load to assign players, too
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 
 Rules TODO:
