@@ -51,7 +51,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const playPegCard = (pegCard, played) => {
+  const playPegCard = (pegCard, played) => {  
     if (!ownProps.cut) return // can't peg before cutting
     dispatch({
       type: `PLAYER${ownProps.num}_PLAY_CARD`,

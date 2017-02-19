@@ -22,18 +22,17 @@ const remotePaths = { //keys = reducers - meta
   player1Played: 'PLAYER1_PLAY_CARD',
   player2Played: 'PLAYER2_PLAY_CARD',
   secondCut: 'SECOND_CUT',
+  round: 'INCREMENT_ROUND'
 }
 
 store.subscribe(() => {
   const newState = store.getState()
   keys(remotePaths).forEach((path) => {
-    push({
-      [path]: newState[path]
-    })
+    push(path, newState[path])
   })
 })
 
-function push (container, path = Object.keys(container)[0], data = container[path]) {
+function push (path, data) {
   if (isNull(data) || isUndefined(data) || isEmpty(data)) return  
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
   if (isObject(data) || isArray(data)) {
@@ -47,7 +46,9 @@ function push (container, path = Object.keys(container)[0], data = container[pat
 }
 
 const gun = Gun([
-  'https://gun-starter-app-lzlbcefjql.now.sh'
+  'https://gun-starter-app-lzlbcefjql.now.sh',
+  'https://gun-starter-app-fztqkpmntx.now.sh',
+  'https://gun-starter-app-usobfzosot.now.sh'
 ])
 
 // Reads key 'game'.
@@ -55,18 +56,16 @@ let game = gun.get('game')
 
 game.map((value, path) => {
   if(keys(remotePaths).indexOf(path) !== -1){
-    updateStore({ [ path ]: value })
+    updateStore(path, value)
   } 
 })
 
-function updateStore (container, path = Object.keys(container)[0], data = container[path]) {
-  if (isNull(data) || isUndefined(data) || isEmpty(data)) return
+function updateStore (path, data) {
+  if(path === 'round') console.log('round ', data)
+  if (isNull(data) || isUndefined(data) || data === "") return
   if (isEqual(cache[path], data)) return
   cache[path] = data
   const action = createAction(path, data)
-  if(action.type.indexOf('PLAY_CARD')!==-1){
-    console.error('got from gun: ', action)
-  }
   store.dispatch(action)
 }
 

@@ -67,6 +67,7 @@ class Game extends Component {
       hand1[i] = deck[i]
       hand2[i] = deck[ i + 6 ]
     }
+    this.props.incrementRound((this.props.currentRound + 1))
     this.props.updateDeck(deck)
     this.props.getHand('player1', hand1)
     this.props.getHand('player2', hand2)
@@ -103,12 +104,13 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { deck, cut, crib, player1Hand, player2Hand, firstCut, secondCut } = state
+  const { round, deck, cut, crib, player1Hand, player2Hand, firstCut, secondCut } = state
   const { isPlayer1, isPlayer2, isMyCrib } = state.meta
   const doneFirstDeal = player1Hand || player2Hand
   const hasFirstCut = !isNull(window.localStorage.getItem('firstCut'))
   const hasSecondCut = !isNull(window.localStorage.getItem('secondCut'))
   return {
+    currentRound: round,
     firstCut,
     secondCut,
     hasFirstCut,
@@ -124,6 +126,7 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    incrementRound: (nextRound) => dispatch({type: 'INCREMENT_ROUND', payload: nextRound}),
     assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
     cutForFirstCrib: (isFirst, cut) => dispatch({
