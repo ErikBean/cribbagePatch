@@ -1,13 +1,8 @@
 import { valueOf } from './deck'
 import { uniq, toPairs, times } from 'lodash'
 
-function valueMaxTen (card) {
+export function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
-}
-
-export function isFifteen (...cards) {
-  let sum = cards.map((card) => valueMaxTen(card)).reduce((acc, curr) => (acc + curr), 0)
-  return sum === 15
 }
 
 function isArraySorted (array) {
@@ -19,6 +14,15 @@ function isArraySorted (array) {
     }
   }
   return false
+}
+
+export function sumOf (cards) {
+  return cards.map(valueMaxTen).reduce((curr, acc) => curr + acc, 0)
+}
+
+export function isFifteen (...cards) {
+  let sum = cards.map((card) => valueMaxTen(card)).reduce((acc, curr) => (acc + curr), 0)
+  return sum === 15
 }
 
 export function getFifteens (hand) {

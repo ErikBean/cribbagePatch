@@ -60,5 +60,3 @@ export default class ScoreBoard extends Component {
     )
   }
 }
-
-// export default ScoreBoard

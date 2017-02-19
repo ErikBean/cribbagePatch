@@ -1,6 +1,6 @@
 /* global Gun */
 import { createStore, combineReducers } from 'redux'
-import _, { isEmpty, isNull, isUndefined, isEqual, isObject, isArray, keys } from 'lodash'
+import _, { isEmpty, isNull, isUndefined, isEqual, isArray, keys } from 'lodash'
 import reducers from './reducers'
 
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -35,7 +35,7 @@ store.subscribe(() => {
 function push (path, data) {
   if (isNull(data) || isUndefined(data) || isEmpty(data)) return
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
-  if (isObject(data) || isArray(data)) {
+  if (isArray(data)) {
     const jsonData = JSON.stringify(data)
     cache[path] = jsonData
     game.path(path).put(jsonData)
@@ -70,7 +70,7 @@ function updateStore (path, data) {
 
 function createAction (path, data) {
   const actionFor = (type, data) => {
-    const isJson = data && (data[0] === '{' || data[0] === '[')
+    const isJson = data && (data[0] === '[')
     if (isJson) {
       return { type, payload: JSON.parse(data) }
     }
@@ -92,8 +92,7 @@ window.restart = () => {
   game.put({
     player1Hand: null,
     player2Hand: null,
-    player1Played: null,
-    player2Played: null,
+    playedCards: null,
     deck: null,
     meta: null,
     firstCut: null,
