@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import store from './store'
@@ -19,7 +19,7 @@ ReactDOM.render(
   document.getElementById('app')
 )
 
-function reload() {
+function reload () {
   window.restart() // wipe gunDB
   // setTimeout(() => window.location.reload(), 200)
 }

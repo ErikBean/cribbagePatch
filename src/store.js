@@ -1,3 +1,4 @@
+/* global Gun */
 import { createStore, combineReducers } from 'redux'
 import _, { isEmpty, isNull, isUndefined, isEqual, isObject, isArray, keys } from 'lodash'
 import reducers from './reducers'
@@ -10,8 +11,8 @@ export default store
 const cache = {}
 
 // does this NEED to be flat? No, but it makes things easier for now
-// What redux action type is associated with a change on this path in gun? 
-const remotePaths = { //keys = reducers - meta
+// What redux action type is associated with a change on this path in gun?
+const remotePaths = { // keys = reducers - meta
   cut: 'GET_CUT',
   cutIndex: 'GET_CUT_INDEX',
   crib: 'ADD_TO_CRIB',
@@ -19,8 +20,7 @@ const remotePaths = { //keys = reducers - meta
   firstCut: 'FIRST_CUT',
   player1Hand: 'GET_PLAYER1_HAND',
   player2Hand: 'GET_PLAYER2_HAND',
-  player1Played: 'PLAYER1_PLAY_CARD',
-  player2Played: 'PLAYER2_PLAY_CARD',
+  playedCards: 'PLAY_CARD',
   secondCut: 'SECOND_CUT',
   round: 'INCREMENT_ROUND'
 }
@@ -33,7 +33,7 @@ store.subscribe(() => {
 })
 
 function push (path, data) {
-  if (isNull(data) || isUndefined(data) || isEmpty(data)) return  
+  if (isNull(data) || isUndefined(data) || isEmpty(data)) return
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
   if (isObject(data) || isArray(data)) {
     const jsonData = JSON.stringify(data)
@@ -55,14 +55,13 @@ const gun = Gun([
 let game = gun.get('game')
 
 game.map((value, path) => {
-  if(keys(remotePaths).indexOf(path) !== -1){
+  if (keys(remotePaths).indexOf(path) !== -1) {
     updateStore(path, value)
-  } 
+  }
 })
 
 function updateStore (path, data) {
-  if(path === 'round') console.log('round ', data)
-  if (isNull(data) || isUndefined(data) || data === "") return
+  if (isNull(data) || isUndefined(data) || data === '') return
   if (isEqual(cache[path], data)) return
   cache[path] = data
   const action = createAction(path, data)
@@ -72,7 +71,7 @@ function updateStore (path, data) {
 function createAction (path, data) {
   const actionFor = (type, data) => {
     const isJson = data && (data[0] === '{' || data[0] === '[')
-    if(isJson){
+    if (isJson) {
       return { type, payload: JSON.parse(data) }
     }
     return { type, payload: data }
@@ -87,8 +86,9 @@ window.cache = cache
 window._ = _
 window.gun = gun
 
-window.restart = () =>{
+window.restart = () => {
   window.localStorage.clear()
+  gun.get('game').put(null)
   game.put({
     player1Hand: null,
     player2Hand: null,
@@ -100,7 +100,8 @@ window.restart = () =>{
     secondCut: null,
     cut: null,
     crib: null,
-    cutIndex: null
+    cutIndex: null,
+    round: null
   })
   window.location.reload(true)
 }

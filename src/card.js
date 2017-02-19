@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
-import { valueOf, getNumberOrFace, getSuit } from './deck'
+import React from 'react'
+import { getNumberOrFace, getSuit } from './deck'
 
 const Card = (props) => {
-  if(!props.card) return (<span>???</span>)
+  if (!props.card) return (<span>???</span>)
   const value = getNumberOrFace(props.card)
   const suit = getSuit(props.card)
   const style = {
@@ -15,7 +15,7 @@ const Card = (props) => {
     backgroundSize: 'contain'
   }
   return (
-    <div onClick={props.clickHandler || Function.prototype} style={style}/>
+    <div onClick={props.clickHandler || Function.prototype} style={style} />
   )
 }
 export default Card

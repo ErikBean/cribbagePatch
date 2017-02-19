@@ -6,7 +6,9 @@ export function createDeck () {
 }
 
 export function shuffle (array) {
-  let i = 0, j = 0, temp = null
+  let i = 0
+  let j = 0
+  let temp = null
   for (i = array.length - 1; i > 0; i -= 1) {
     j = Math.floor(Math.random() * (i + 1))
     temp = array[i]
@@ -25,13 +27,10 @@ export function getNumberOrFace (card) {
   switch (number) {
     case 1:
       return 'ace'
-      break
     case 11:
       return 'jack'
-      break
     case 12:
       return 'queen'
-      break
     case 13:
       return 'king'
     default:
@@ -39,7 +38,7 @@ export function getNumberOrFace (card) {
   }
 }
 
-export function getSuit(card){
+export function getSuit (card) {
   switch (card[0]) {
     case 'H':
       return 'hearts'

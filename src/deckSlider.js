@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import { size } from 'lodash'
 import { connect } from 'react-redux'
 
 import Card from './card'
 
-class DeckSlider extends Component{
-  constructor(props){
-    super(props)    
+class DeckSlider extends Component {
+  constructor (props) {
+    super(props)
     this.state = {
       hasBeenCut: false,
       cutIndex: 0
@@ -15,22 +14,22 @@ class DeckSlider extends Component{
     this.selectCutIndex = this.selectCutIndex.bind(this)
     this.doCut = this.doCut.bind(this)
   }
-  selectCutIndex(){
+  selectCutIndex () {
     this.setState({
       hasBeenCut: true
     })
     this.props.selectCutIndex(this.state.cutIndex)
   }
-  changeCutIndex(e){
+  changeCutIndex (e) {
     this.setState({
       cutIndex: e.target.value
     })
   }
-  doCut(){
+  doCut () {
     const NUM_CARDS_DEALT = 12
     this.props.doCut(this.props.deck[NUM_CARDS_DEALT + this.state.cutIndex])
   }
-  render(){
+  render () {
     return (
       <div hidden={this.props.isHidden}>
         <div hidden={this.props.cut} >
@@ -41,14 +40,14 @@ class DeckSlider extends Component{
             min='0' max='40'
             hidden={this.props.isMyCrib}
             disabled={this.props.cutIndex}
-            onChange={this.changeCutIndex}/>
-          <button 
+            onChange={this.changeCutIndex} />
+          <button
             hidden={this.props.isMyCrib}
             disabled={this.props.hasBeenCut}
             onClick={this.selectCutIndex}>
             Cut the deck!
           </button>
-          <button 
+          <button
             disabled={!this.props.isMyCrib || !this.props.cutIndex}
             onClick={this.doCut}>
             Cut 5th Card
@@ -75,5 +74,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeckSlider)
-
 

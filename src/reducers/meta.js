@@ -7,20 +7,20 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'ASSIGN_PLAYER':
-      switch(action.payload){
+      switch (action.payload) {
         case 'player1':
           return {
             ...state,
             isPlayer1: true,
             isMyCrib: true
           }
-        case 'player2': 
+        case 'player2':
           return {
             ...state,
             isPlayer2: true,
             isMyCrib: false
           }
-        default: 
+        default:
           return state
       }
 

@@ -3,8 +3,8 @@ real time cribbage game
 
 Refactor TODO:
 1. Points does not account for cutting a jack, or the right jack
-2. hand.length is not good enough for hiding things after pegging done
-3. can look in localStorage on page load to assign players, too
+2. Need to merge playedCards into 1 array
+3. Update gun to 0.6.1
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. BUG: doing first cut doesn't grey out button for second cut
 6. BUG: Last card will not be removed from remote played stack (because empty array check causes early return)

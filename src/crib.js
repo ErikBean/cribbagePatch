@@ -1,25 +1,21 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { difference } from 'lodash'
-import { createDeck, shuffle, valueOf } from './deck'
-import { getFifteens, getRuns, getPairs } from './points'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
 export default class Crib extends Component {
-  constructor(props){
+  constructor (props) {
     super(props)
     this.state = {
       isHidden: true
     }
     this.reveal = this.reveal.bind(this)
   }
-  reveal(){
+  reveal () {
     this.setState({
       isHidden: false
     })
   }
-  render(){
+  render () {
     return (
       <div hidden={!this.props.cards.length}>
         <button onClick={this.reveal}>

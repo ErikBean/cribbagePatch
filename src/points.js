@@ -1,5 +1,5 @@
-import { valueOf, getSuit } from './deck'
-import { uniq, size, toPairs, times } from 'lodash'
+import { valueOf } from './deck'
+import { uniq, toPairs, times } from 'lodash'
 
 function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
@@ -62,7 +62,7 @@ export function getPairs (hand) {
     if (hasThreeOfAKind) {
       pairs[n] = 3
     } else if (hasFourOfAKind) {
-      pairs[n] = 6 
+      pairs[n] = 6
     }
   }
   return pairs
@@ -85,9 +85,10 @@ export function getRuns (hand) {
   let multiRuns = []
   for (let [value, numPairs] of pairs) {
     if (run.includes(parseInt(value))) {
-      switch(numPairs){
+      switch (numPairs) {
         case 1:
           multiRuns = multiRuns.concat(times(2, () => run)) // double run
+          break
         case 3:
           multiRuns = multiRuns.concat(times(3, () => run)) // triple run
       }

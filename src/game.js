@@ -6,13 +6,11 @@ import Player from './player'
 import Crib from './crib'
 import DeckSlider from './deckSlider'
 import Card from './card'
-function assignPlayerBasedOnCuts(myCut, theirCut, assign){
-  if(valueOf(myCut) < valueOf(theirCut)){
+function assignPlayerBasedOnCuts (myCut, theirCut, assign) {
+  if (valueOf(myCut) < valueOf(theirCut)) {
     assign('player1')
-  } else if(valueOf(myCut) > valueOf(theirCut)){
+  } else if (valueOf(myCut) > valueOf(theirCut)) {
     assign('player2')
-  } else{
-    alert('tie!')
   }
 }
 class Game extends Component {
@@ -22,20 +20,20 @@ class Game extends Component {
     this.doFirstCut = this.doFirstCut.bind(this)
     this.deal = this.deal.bind(this)
   }
-  componentWillMount(){
+  componentWillMount () {
     const stored = {
       firstCut: window.localStorage.getItem('firstCut'),
       secondCut: window.localStorage.getItem('secondCut')
     }
     let myStoredCut = stored.firstCut || stored.secondCut
     let theirCut = (myStoredCut === stored.firstCut) ? this.props.secondCut : this.props.firstCut
-    if(myStoredCut && theirCut){
+    if (myStoredCut && theirCut) {
       assignPlayerBasedOnCuts(myStoredCut, theirCut, this.props.assignPlayer)
     }
   }
-  componentWillReceiveProps(newProps){
-    const isNotAssignedPlayer = ( !newProps.isPlayer1 && !newProps.isPlayer2 )
-    if(isNotAssignedPlayer && newProps.firstCut && newProps.secondCut){
+  componentWillReceiveProps (newProps) {
+    const isNotAssignedPlayer = (!newProps.isPlayer1 && !newProps.isPlayer2)
+    if (isNotAssignedPlayer && newProps.firstCut && newProps.secondCut) {
       const myCut = newProps.hasFirstCut ? newProps.firstCut : newProps.secondCut
       const theirCut = newProps.hasFirstCut ? newProps.secondCut : newProps.firstCut
       // Assign players here:
@@ -43,7 +41,7 @@ class Game extends Component {
     }
   }
 
-  doFirstCut(){
+  doFirstCut () {
     const deck = shuffle(createDeck())
     this.props.updateDeck(deck)
     const myCut = deck[0]
@@ -51,7 +49,7 @@ class Game extends Component {
     window.localStorage.setItem('firstCut', myCut)
     // then wait for remote player to make second cut
   }
-  doSecondCut() {
+  doSecondCut () {
     const myCut = this.props.deck[1]
     const theirCut = this.props.firstCut
     this.props.cutForFirstCrib(false, myCut)
@@ -59,7 +57,7 @@ class Game extends Component {
     // Assign players here:
     assignPlayerBasedOnCuts(myCut, theirCut, this.props.assignPlayer)
   }
-  deal(){
+  deal () {
     const deck = shuffle(createDeck())
     const hand1 = []
     const hand2 = []
@@ -90,14 +88,10 @@ class Game extends Component {
           <br />
           <Player num='2' cut={this.props.cut} deal={this.deal} />
           <Crib visibleCards={this.props.crib || []} cards={(this.props.crib || []).concat(this.props.cut || [])} />
-          <DeckSlider 
-            deck={this.props.deck} 
+          <DeckSlider
+            deck={this.props.deck}
             isHidden={!this.props.crib || this.props.crib.length !== 4}
             isMyCrib={this.props.isMyCrib} />
-          <br />
-          <div id='debugDeck' onClick={(e) => { e.target.innerHTML = JSON.stringify(props.deck) }}>
-            Click to log the deck
-          </div>
         </div>
       </div>
     )

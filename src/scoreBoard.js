@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
-import { without, includes } from 'lodash'
 import { getFifteens, getRuns, getPairs } from './points'
 
 // Sum the length of all arrays in obj
-function sumLengths(obj){
+function sumLengths (obj) {
   return Object.keys(obj).map((k) => {
     return obj[k].length
   }).reduce((acc, curr) => {
@@ -12,7 +11,7 @@ function sumLengths(obj){
 }
 
 // Sum all values in obj
-function sumValues(obj){
+function sumValues (obj) {
   return Object.keys(obj).map((k) => {
     return obj[k]
   }).reduce((acc, curr) => {
@@ -21,15 +20,15 @@ function sumValues(obj){
 }
 
 export default class ScoreBoard extends Component {
-  constructor(props){
+  constructor (props) {
     super(props)
     this.state = {}
     this.computePoints = this.computePoints.bind(this)
   }
-  componentWillReceiveProps(newProps){
+  componentWillReceiveProps (newProps) {
     this.computePoints(newProps.cards)
   }
-  computePoints(cards){
+  computePoints (cards) {
     const fifteens = getFifteens(cards)
     const pairs = getPairs(cards)
     const runs = getRuns(cards)
@@ -43,7 +42,7 @@ export default class ScoreBoard extends Component {
     })
   }
 
-  render(){
+  render () {
     return (
       <div>
         <ul>
