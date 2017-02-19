@@ -34,14 +34,8 @@ store.subscribe(() => {
 })
 
 function push (container, path = Object.keys(container)[0], data = container[path]) {
-  if (isNull(data) || isUndefined(data) || isEmpty(data)) return
-  // if (path contains player 2 and I'm player2....) return
-  
+  if (isNull(data) || isUndefined(data) || isEmpty(data)) return  
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
-  if(path === 'player1Hand') {
-    console.log('>>> p1H: ', data, cache[path])
-    debugger;
-  }
   if (isObject(data) || isArray(data)) {
     const jsonData = JSON.stringify(data)
     cache[path] = jsonData
@@ -62,9 +56,7 @@ let game = gun.get('game')
 game.map((value, path) => {
   if(keys(remotePaths).indexOf(path) !== -1){
     updateStore({ [ path ]: value })
-  } else{
-    // console.warn(`nothing in store for ${path}`)
-  }
+  } 
 })
 
 function updateStore (container, path = Object.keys(container)[0], data = container[path]) {
@@ -72,6 +64,9 @@ function updateStore (container, path = Object.keys(container)[0], data = contai
   if (isEqual(cache[path], data)) return
   cache[path] = data
   const action = createAction(path, data)
+  if(action.type.indexOf('PLAY_CARD')!==-1){
+    console.error('got from gun: ', action)
+  }
   store.dispatch(action)
 }
 

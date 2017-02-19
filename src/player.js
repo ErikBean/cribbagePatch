@@ -21,7 +21,7 @@ const Player = (props) => {
           <Set 
             cards={props.hand} 
             discard={props.discard} 
-            playCard={(card) => props.playPegCard(card, props.hand)} />
+            playCard={(card) => props.playPegCard(card, props.hand, props.played)} />
         </div>
       </div>
       <div id='played-cards' hidden={!props.cut}>
@@ -51,11 +51,11 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const playPegCard = (pegCard, hand) => {
+  const playPegCard = (pegCard, hand, played) => {
     if (!ownProps.cut) return // can't peg before cutting
     dispatch({
       type: `PLAYER${ownProps.num}_PLAY_CARD`,
-      payload: pegCard
+      payload: played.concat(pegCard)
     })
     dispatch({
       type: `GET_PLAYER${ownProps.num}_HAND`,
