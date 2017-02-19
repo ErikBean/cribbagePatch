@@ -7,7 +7,7 @@ Refactor TODO:
 3. can look in localStorage on page load to assign players, too
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. BUG: doing first cut doesn't grey out button for second cut
-6. BUG: Last card not removed from remote hand because empty array check causes early return
+6. BUG: Last card will not be removed from remote played stack (because empty array check causes early return)
 
 Rules TODO:
 

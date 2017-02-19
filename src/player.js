@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { without } from 'lodash'
+import { difference } from 'lodash'
 import { createDeck, shuffle, valueOf } from './deck'
 import Set from './set'
 import ScoreBoard from './scoreBoard'
@@ -19,9 +19,9 @@ const Player = (props) => {
         <div hidden={!props.isDoneDealing}>
           <ScoreBoard cards={props.myHandWithCut} />
           <Set 
-            cards={props.hand} 
+            cards={difference(props.hand, props.played)}
             discard={props.discard} 
-            playCard={(card) => props.playPegCard(card, props.hand, props.played)} />
+            playCard={(card) => props.playPegCard(card, props.played)} />
         </div>
       </div>
       <div id='played-cards' hidden={!props.cut}>
@@ -51,15 +51,11 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const playPegCard = (pegCard, hand, played) => {
+  const playPegCard = (pegCard, played) => {
     if (!ownProps.cut) return // can't peg before cutting
     dispatch({
       type: `PLAYER${ownProps.num}_PLAY_CARD`,
       payload: played.concat(pegCard)
-    })
-    dispatch({
-      type: `GET_PLAYER${ownProps.num}_HAND`,
-      payload: without(hand, pegCard)
     })
   }
   const discard = (discards) => {
