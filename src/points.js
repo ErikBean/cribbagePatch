@@ -16,7 +16,7 @@ function isArraySorted (array) {
   return false
 }
 
-export function sumOf (cards) {
+export function sumOf (cards) { // for pegging to 31
   return cards.map(valueMaxTen).reduce((curr, acc) => curr + acc, 0)
 }
 

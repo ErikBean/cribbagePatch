@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getFifteens, getRuns, getPairs } from './points'
+import { getFifteens, getRuns, getPairs } from '../points'
 
 // Sum the length of all arrays in obj
 function sumLengths (obj) {

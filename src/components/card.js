@@ -1,5 +1,5 @@
 import React from 'react'
-import { getNumberOrFace, getSuit } from './deck'
+import { getNumberOrFace, getSuit } from '../deck'
 
 const Card = (props) => {
   if (!props.card) return (<span>???</span>)

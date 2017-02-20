@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { difference, intersection, last, without, every } from 'lodash'
-import { sumOf, valueMaxTen } from './points'
+import { sumOf, valueMaxTen } from '../points'
 import Set from './set'
 import ScoreBoard from './scoreBoard'
 

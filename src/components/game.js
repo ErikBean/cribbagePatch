@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { createDeck, shuffle, valueOf } from './deck'
 import { isNull } from 'lodash'
+import { createDeck, shuffle, valueOf } from '../deck'
 import Player from './player'
 import Crib from './crib'
 import DeckSlider from './deckSlider'
 import Card from './card'
+
 function assignPlayerBasedOnCuts (myCut, theirCut, assign) {
   if (valueOf(myCut) < valueOf(theirCut)) {
     assign('player1')

@@ -49,6 +49,6 @@ export function getSuit (card) {
     case 'C':
       return 'clubs'
     default:
-      return 'XXXX'
+      return 'ERROR'
   }
 }

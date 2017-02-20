@@ -1,13 +1,12 @@
 var path = require('path')
 
 module.exports = {
-  debug: true,
   devtool: 'source-map',
-  entry: './src/app',
+  entry: './src/components/app',
   module: {
     loaders: [{
-      test: /\.jsx?$/,
-      loader: 'babel?cacheDirectory',
+      test: /\.js$/,
+      loader: 'babel-loader?cacheDirectory',
       exclude: /node_modules/
     },
     {

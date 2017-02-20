@@ -2,8 +2,8 @@
 real time cribbage game
 
 Refactor TODO:
-1. Points does not account for cutting a jack, or the right jack
-2. Wiping out 
+1. 
+2. 
 3. Update gun to 0.6.1
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. BUG: doing first cut doesn't grey out button for second cut
@@ -18,4 +18,6 @@ remove 6 cards from top into hand array for each player, push all this to gun
 6. DONE! player w/o crib selects slot in array to beginGameCut the deck, move card to game.beginGameCut
 7. DONE! Compute score of hands
 8. DONE! Player w/o crib has to select card to lead, copy this from hand to playedCards
-9. Players need to take turns playing peg cards. Player w/o crib needs to start
+9. Player w/o crib needs to start the pegging
+10. Need to know if local player says its a go, not just opponent. ( If I say it's a go && they say it's a go, we know to start over pegging )
+11. Points does not account for cutting a jack, or the right jack
