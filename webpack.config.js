@@ -3,10 +3,21 @@ var webpack = require('webpack')
 module.exports = {
   devtool: 'source-map',
   entry: {
-    main: './src/components/app'
+    hmr: ['react-hot-loader/patch',
+    // activate HMR for React
+
+      'webpack-dev-server/client?http://localhost:8080',
+    // bundle the client for webpack-dev-server
+    // and connect to the provided endpoint
+
+      'webpack/hot/only-dev-server'
+    // bundle the client for hot reloading
+    // only- means to only hot reload for successful updates
+    ],
+    bundle: './src/components/app'
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
       loader: 'babel-loader?cacheDirectory',
       exclude: /node_modules/
@@ -22,7 +33,8 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: '[name].js'
+    filename: '[name].js',
+    publicPath: '/'
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({

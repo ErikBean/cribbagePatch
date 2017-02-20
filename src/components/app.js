@@ -23,3 +23,10 @@ function reload () {
   window.restart() // wipe gunDB
   // setTimeout(() => window.location.reload(), 200)
 }
+
+// Hot Module Replacement API
+if (module.hot) {
+  module.hot.accept('./components/App', () => {
+    render(App)
+  });
+}

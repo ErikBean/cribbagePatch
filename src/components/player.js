@@ -16,7 +16,7 @@ const Player = (props) => {
   }
   return (
     <div id='player-container'>
-      <h2>Player {props.num} {props.isCurrentPlayer ? '(This is You)' : ''}</h2>
+      <h2>PlayerXXXXX {props.num} {props.isCurrentPlayer ? '(This is You)' : ''}</h2>
       <div id='player-hand' hidden={!props.isCurrentPlayer}>
         Your Hand:
         <div id='deal-hands' hidden={props.isDoneDealing || props.noCuts}>

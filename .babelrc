@@ -9,5 +9,5 @@
       "loose": true
     }]
   ],
-  "plugins": ["lodash", "transform-object-rest-spread"]
+  "plugins": ["lodash", "react-hot-loader/babel", "transform-object-rest-spread"]
 }
