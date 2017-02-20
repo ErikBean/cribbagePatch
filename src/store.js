@@ -1,6 +1,6 @@
 /* global Gun */
 import { createStore, combineReducers } from 'redux'
-import _, { isEmpty, isNull, isUndefined, isEqual, isArray, keys } from 'lodash'
+import { isEmpty, isNull, isUndefined, isEqual, isArray, keys } from 'lodash'
 import reducers from './reducers'
 
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -83,7 +83,7 @@ function createAction (path, data) {
 window.store = store
 window.game = game
 window.cache = cache
-window._ = _
+// window._ = _
 window.gun = gun
 
 window.restart = () => {

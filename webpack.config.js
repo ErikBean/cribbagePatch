@@ -1,8 +1,10 @@
 var path = require('path')
-
+var webpack = require('webpack')
 module.exports = {
   devtool: 'source-map',
-  entry: './src/components/app',
+  entry: {
+    main: './src/components/app'
+  },
   module: {
     loaders: [{
       test: /\.js$/,
@@ -20,8 +22,16 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: '[name].js'
   },
-  plugins: [],
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: function (module) {
+                   // this assumes your vendor imports exist in the node_modules directory
+        return module.context && module.context.indexOf('node_modules') !== -1
+      }
+    })
+  ],
   externals: []
 }
