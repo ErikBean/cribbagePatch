@@ -88,7 +88,6 @@ window.gun = gun
 
 window.restart = () => {
   window.localStorage.clear()
-  gun.get('game').put(null)
   game.put({
     player1Hand: null,
     player2Hand: null,

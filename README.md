@@ -2,7 +2,7 @@
 real time cribbage game
 
 Refactor TODO:
-1. 
+1. Need someplace to put derived data 
 2. 
 3. Update gun to 0.6.1
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
@@ -21,3 +21,50 @@ remove 6 cards from top into hand array for each player, push all this to gun
 9. Player w/o crib needs to start the pegging
 10. Need to know if local player says its a go, not just opponent. ( If I say it's a go && they say it's a go, we know to start over pegging )
 11. Points does not account for cutting a jack, or the right jack
+
+
+State@3-13-17:
+{
+   "crib":[
+      "C1",
+      "D1",
+      "H2",
+      "H3"
+   ],
+   "cut":"D11",
+   "cutIndex":"14",
+   "deck":[
+      "C5",
+      "H3",
+      "C10",
+      "H2",
+      "S11",
+      "D5",
+      "...etc."
+   ],
+   "firstCut":"D1",
+   "meta":{
+      "isPlayer1":false,
+      "isPlayer2":true,
+      "firstCut":null,
+      "secondCut":null,
+      "isMyCrib":false
+   },
+   "player1Hand":[
+      "C10",
+      "C5",
+      "D5",
+      "S11"
+   ],
+   "player2Hand":[
+      "C11",
+      "C12",
+      "D12",
+      "H5"
+   ],
+   "playedCards":[
+
+   ],
+   "round":0,
+   "secondCut":"S4"
+}

@@ -1,22 +1,32 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { difference, intersection, last, without, every } from 'lodash'
+import { difference, intersection, last, without, every, isEmpty, includes } from 'lodash'
 import { sumOf, valueMaxTen } from '../points'
 import Set from './set'
 import ScoreBoard from './scoreBoard'
 
+const isTooHighToPlay = (c, pegCount) => {
+  return valueMaxTen(c) > (31 - pegCount)
+}
+
+const isMyCrib = (playerNum, round) => {
+  // on first crib, playerNum = 1, round = 1
+  return (playerNum + round) % 2 === 0
+}
+
 const Player = (props) => {
   const cribWinnerMsg = props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
   const playPegCard = (card) => {
-    if (!props.cut) return // disable pegging before cutting deck
-    const didPlayLast = props.hand.indexOf(last(props.playedCards)) !== -1
-    const isMyTurn = !didPlayLast || props.isThatAGo
-    if (!isMyTurn) return
+    const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
+    const didPlayLast = includes(props.hand, last(props.playedCards))
+    const isMyTurn = !didPlayLast || props.hasAGo
+    console.log('>>> Here: ', {go: props.hasAGo, isWaitingForLead, isMyTurn, tooH: isTooHighToPlay(card, props.pegCount)})
+    if (!props.cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, props.pegCount)) return
     props.playPegCard(card, props.playedCards)
   }
   return (
     <div id='player-container'>
-      <h2>PlayerXXXXX {props.num} {props.isCurrentPlayer ? '(This is You)' : ''}</h2>
+      <h2>Player {props.num} {props.isCurrentPlayer ? '(This is You)' : ''}</h2>
       <div id='player-hand' hidden={!props.isCurrentPlayer}>
         Your Hand:
         <div id='deal-hands' hidden={props.isDoneDealing || props.noCuts}>
@@ -35,26 +45,24 @@ const Player = (props) => {
       <div id='played-cards' hidden={!props.cut}>
         On the Table:
         <Set cards={intersection(props.playedCards, props.hand)} />
-        { (!props.isCurrentPlayer && props.isThatAGo) ? 'Go!' : ''}
+        { (!props.isCurrentPlayer && props.hasAGo) ? 'Go!' : ''}
       </div>
     </div>
   )
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { firstCut, secondCut, playedCards } = state
+  const { firstCut, secondCut, playedCards, round } = state
   const { isPlayer1, isPlayer2 } = state.meta
   const hand = state[`player${ownProps.num}Hand`] || []
 
-  // TODO:  this block is untested loic:
   const theirNum = (3 - ownProps.num)
   const theirHand = state[`player${theirNum}Hand`] || []
-  const theirUnplayed = without(theirHand, playedCards) // what's left in their hand
+  const myUnplayed = without(hand, ...playedCards)
+  const theirUnplayed = without(theirHand, ...playedCards)
   const pegCount = sumOf(playedCards)
-  const isTooHighToPlay = (c) => {
-    return valueMaxTen(c) > (31 - pegCount)
-  }
-  const isThatAGo = every(theirUnplayed, isTooHighToPlay) // any of theirUnplayed < ( 31 - peggingCount ) ?
+  console.log('>>> GG: ', {theirUnplayed})
+  const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount))
 
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
   const isDoneDealing = !!(hand.length || playedCards.length)
@@ -63,7 +71,7 @@ const mapStateToProps = (state, ownProps) => {
     hand,
     playedCards,
     pegCount,
-    isThatAGo,
+    hasAGo,
     isCurrentPlayer,
     isDoneDealing,
     myHandWithCut: hand.concat(ownProps.cut || []),
