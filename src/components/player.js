@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { difference, intersection, last, without, every, isEmpty, includes } from 'lodash'
 import { sumOf, valueMaxTen } from '../points'
@@ -14,42 +14,61 @@ const isMyCrib = (playerNum, round) => {
   return (playerNum + round) % 2 === 0
 }
 
-const Player = (props) => {
-  const cribWinnerMsg = props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
-  const playPegCard = (card) => {
-    const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
-    const didPlayLast = includes(props.hand, last(props.playedCards))
-    const isMyTurn = !didPlayLast || props.hasAGo
-    console.log('>>> Here: ', {go: props.hasAGo, isWaitingForLead, isMyTurn, tooH: isTooHighToPlay(card, props.pegCount)})
-    if (!props.cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, props.pegCount)) return
-    props.playPegCard(card, props.playedCards)
-  }
-  return (
-    <div id='player-container'>
-      <h2>Player {props.num} {props.isCurrentPlayer ? '(This is You)' : ''}</h2>
-      <div id='player-hand' hidden={!props.isCurrentPlayer}>
-        Your Hand:
-        <div id='deal-hands' hidden={props.isDoneDealing || props.noCuts}>
-          <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
-          <button id='deal-button' hidden={!props.hasFirstCrib} onClick={props.deal}> Deal! </button>
-        </div>
-        <div hidden={!props.isDoneDealing}>
-          <ScoreBoard cards={props.myHandWithCut} />
-          Peg Count: {props.pegCount}
-          <Set
-            cards={difference(props.hand, props.playedCards)}
-            discard={props.discard}
-            playCard={playPegCard} />
-        </div>
-      </div>
-      <div id='played-cards' hidden={!props.cut}>
-        On the Table:
-        <Set cards={intersection(props.playedCards, props.hand)} />
-        { (!props.isCurrentPlayer && props.hasAGo) ? 'Go!' : ''}
-      </div>
-    </div>
-  )
+function stateFromProps (props) {
+  const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
+  const didPlayLast = includes(props.hand, last(props.playedCards))
+  const isMyTurn = !didPlayLast || props.hasAGo
+  const pegCount = sumOf(props.playedCards)
+  
+  return { isWaitingForLead, isMyTurn, pegCount }
 }
+
+class Player extends Component {
+  constructor(props){
+    super(props)
+    this.state = stateFromProps(props)
+    this.tryPlayCard = this.tryPlayCard.bind(this)
+  }
+  componentWillReceiveProps(nextProps){
+    this.setState(stateFromProps(nextProps))
+  }
+  tryPlayCard(card){
+    const { cut, playedCards } = this.props 
+    const { isMyTurn, isWaitingForLead, pegCount } = this.state
+    if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
+      return
+    }
+    this.props.playPegCard(card, playedCards)
+  }
+  render(){
+    const cribWinnerMsg = this.props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
+    return (
+      <div id='player-container'>
+        <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
+        <div id='player-hand' hidden={!this.props.isCurrentPlayer}>
+          Your Hand:
+          <div id='deal-hands' hidden={this.props.isDoneDealing || this.props.noCuts}>
+            <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
+            <button id='deal-button' hidden={!this.props.hasFirstCrib} onClick={this.props.deal}> Deal! </button>
+          </div>
+          <div hidden={!this.props.isDoneDealing}>
+            <ScoreBoard cards={this.props.myHandWithCut} />
+            Peg Count: {this.props.pegCount}
+            <Set
+              cards={difference(this.props.hand, this.props.playedCards)}
+              discard={this.props.discard}
+              playCard={this.tryPlayCard} />
+          </div>
+        </div>
+        <div id='played-cards' hidden={!this.props.cut}>
+          On the Table:
+          <Set cards={intersection(this.props.playedCards, this.props.hand)} />
+          { (!this.props.isCurrentPlayer && this.props.hasAGo) ? 'Go!' : ''}
+        </div>
+      </div>
+      )
+    }
+  }
 
 const mapStateToProps = (state, ownProps) => {
   const { firstCut, secondCut, playedCards, round } = state
@@ -61,7 +80,6 @@ const mapStateToProps = (state, ownProps) => {
   const myUnplayed = without(hand, ...playedCards)
   const theirUnplayed = without(theirHand, ...playedCards)
   const pegCount = sumOf(playedCards)
-  console.log('>>> GG: ', {theirUnplayed})
   const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount))
 
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
@@ -70,7 +88,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     hand,
     playedCards,
-    pegCount,
     hasAGo,
     isCurrentPlayer,
     isDoneDealing,
