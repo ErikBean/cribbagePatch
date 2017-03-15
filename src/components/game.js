@@ -101,7 +101,7 @@ class Game extends Component {
 const mapStateToProps = (state) => {
   const { round, deck, cut, crib, player1Hand, player2Hand, firstCut, secondCut } = state
   const { isPlayer1, isPlayer2, isMyCrib } = state.meta
-  const doneFirstDeal = player1Hand || player2Hand
+  const doneFirstDeal = player1Hand.length > 0 || player2Hand.length > 0
   const hasFirstCut = !isNull(window.localStorage.getItem('firstCut'))
   const hasSecondCut = !isNull(window.localStorage.getItem('secondCut'))
   return {

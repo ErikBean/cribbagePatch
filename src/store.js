@@ -1,6 +1,6 @@
 /* global Gun */
 import { createStore, combineReducers } from 'redux'
-import { isEmpty, isNull, isUndefined, isEqual, isArray, keys } from 'lodash'
+import { isEmpty, isNull, isUndefined, isEqual, isArray, keys, defer } from 'lodash'
 import reducers from './reducers'
 
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -32,8 +32,8 @@ store.subscribe(() => {
   })
 })
 
-function push (path, data) {
-  if (isNull(data) || isUndefined(data) || isEmpty(data)) return
+function push(path, data) {
+  if (isUndefined(data)) return
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
   if (isArray(data)) {
     const jsonData = JSON.stringify(data)
@@ -44,6 +44,17 @@ function push (path, data) {
     game.path(path).put(data)
   }
 }
+
+function updateStore(path, data) {
+  // console.log('>>> want to update store with: ', {path, data})
+  if (isUndefined(data) || data === '') return
+  if (isEqual(cache[path], data)) return
+  console.log('>>> Here: ', data, path)
+  cache[path] = data
+  const action = createAction(path, data)
+  store.dispatch(action)
+}
+
 
 const gun = Gun([
   'https://gun-starter-app-lzlbcefjql.now.sh',
@@ -56,17 +67,10 @@ let game = gun.get('game')
 
 game.map((value, path) => {
   if (keys(remotePaths).indexOf(path) !== -1) {
-    updateStore(path, value)
+    defer(() => updateStore(path, value))
   }
 })
 
-function updateStore (path, data) {
-  if (isNull(data) || isUndefined(data) || data === '') return
-  if (isEqual(cache[path], data)) return
-  cache[path] = data
-  const action = createAction(path, data)
-  store.dispatch(action)
-}
 
 function createAction (path, data) {
   const actionFor = (type, data) => {
@@ -89,17 +93,17 @@ window.gun = gun
 window.restart = () => {
   window.localStorage.clear()
   game.put({
-    player1Hand: null,
-    player2Hand: null,
-    playedCards: null,
-    deck: null,
+    player1Hand: '[]',
+    player2Hand: '[]',
+    playedCards: '[]',
+    deck: '[]',
+    crib: '[]',
     meta: null,
     firstCut: null,
     secondCut: null,
     cut: null,
-    crib: null,
     cutIndex: null,
-    round: null
+    round: 0
   })
   window.location.reload(true)
 }

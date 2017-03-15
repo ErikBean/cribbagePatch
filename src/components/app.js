@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import store from '../store'
 import Game from './game'
-
 const App = () => (
   <Provider store={store}>
     <div>
@@ -19,10 +18,6 @@ ReactDOM.render(
   document.getElementById('app')
 )
 
-function reload () {
-  window.restart() // wipe gunDB
-  // setTimeout(() => window.location.reload(), 200)
-}
 
 // Hot Module Replacement API
 if (module.hot) {

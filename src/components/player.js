@@ -53,7 +53,7 @@ class Player extends Component {
           </div>
           <div hidden={!this.props.isDoneDealing}>
             <ScoreBoard cards={this.props.myHandWithCut} />
-            Peg Count: {this.props.pegCount}
+            Peg Count: {this.state.pegCount}
             <Set
               cards={difference(this.props.hand, this.props.playedCards)}
               discard={this.props.discard}
