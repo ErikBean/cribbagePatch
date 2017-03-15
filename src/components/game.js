@@ -6,6 +6,7 @@ import Player from './player'
 import Crib from './crib'
 import DeckSlider from './deckSlider'
 import Card from './card'
+import GameInfo from './infoMessage'
 
 function assignPlayerBasedOnCuts (myCut, theirCut, assign) {
   if (valueOf(myCut) < valueOf(theirCut)) {
@@ -17,9 +18,13 @@ function assignPlayerBasedOnCuts (myCut, theirCut, assign) {
 class Game extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+      message: 'Need to cut for first crib'
+    }
     this.doSecondCut = this.doSecondCut.bind(this)
     this.doFirstCut = this.doFirstCut.bind(this)
     this.deal = this.deal.bind(this)
+    this.showMessage = this.showMessage.bind(this)
   }
   componentWillMount () {
     const stored = {
@@ -41,7 +46,9 @@ class Game extends Component {
       assignPlayerBasedOnCuts(myCut, theirCut, this.props.assignPlayer)
     }
   }
-
+  showMessage(message){
+    this.setState({message})
+  }
   doFirstCut () {
     const deck = shuffle(createDeck())
     this.props.updateDeck(deck)
@@ -74,6 +81,7 @@ class Game extends Component {
   render () {
     return (
       <div>
+        <GameInfo foo={this.state.message}/>
         <div hidden={this.props.doneFirstDeal}>
           <button disabled={this.props.firstCut} onClick={this.doFirstCut}>
             First Cut
@@ -85,9 +93,9 @@ class Game extends Component {
           <Card card={this.props.secondCut} />
         </div>
         <div>
-          <Player num='1' cut={this.props.cut} deal={this.deal} />
+          <Player num='1' cut={this.props.cut} deal={this.deal} hand={this.props.player1Hand} theirHand={this.props.player2Hand} showMessage={this.showMessage}/>
           <br />
-          <Player num='2' cut={this.props.cut} deal={this.deal} />
+          <Player num='2' cut={this.props.cut} deal={this.deal} hand={this.props.player2Hand} theirHand={this.props.player1Hand} showMessage={this.showMessage}/>
           <Crib visibleCards={this.props.crib || []} cards={(this.props.crib || []).concat(this.props.cut || [])} />
           <DeckSlider
             deck={this.props.deck}
@@ -113,6 +121,8 @@ const mapStateToProps = (state) => {
     doneFirstDeal,
     isPlayer1,
     isPlayer2,
+    player1Hand,
+    player2Hand,
     isMyCrib,
     crib,
     deck,

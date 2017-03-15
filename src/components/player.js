@@ -17,10 +17,13 @@ const isMyCrib = (playerNum, round) => {
 function stateFromProps (props) {
   const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
   const didPlayLast = includes(props.hand, last(props.playedCards))
-  const isMyTurn = !didPlayLast || props.hasAGo
   const pegCount = sumOf(props.playedCards)
+  const myUnplayed = without(props.hand, ...props.playedCards)
+  const theirUnplayed = without(props.theirHand, ...props.playedCards)
+  const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
+  const isMyTurn = !didPlayLast || hasAGo
   
-  return { isWaitingForLead, isMyTurn, pegCount }
+  return { isWaitingForLead, isMyTurn, pegCount, hasAGo }
 }
 
 class Player extends Component {
@@ -31,6 +34,13 @@ class Player extends Component {
   }
   componentWillReceiveProps(nextProps){
     this.setState(stateFromProps(nextProps))
+    const cribWinnerMsg = nextProps.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
+
+    if(nextProps.hasFirstCrib){
+      this.props.showMessage('You win the first crib!')
+    } else if(nextProps.opponentHasFirstCrib){
+      this.props.showMessage('Opponent has the first crib')
+    }
   }
   tryPlayCard(card){
     const { cut, playedCards } = this.props 
@@ -47,7 +57,7 @@ class Player extends Component {
         <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
         <div id='player-hand' hidden={!this.props.isCurrentPlayer}>
           Your Hand:
-          <div id='deal-hands' hidden={this.props.isDoneDealing || this.props.noCuts}>
+          <div id='deal-hands' hidden={this.props.isDoneDealing}>
             <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
             <button id='deal-button' hidden={!this.props.hasFirstCrib} onClick={this.props.deal}> Deal! </button>
           </div>
@@ -63,7 +73,7 @@ class Player extends Component {
         <div id='played-cards' hidden={!this.props.cut}>
           On the Table:
           <Set cards={intersection(this.props.playedCards, this.props.hand)} />
-          { (!this.props.isCurrentPlayer && this.props.hasAGo) ? 'Go!' : ''}
+          { (!this.props.isCurrentPlayer && this.state.hasAGo) ? 'Other player says Go!' : '' }
         </div>
       </div>
       )
@@ -73,27 +83,17 @@ class Player extends Component {
 const mapStateToProps = (state, ownProps) => {
   const { firstCut, secondCut, playedCards, round } = state
   const { isPlayer1, isPlayer2 } = state.meta
-  const hand = state[`player${ownProps.num}Hand`] || []
-
-  const theirNum = (3 - ownProps.num)
-  const theirHand = state[`player${theirNum}Hand`] || []
-  const myUnplayed = without(hand, ...playedCards)
-  const theirUnplayed = without(theirHand, ...playedCards)
-  const pegCount = sumOf(playedCards)
-  const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount))
 
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
-  const isDoneDealing = !!(hand.length || playedCards.length)
-  const noCuts = !firstCut && !secondCut
+  const isDoneDealing = !!(ownProps.hand.length || playedCards.length)
   return {
-    hand,
+    // hand,
     playedCards,
-    hasAGo,
     isCurrentPlayer,
     isDoneDealing,
-    myHandWithCut: hand.concat(ownProps.cut || []),
+    myHandWithCut: ownProps.hand.concat(ownProps.cut || []),
     hasFirstCrib: isPlayer1,
-    noCuts
+    opponentHasFirstCrib: isPlayer2,
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

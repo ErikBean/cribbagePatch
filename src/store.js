@@ -49,7 +49,7 @@ function updateStore(path, data) {
   // console.log('>>> want to update store with: ', {path, data})
   if (isUndefined(data) || data === '') return
   if (isEqual(cache[path], data)) return
-  console.log('>>> Here: ', data, path)
+  console.log('>>> update store: ', data, path)
   cache[path] = data
   const action = createAction(path, data)
   store.dispatch(action)
@@ -67,7 +67,7 @@ let game = gun.get('game')
 
 game.map((value, path) => {
   if (keys(remotePaths).indexOf(path) !== -1) {
-    defer(() => updateStore(path, value))
+    updateStore(path, value)
   }
 })
 
@@ -87,11 +87,9 @@ function createAction (path, data) {
 window.store = store
 window.game = game
 window.cache = cache
-// window._ = _
 window.gun = gun
 
 window.restart = () => {
-  window.localStorage.clear()
   game.put({
     player1Hand: '[]',
     player2Hand: '[]',
@@ -105,6 +103,7 @@ window.restart = () => {
     cutIndex: null,
     round: 0
   })
+  window.localStorage.clear()
   window.location.reload(true)
 }
 
