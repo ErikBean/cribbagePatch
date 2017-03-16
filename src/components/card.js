@@ -15,7 +15,7 @@ const Card = (props) => {
     backgroundSize: 'contain'
   }
   return (
-    <div style={style} onClick={props.onClick}/>
+    <div style={style} onClick={props.onClick}>{props.pegCount || ''}</div>
   )
 }
 export default Card

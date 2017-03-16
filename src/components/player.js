@@ -47,7 +47,7 @@ class Player extends Component {
   }
   componentDidUpdate(){
     if(this.state.shouldDiscard){
-      this.props.showMessage('please dicard 2 cards', () => {
+      this.props.showMessage('please discard 2 cards', () => {
         if(!this.state.selected[0] || !this.state.selected[1]){
           alert('select 2 cards!')
         }
@@ -95,7 +95,7 @@ class Player extends Component {
             </div>
           </div>
         </div>
-        
+
       </div>
       )
     }

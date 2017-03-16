@@ -11,7 +11,7 @@ export default store
 const cache = {}
 
 // does this NEED to be flat? No, but it makes things easier for now
-// What redux action type is associated with a change on this path in gun?
+// Indicates which redux action type is associated with a change on this path in gun
 const remotePaths = { // keys = reducers - meta
   cut: 'GET_CUT',
   cutIndex: 'GET_CUT_INDEX',
@@ -46,10 +46,8 @@ function push(path, data) {
 }
 
 function updateStore(path, data) {
-  // console.log('>>> want to update store with: ', {path, data})
-  if (isUndefined(data) || data === '') return
+  if (isNull(data) || isUndefined(data) || data === '') return
   if (isEqual(cache[path], data)) return
-  console.log('>>> update store: ', data, path)
   cache[path] = data
   const action = createAction(path, data)
   store.dispatch(action)
@@ -90,6 +88,7 @@ window.cache = cache
 window.gun = gun
 
 window.restart = () => {
+  window.localStorage.clear()
   game.put({
     player1Hand: '[]',
     player2Hand: '[]',

@@ -8,7 +8,8 @@ const bannerStyle = {
   color: 'white',
   padding: '0 50px',
   lineHeight: '30px',
-  cursor: 'pointer'
+  cursor: 'pointer',
+  zIndex: '100',
 }
 const buttonStyle = {
   backgroundColor: 'blue',
