@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { difference, intersection, last, without, every, isEmpty, includes } from 'lodash'
 import { sumOf, valueMaxTen } from '../points'
-import Set from './set'
+import Card from './card'
 import ScoreBoard from './scoreBoard'
 
 const isTooHighToPlay = (c, pegCount) => {
@@ -22,24 +22,49 @@ function stateFromProps (props) {
   const theirUnplayed = without(props.theirHand, ...props.playedCards)
   const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
   const isMyTurn = !didPlayLast || hasAGo
-  
-  return { isWaitingForLead, isMyTurn, pegCount, hasAGo }
+  const shouldDiscard = props.hand.length > 4
+  return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard }
 }
 
 class Player extends Component {
   constructor(props){
     super(props)
-    this.state = stateFromProps(props)
+    this.state = {
+      selected: [null, null],
+      ...stateFromProps(props)
+    }
     this.tryPlayCard = this.tryPlayCard.bind(this)
+    this.onCardClick = this.onCardClick.bind(this)
+    this.toggleSelect = this.toggleSelect.bind(this)
   }
   componentWillReceiveProps(nextProps){
     this.setState(stateFromProps(nextProps))
-    const cribWinnerMsg = nextProps.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
-
-    if(nextProps.hasFirstCrib){
-      this.props.showMessage('You win the first crib!')
-    } else if(nextProps.opponentHasFirstCrib){
-      this.props.showMessage('Opponent has the first crib')
+    if(nextProps.hasFirstCrib && !nextProps.hand.length){
+      this.props.showMessage('You win the first crib! Deal the cards.', this.props.deal)
+    } else if(nextProps.opponentHasFirstCrib && !nextProps.hand.length){
+      this.props.showMessage('Opponent has the first crib. Waitng for deal.')
+    }
+  }
+  componentDidUpdate(){
+    if(this.state.shouldDiscard){
+      this.props.showMessage('please dicard 2 cards', () => {
+        if(!this.state.selected[0] || !this.state.selected[1]){
+          alert('select 2 cards!')
+        }
+        this.props.discard(this.state.selected)
+      })
+    }
+  }
+  toggleSelect(card){
+    this.setState({
+      selected: [ card, this.state.selected[0] ]
+    })
+  }
+  onCardClick(card){
+    if(this.props.hand.length > 4){
+      this.toggleSelect(card)
+    } else {
+      this.tryPlayCard(card)
     }
   }
   tryPlayCard(card){
@@ -51,30 +76,26 @@ class Player extends Component {
     this.props.playPegCard(card, playedCards)
   }
   render(){
-    const cribWinnerMsg = this.props.hasFirstCrib ? 'You win the first crib!' : 'Opponent has the first crib'
     return (
       <div id='player-container'>
         <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
         <div id='player-hand' hidden={!this.props.isCurrentPlayer}>
           Your Hand:
-          <div id='deal-hands' hidden={this.props.isDoneDealing}>
-            <h5> {cribWinnerMsg} <br /> Waiting for deal </h5>
-            <button id='deal-button' hidden={!this.props.hasFirstCrib} onClick={this.props.deal}> Deal! </button>
-          </div>
           <div hidden={!this.props.isDoneDealing}>
             <ScoreBoard cards={this.props.myHandWithCut} />
             Peg Count: {this.state.pegCount}
-            <Set
-              cards={difference(this.props.hand, this.props.playedCards)}
-              discard={this.props.discard}
-              playCard={this.tryPlayCard} />
+            <div>
+              {difference(this.props.hand, this.props.playedCards).map((card) => (
+                <Card
+                  onClick={() => this.onCardClick(card)}
+                  isSelected={includes(this.state.selected, card)}
+                  card={card}
+                  key={card} />
+              ))}
+            </div>
           </div>
         </div>
-        <div id='played-cards' hidden={!this.props.cut}>
-          On the Table:
-          <Set cards={intersection(this.props.playedCards, this.props.hand)} />
-          { (!this.props.isCurrentPlayer && this.state.hasAGo) ? 'Other player says Go!' : '' }
-        </div>
+        
       </div>
       )
     }

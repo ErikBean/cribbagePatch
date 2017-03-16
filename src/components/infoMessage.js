@@ -1,5 +1,5 @@
 import React from 'react'
-const style = {
+const bannerStyle = {
   position: 'fixed',
   bottom: '0',
   left: '0',
@@ -7,8 +7,17 @@ const style = {
   backgroundColor: 'green',
   color: 'white',
   padding: '0 50px',
-  lineHeight: '30px'
+  lineHeight: '30px',
+  cursor: 'pointer'
+}
+const buttonStyle = {
+  backgroundColor: 'blue',
+  borderRadius: '99px',
+  padding: '0 20px',
+  marginLeft: '20px'
 }
 export default (props) => (
-  <div style={style}>{props.foo}</div>
+  <div style={bannerStyle}>
+    {props.text} <span style={buttonStyle} onClick={props.onConfirm}>OK</span>
+  </div>
 )

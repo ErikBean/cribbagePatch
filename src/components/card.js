@@ -7,7 +7,7 @@ const Card = (props) => {
   const suit = getSuit(props.card)
   const style = {
     display: 'inline-block',
-    border: props.isSelected ? '3px solid red' : 'none',
+    border: props.isSelected ? '3px solid red' : '3px solid transparent',
     height: '200px',
     width: '140px',
     boxShadow: props.isOnDeck ? '10px 10px 10px black' : 'none',
@@ -15,7 +15,7 @@ const Card = (props) => {
     backgroundSize: 'contain'
   }
   return (
-    <div onClick={props.clickHandler || Function.prototype} style={style} />
+    <div style={style} onClick={props.onClick}/>
   )
 }
 export default Card

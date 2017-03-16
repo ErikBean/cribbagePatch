@@ -18,13 +18,14 @@ function assignPlayerBasedOnCuts (myCut, theirCut, assign) {
 class Game extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      message: 'Need to cut for first crib'
-    }
     this.doSecondCut = this.doSecondCut.bind(this)
     this.doFirstCut = this.doFirstCut.bind(this)
     this.deal = this.deal.bind(this)
     this.showMessage = this.showMessage.bind(this)
+    this.state = {
+      message: 'Need to cut for first crib',
+      nextAction: this.doFirstCut
+    }
   }
   componentWillMount () {
     const stored = {
@@ -39,15 +40,19 @@ class Game extends Component {
   }
   componentWillReceiveProps (newProps) {
     const isNotAssignedPlayer = (!newProps.isPlayer1 && !newProps.isPlayer2)
+
     if (isNotAssignedPlayer && newProps.firstCut && newProps.secondCut) {
       const myCut = newProps.hasFirstCut ? newProps.firstCut : newProps.secondCut
       const theirCut = newProps.hasFirstCut ? newProps.secondCut : newProps.firstCut
       // Assign players here:
       assignPlayerBasedOnCuts(myCut, theirCut, this.props.assignPlayer)
     }
+    if(newProps.firstCut && !newProps.isPlayer1){
+      this.setState({nextAction: this.doSecondCut})
+    }
   }
-  showMessage(message){
-    this.setState({message})
+  showMessage(message, cb = ()=>{}){
+    this.setState({message,nextAction: cb})
   }
   doFirstCut () {
     const deck = shuffle(createDeck())
@@ -81,20 +86,13 @@ class Game extends Component {
   render () {
     return (
       <div>
-        <GameInfo foo={this.state.message}/>
+        <GameInfo text={this.state.message} onConfirm={this.state.nextAction}/>
         <div hidden={this.props.doneFirstDeal}>
-          <button disabled={this.props.firstCut} onClick={this.doFirstCut}>
-            First Cut
-          </button>
           <Card card={this.props.firstCut} />
-          <button disabled={this.props.secondCut || this.props.hasFirstCut} onClick={this.doSecondCut}>
-            Second Cut
-          </button>
           <Card card={this.props.secondCut} />
         </div>
         <div>
           <Player num='1' cut={this.props.cut} deal={this.deal} hand={this.props.player1Hand} theirHand={this.props.player2Hand} showMessage={this.showMessage}/>
-          <br />
           <Player num='2' cut={this.props.cut} deal={this.deal} hand={this.props.player2Hand} theirHand={this.props.player1Hand} showMessage={this.showMessage}/>
           <Crib visibleCards={this.props.crib || []} cards={(this.props.crib || []).concat(this.props.cut || [])} />
           <DeckSlider
@@ -102,12 +100,21 @@ class Game extends Component {
             isHidden={!this.props.crib || this.props.crib.length !== 4}
             isMyCrib={this.props.isMyCrib} />
         </div>
+        <br/>
+        <div id='played-cards' hidden={!this.props.cut}>
+          On the Table:<br/>
+          {this.props.playedCards.map((card) => (
+            <Card
+              card={card}
+              key={card} />
+          ))}
+        </div>
       </div>
     )
   }
 }
 const mapStateToProps = (state) => {
-  const { round, deck, cut, crib, player1Hand, player2Hand, firstCut, secondCut } = state
+  const { round, deck, cut, crib, player1Hand, player2Hand, playedCards, firstCut, secondCut } = state
   const { isPlayer1, isPlayer2, isMyCrib } = state.meta
   const doneFirstDeal = player1Hand.length > 0 || player2Hand.length > 0
   const hasFirstCut = !isNull(window.localStorage.getItem('firstCut'))
@@ -123,6 +130,7 @@ const mapStateToProps = (state) => {
     isPlayer2,
     player1Hand,
     player2Hand,
+    playedCards,
     isMyCrib,
     crib,
     deck,
