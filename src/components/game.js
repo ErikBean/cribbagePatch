@@ -103,7 +103,7 @@ class Game extends Component {
         </div>
         <div id='played-cards' hidden={!this.props.cut}>
           On the Table:<br />
-          <PeggingArea playedCards={this.props.playedCards} />
+          <PeggingArea playedCards={this.props.playedCards || []} />
         </div>
       </div>
     )
@@ -112,7 +112,7 @@ class Game extends Component {
 const mapStateToProps = (state) => {
   const { round, deck, cut, crib, player1Hand, player2Hand, playedCards, firstCut, secondCut } = state
   const { isPlayer1, isPlayer2, isMyCrib } = state.meta
-  const doneFirstDeal = player1Hand.length > 0 || player2Hand.length > 0
+  const doneFirstDeal = (player1Hand || []).length > 0 || (player2Hand || []).length > 0
   return {
     currentRound: round,
     firstCut,

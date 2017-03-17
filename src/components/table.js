@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { includes } from 'lodash'
+import { includes, last } from 'lodash'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 import { sumOf } from '../points'
@@ -8,7 +8,7 @@ export default class Crib extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      isHidden: true
+      isHidden: false
     }
     this.isFromMe = this.isFromMe.bind(this)
   }
@@ -29,20 +29,23 @@ export default class Crib extends Component {
       fontFamily: 'sans-serif',
       fontSize: '72px',
       padding: '50px',
-      fontweight: 'bold'
+      fontweight: 'bold',
+      height: '100%',
+      textAlign: 'center'
     }
+    const isLast = (card) => card === last(this.props.playedCards)
     return (
       <div hidden={this.state.isHidden}>
-        <ScoreBoard cards={this.props.pegCards} />
-        {this.props.playedCards.map((card) => {
-          return (
-            <span key={card} style={offsetStyle(card)}>
-              <Card card={card} pegCount={sumOf(this.props.playedCards)}>
-                <span style={fontStyle}>{sumOf(this.props.playedCards)}</span>
-              </Card>
-            </span>
-          )
-        })}
+        <ScoreBoard cards={this.props.playedCards} />
+        {this.props.playedCards.map((card) => (
+          <span key={card} style={offsetStyle(card)}>
+            <Card card={card} pegCount={sumOf(this.props.playedCards)}>
+              <div style={fontStyle}>
+                {isLast(card) ? sumOf(this.props.playedCards) : ''}
+              </div>
+            </Card>
+          </span>
+        ))}
       </div>
     )
   }

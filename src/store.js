@@ -54,9 +54,8 @@ function updateStore (path, data) {
 }
 
 const gun = Gun([
-  'https://gun-starter-app-lzlbcefjql.now.sh',
-  'https://gun-starter-app-fztqkpmntx.now.sh',
-  'https://gun-starter-app-usobfzosot.now.sh'
+  'https://gun-uvmkdvqfub.now.sh',
+  'https://gun-mvdlzwopkp.now.sh'
 ])
 
 // Reads key 'game'.
@@ -101,9 +100,9 @@ window.restart = () => {
     round: 0
   })
   window.localStorage.clear()
-  window.location.reload(true)
+  window.location.reload()
 }
-
+window.gunVal = game.val(console.log.bind(console))
 window.getHand = (hand, player) => {
   store.dispatch({
     type: `GET_${player.toUpperCase()}_HAND`,

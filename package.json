@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/ErikBean/cribbagePatch#readme",
   "dependencies": {
-    "gun": "^0.3.9991",
+    "gun": "^0.6.3",
     "lodash": "^4.17.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",

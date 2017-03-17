@@ -1,5 +1,5 @@
 import { difference } from 'lodash'
-const initialState = []
+const initialState = null
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'GET_PLAYER2_HAND':

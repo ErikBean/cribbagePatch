@@ -1,5 +1,5 @@
 import { union } from 'lodash'
-const initialState = []
+const initialState = null
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_TO_CRIB':

@@ -17,12 +17,12 @@ const isMyCrib = (playerNum, round) => {
 function stateFromProps (props) {
   const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
   const didPlayLast = includes(props.hand, last(props.playedCards))
-  const pegCount = sumOf(props.playedCards)
-  const myUnplayed = difference(this.props.hand, this.props.playedCards)
+  const pegCount = sumOf(props.playedCards || [])
+  const myUnplayed = difference(props.hand, props.playedCards)
   const theirUnplayed = difference(props.theirHand, props.playedCards)
   const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
   const isMyTurn = !didPlayLast || hasAGo
-  const shouldDiscard = props.hand.length > 4
+  const shouldDiscard = (props.hand || []).length > 4
   return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard, myUnplayed }
 }
 
@@ -41,7 +41,7 @@ class Player extends Component {
     this.setState(stateFromProps(nextProps))
     if (nextProps.hasFirstCrib && !nextProps.hand.length) {
       this.props.showMessage('You win the first crib! Deal the cards.', this.props.deal)
-    } else if (nextProps.opponentHasFirstCrib && !nextProps.hand.length) {
+    } else if (nextProps.opponentHasFirstCrib && !(nextProps.hand || []).length) {
       this.props.showMessage('Opponent has the first crib. Waitng for deal.')
     }
   }
@@ -81,7 +81,7 @@ class Player extends Component {
         <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
         <div id='player-hand' hidden={!this.props.isCurrentPlayer}>
           Your Hand:
-          <div hidden={!this.props.isDoneDealing}>
+          <div>
             <ScoreBoard cards={this.props.myHandWithCut} />
             Peg Count: {this.state.pegCount}
             <div>
@@ -105,12 +105,10 @@ const mapStateToProps = (state, ownProps) => {
   const { isPlayer1, isPlayer2 } = state.meta
 
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
-  const isDoneDealing = !!(ownProps.hand.length || playedCards.length)
   return {
     playedCards,
     isCurrentPlayer,
-    isDoneDealing,
-    myHandWithCut: ownProps.hand.concat(ownProps.cut || []),
+    myHandWithCut: (ownProps.hand || []).concat(ownProps.cut || []),
     hasFirstCrib: isPlayer1,
     opponentHasFirstCrib: isPlayer2
   }
