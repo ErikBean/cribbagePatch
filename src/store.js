@@ -1,6 +1,6 @@
 /* global Gun */
 import { createStore, combineReducers } from 'redux'
-import { isEmpty, isNull, isUndefined, isEqual, isArray, keys, defer } from 'lodash'
+import { isNull, isUndefined, isEqual, isArray, keys } from 'lodash'
 import reducers from './reducers'
 
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -32,7 +32,7 @@ store.subscribe(() => {
   })
 })
 
-function push(path, data) {
+function push (path, data) {
   if (isUndefined(data)) return
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
   if (isArray(data)) {
@@ -45,14 +45,13 @@ function push(path, data) {
   }
 }
 
-function updateStore(path, data) {
+function updateStore (path, data) {
   if (isNull(data) || isUndefined(data) || data === '') return
   if (isEqual(cache[path], data)) return
   cache[path] = data
   const action = createAction(path, data)
   store.dispatch(action)
 }
-
 
 const gun = Gun([
   'https://gun-starter-app-lzlbcefjql.now.sh',
@@ -68,7 +67,6 @@ game.map((value, path) => {
     updateStore(path, value)
   }
 })
-
 
 function createAction (path, data) {
   const actionFor = (type, data) => {

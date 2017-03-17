@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { difference, intersection, last, without, every, isEmpty, includes } from 'lodash'
+import { difference, last, every, isEmpty, includes } from 'lodash'
 import { sumOf, valueMaxTen } from '../points'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
@@ -18,16 +18,16 @@ function stateFromProps (props) {
   const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
   const didPlayLast = includes(props.hand, last(props.playedCards))
   const pegCount = sumOf(props.playedCards)
-  const myUnplayed = without(props.hand, ...props.playedCards)
-  const theirUnplayed = without(props.theirHand, ...props.playedCards)
+  const myUnplayed = difference(this.props.hand, this.props.playedCards)
+  const theirUnplayed = difference(props.theirHand, props.playedCards)
   const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
   const isMyTurn = !didPlayLast || hasAGo
   const shouldDiscard = props.hand.length > 4
-  return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard }
+  return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard, myUnplayed }
 }
 
 class Player extends Component {
-  constructor(props){
+  constructor (props) {
     super(props)
     this.state = {
       selected: [null, null],
@@ -37,45 +37,45 @@ class Player extends Component {
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
   }
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps (nextProps) {
     this.setState(stateFromProps(nextProps))
-    if(nextProps.hasFirstCrib && !nextProps.hand.length){
+    if (nextProps.hasFirstCrib && !nextProps.hand.length) {
       this.props.showMessage('You win the first crib! Deal the cards.', this.props.deal)
-    } else if(nextProps.opponentHasFirstCrib && !nextProps.hand.length){
+    } else if (nextProps.opponentHasFirstCrib && !nextProps.hand.length) {
       this.props.showMessage('Opponent has the first crib. Waitng for deal.')
     }
   }
-  componentDidUpdate(){
-    if(this.state.shouldDiscard){
+  componentDidUpdate () {
+    if (this.state.shouldDiscard) {
       this.props.showMessage('please discard 2 cards', () => {
-        if(!this.state.selected[0] || !this.state.selected[1]){
-          alert('select 2 cards!')
+        if (!this.state.selected[0] || !this.state.selected[1]) {
+          window.alert('select 2 cards!')
         }
         this.props.discard(this.state.selected)
       })
     }
   }
-  toggleSelect(card){
+  toggleSelect (card) {
     this.setState({
       selected: [ card, this.state.selected[0] ]
     })
   }
-  onCardClick(card){
-    if(this.props.hand.length > 4){
+  onCardClick (card) {
+    if (this.props.hand.length > 4) {
       this.toggleSelect(card)
     } else {
       this.tryPlayCard(card)
     }
   }
-  tryPlayCard(card){
-    const { cut, playedCards } = this.props 
+  tryPlayCard (card) {
+    const { cut, playedCards } = this.props
     const { isMyTurn, isWaitingForLead, pegCount } = this.state
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
     this.props.playPegCard(card, playedCards)
   }
-  render(){
+  render () {
     return (
       <div id='player-container'>
         <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
@@ -85,7 +85,7 @@ class Player extends Component {
             <ScoreBoard cards={this.props.myHandWithCut} />
             Peg Count: {this.state.pegCount}
             <div>
-              {difference(this.props.hand, this.props.playedCards).map((card) => (
+              {this.state.myUnplayed.map((card) => (
                 <Card
                   onClick={() => this.onCardClick(card)}
                   isSelected={includes(this.state.selected, card)}
@@ -95,26 +95,24 @@ class Player extends Component {
             </div>
           </div>
         </div>
-
       </div>
-      )
-    }
+    )
+  }
   }
 
 const mapStateToProps = (state, ownProps) => {
-  const { firstCut, secondCut, playedCards, round } = state
+  const { playedCards } = state
   const { isPlayer1, isPlayer2 } = state.meta
 
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
   const isDoneDealing = !!(ownProps.hand.length || playedCards.length)
   return {
-    // hand,
     playedCards,
     isCurrentPlayer,
     isDoneDealing,
     myHandWithCut: ownProps.hand.concat(ownProps.cut || []),
     hasFirstCrib: isPlayer1,
-    opponentHasFirstCrib: isPlayer2,
+    opponentHasFirstCrib: isPlayer2
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

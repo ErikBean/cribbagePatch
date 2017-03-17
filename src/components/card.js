@@ -14,8 +14,11 @@ const Card = (props) => {
     background: `url(../styles/svg-cards/${value}_of_${suit}.svg) no-repeat`,
     backgroundSize: 'contain'
   }
+
   return (
-    <div style={style} onClick={props.onClick}>{props.pegCount || ''}</div>
+    <div style={style} onClick={props.onClick}>
+      {props.children}
+    </div>
   )
 }
 export default Card

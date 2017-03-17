@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { isNull, includes } from 'lodash'
 import { createDeck, shuffle, valueOf } from '../deck'
-import { sumOf } from '../points'
 
 import Player from './player'
 import Crib from './crib'
 import DeckSlider from './deckSlider'
 import Card from './card'
 import GameInfo from './infoMessage'
+import PeggingArea from './table'
 
 class Game extends Component {
   constructor (props) {
@@ -30,41 +29,39 @@ class Game extends Component {
   componentWillMount () {
     if (this.state.isPlayer1) {
       this.props.assignPlayer('player1')
-    } else if(this.state.isPlayer2) {
+    } else if (this.state.isPlayer2) {
       this.props.assignPlayer('player2')
     }
   }
   componentWillReceiveProps (newProps) {
-    if(newProps.firstCut && !newProps.isPlayer1){
+    if (newProps.firstCut && !newProps.isPlayer1) {
       this.setState({nextAction: this.doSecondCut})
     }
     if (newProps.firstCut && newProps.secondCut && !this.state.isPlayer1 && !this.state.isPlayer2) {
       const myCut = this.state.didFirstCut ? newProps.firstCut : newProps.secondCut
-      const theirCut = this.state.didFirstCut ?  newProps.secondCut : newProps.firstCut
+      const theirCut = this.state.didFirstCut ? newProps.secondCut : newProps.firstCut
       this.assignPlayer(myCut, theirCut)
     }
   }
-  assignPlayer(myCut, theirCut){
-    if(!myCut || !theirCut) console.error('!!!!!assign based on no cut!',{myCut, theirCut})
+  assignPlayer (myCut, theirCut) {
+    if (!myCut || !theirCut) console.error('!!!!!assign based on no cut!', {myCut, theirCut})
     if (valueOf(myCut) < valueOf(theirCut)) {
       this.props.assignPlayer('player1')
       window.localStorage.setItem('cribbagePatchPlayer1', true)
-      
     } else if (valueOf(myCut) > valueOf(theirCut)) {
       this.props.assignPlayer('player2')
       window.localStorage.setItem('cribbagePatchPlayer2', true)
-
     }
   }
-  showMessage(message, cb = ()=>{}){
-    this.setState({message,nextAction: cb})
+  showMessage (message, cb = () => {}) {
+    this.setState({message, nextAction: cb})
   }
   doFirstCut () {
     const deck = shuffle(createDeck())
     this.props.updateDeck(deck)
     const myCut = deck[0]
     this.props.cutForFirstCrib(true, myCut)
-    this.setState({didFirstCut:true})
+    this.setState({didFirstCut: true})
     // then wait for remote player to make second cut
   }
   doSecondCut () {
@@ -90,42 +87,23 @@ class Game extends Component {
   render () {
     return (
       <div>
-        <GameInfo text={this.state.message} onConfirm={this.state.nextAction}/>
+        <GameInfo text={this.state.message} onConfirm={this.state.nextAction} />
         <div hidden={this.props.doneFirstDeal}>
           <Card card={this.props.firstCut} />
           <Card card={this.props.secondCut} />
         </div>
         <div>
-          <Player num='1' cut={this.props.cut} deal={this.deal} hand={this.props.player1Hand} theirHand={this.props.player2Hand} showMessage={this.showMessage}/>
-          <Player num='2' cut={this.props.cut} deal={this.deal} hand={this.props.player2Hand} theirHand={this.props.player1Hand} showMessage={this.showMessage}/>
+          <Player num='1' cut={this.props.cut} deal={this.deal} hand={this.props.player1Hand} theirHand={this.props.player2Hand} showMessage={this.showMessage} />
+          <Player num='2' cut={this.props.cut} deal={this.deal} hand={this.props.player2Hand} theirHand={this.props.player1Hand} showMessage={this.showMessage} />
           <Crib visibleCards={this.props.crib || []} cards={(this.props.crib || []).concat(this.props.cut || [])} />
           <DeckSlider
             deck={this.props.deck}
             isHidden={!this.props.crib || this.props.crib.length !== 4}
             isMyCrib={this.props.isMyCrib} />
         </div>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
         <div id='played-cards' hidden={!this.props.cut}>
-          On the Table:<br/>
-          {this.props.playedCards.map((card) => {
-            const isFromMe = (this.props.isPlayer1 && includes(this.props.player1Hand, card)) || (this.props.isPlayer2 && includes(this.props.player2Hand, card))
-            const offsetStyle = {
-              position: 'relative',
-              display: 'inline-block',
-              top: isFromMe ? '50px' : '',
-              bottom: isFromMe ? '' : '50px'
-            }
-            console.log('>>> isFrom Me, ', card, isFromMe)
-            return (
-              <span key={card} style={offsetStyle}>
-                <Card card={card} pegCount={sumOf(this.props.playedCards)}/>
-              </span>
-            )
-          })}
+          On the Table:<br />
+          <PeggingArea playedCards={this.props.playedCards} />
         </div>
       </div>
     )

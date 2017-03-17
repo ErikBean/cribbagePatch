@@ -18,10 +18,9 @@ ReactDOM.render(
   document.getElementById('app')
 )
 
-
 // Hot Module Replacement API
 if (module.hot) {
   module.hot.accept('./components/App', () => {
-    render(App)
-  });
+    ReactDOM.render(App)
+  })
 }
