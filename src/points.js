@@ -1,8 +1,41 @@
 import { valueOf } from './deck'
-import { uniq, toPairs, times } from 'lodash'
+import { uniq, toPairs, times, last, includes, reverse, first } from 'lodash'
 
 export function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
+}
+
+export function getPegPoints(playedCards, hand) {
+  const isLastCardPlayedByMe = includes(hand, last(playedCards))
+  if(!isLastCardPlayedByMe) return
+  const fifteenPoints = sumOf(playedCards) === 15 ? 2 : 0
+  const last4 = playedCards.slice(-4).map(valueOf)
+  let pairsPoints = 0;
+  if(last4[3] === last4[2]){
+    pairsPoints += 2
+    if(last4[2] === last4[1]){
+      pairsPoints += 4
+      if(last4[1] === last4[0]){
+        pairsPoints += 6
+      }
+    }
+  }
+  let runsPoints = 0
+  const run = first(getRuns(playedCards))
+  if(run && includes(runs[0], last(playedCards))){
+    runsPoints = run.length
+  }
+  console.log('>>> getPegPoints: ', {
+    pairsPoints,
+    fifteenPoints,
+    runsPoints
+  })
+  return {
+    pairsPoints,
+    fifteenPoints,
+    runsPoints
+  }
+  // TODO: go backwards through played cards seeing if run is larger
 }
 
 function isArraySorted (array) {

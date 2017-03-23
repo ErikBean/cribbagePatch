@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { difference, last, every, isEmpty, includes } from 'lodash'
-import { sumOf, valueMaxTen } from '../points'
+import { sumOf, valueMaxTen, getPegPoints } from '../points'
+import { createDeck, shuffle, valueOf } from '../deck'
+
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
@@ -23,6 +25,7 @@ function stateFromProps (props) {
   const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
   const isMyTurn = !didPlayLast || hasAGo
   const shouldDiscard = (props.hand || []).length > 4
+  const myPegPoints = getPegPoints(props.playedCards, props.hand)
   return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard, myUnplayed }
 }
 
@@ -36,13 +39,14 @@ class Player extends Component {
     this.tryPlayCard = this.tryPlayCard.bind(this)
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
+    this.deal = this.deal.bind(this)
   }
   componentWillReceiveProps (nextProps) {
     this.setState(stateFromProps(nextProps))
-    if (nextProps.hasFirstCrib && !nextProps.hand.length) {
-      this.props.showMessage('You win the first crib! Deal the cards.', this.props.deal)
+    if (nextProps.hasFirstCrib && !(nextProps.hand || []).length) {
+      this.props.showMessage('You win the first crib! Deal the cards.', this.deal)
     } else if (nextProps.opponentHasFirstCrib && !(nextProps.hand || []).length) {
-      this.props.showMessage('Opponent has the first crib. Waitng for deal.')
+      this.props.showMessage('Opponent has the first crib. Waiting for deal.', null)
     }
   }
   componentDidUpdate () {
@@ -55,17 +59,23 @@ class Player extends Component {
       })
     }
   }
+  deal () {
+    const deck = shuffle(createDeck())
+    const hand1 = []
+    const hand2 = []
+    for (let i = 0; i < 6; i++) {
+      hand1[i] = deck[i]
+      hand2[i] = deck[ i + 6 ]
+    }
+    this.props.incrementRound((this.props.currentRound + 1))
+    this.props.updateDeck(deck)
+    this.props.getHand('player1', hand1)
+    this.props.getHand('player2', hand2)
+  }
   toggleSelect (card) {
     this.setState({
       selected: [ card, this.state.selected[0] ]
     })
-  }
-  onCardClick (card) {
-    if (this.props.hand.length > 4) {
-      this.toggleSelect(card)
-    } else {
-      this.tryPlayCard(card)
-    }
   }
   tryPlayCard (card) {
     const { cut, playedCards } = this.props
@@ -74,6 +84,13 @@ class Player extends Component {
       return
     }
     this.props.playPegCard(card, playedCards)
+  }
+  onCardClick (card) {
+    if (this.props.hand.length > 4) {
+      this.toggleSelect(card)
+    } else {
+      this.tryPlayCard(card)
+    }
   }
   render () {
     return (
@@ -131,7 +148,16 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     })
   }
 
-  return { discard, playPegCard }
+  return { 
+    discard,
+    playPegCard,
+    incrementRound: (nextRound) => dispatch({type: 'INCREMENT_ROUND', payload: nextRound}),
+    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
+    getHand: (player, hand) => dispatch({
+      type: `GET_${player.toUpperCase()}_HAND`,
+      payload: hand
+    })
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Player)

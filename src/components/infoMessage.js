@@ -19,6 +19,8 @@ const buttonStyle = {
 }
 export default (props) => (
   <div style={bannerStyle}>
-    {props.text} <span style={buttonStyle} onClick={props.onConfirm}>OK</span>
+    {props.text} <span hidden={!props.onConfirm} style={buttonStyle} onClick={props.onConfirm}>OK</span>
+    <br />
+    {props.extra ? props.extra : null}
   </div>
 )

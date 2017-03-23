@@ -2,9 +2,9 @@
 real time cribbage game
 
 Refactor TODO:
-1. Need someplace to put derived data 
-2. 
-3. Update gun to 0.6.1
+1. DONE! Need someplace to put derived data (this.state...not the best)
+2. Need message to cut the deck
+3. DONE! Update gun to 0.6.1
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. BUG: doing first cut doesn't grey out button for second cut
 6. Serious trouble restarting the game

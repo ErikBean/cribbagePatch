@@ -33,7 +33,7 @@ store.subscribe(() => {
 })
 
 function push (path, data) {
-  if (isUndefined(data)) return
+  if (isUndefined(data) || isNull(data)) return
   if (isEqual(cache[path], data) || JSON.stringify(data) === cache[path]) return
   if (isArray(data)) {
     const jsonData = JSON.stringify(data)
