@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { difference, last, every, isEmpty, includes } from 'lodash'
+import { difference, last, every, isEmpty, includes, size } from 'lodash'
 import { sumOf, valueMaxTen, getPegPoints } from '../points'
 import { createDeck, shuffle, valueOf } from '../deck'
 
@@ -13,7 +13,7 @@ const isTooHighToPlay = (c, pegCount) => {
 
 const isMyCrib = (playerNum, round) => {
   // on first crib, playerNum = 1, round = 1
-  return (playerNum + round) % 2 === 0
+  return (parseInt(playerNum) + round) % 2 === 0
 }
 
 function stateFromProps (props) {
@@ -40,24 +40,41 @@ class Player extends Component {
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
     this.deal = this.deal.bind(this)
+    this.discard = this.discard.bind(this)
   }
   componentWillReceiveProps (nextProps) {
-    this.setState(stateFromProps(nextProps))
+    this.setState(stateFromProps(nextProps), this.componentDidUpdate)
     if (nextProps.hasFirstCrib && !(nextProps.hand || []).length) {
       this.props.showMessage('You win the first crib! Deal the cards.', this.deal)
     } else if (nextProps.opponentHasFirstCrib && !(nextProps.hand || []).length) {
       this.props.showMessage('Opponent has the first crib. Waiting for deal.', null)
     }
   }
-  componentDidUpdate () {
+  componentDidUpdate(){
+    const hasHand = this.props.hand && this.props.hand.length
+    const { num, round, showMessage, isCurrentPlayer, cut, cutIndex, crib } = this.props
+    const hasCrib = isMyCrib(num, round)
+    if(!hasHand || !isCurrentPlayer) return
     if (this.state.shouldDiscard) {
-      this.props.showMessage('please discard 2 cards', () => {
-        if (!this.state.selected[0] || !this.state.selected[1]) {
-          window.alert('select 2 cards!')
-        }
-        this.props.discard(this.state.selected)
-      })
+      showMessage('please discard 2 cards', this.discard)
+    } else if(size(crib) < 4){
+      showMessage('Waiting for other player to discard', null)
+    } else if(!cutIndex && !hasCrib){ // need to cut 5th card
+      showMessage('Cut the Deck!', this.props.selectCutIndex)
+    } else if (cutIndex && !cut && hasCrib){
+      showMessage('Cut 5th card!', this.props.cutDeck)
+    } else if(!cut) {
+      showMessage('Waiting for other player to cut', null) // either index or 5th card
+    } else {
+      showMessage('click a card to start pegging', null)
     }
+  }
+  discard () {
+    if (!this.state.selected[0] || !this.state.selected[1]) {
+     window.alert('select 2 cards!')
+     return
+    }
+    this.props.discard(this.state.selected)
   }
   deal () {
     const deck = shuffle(createDeck())
@@ -67,7 +84,7 @@ class Player extends Component {
       hand1[i] = deck[i]
       hand2[i] = deck[ i + 6 ]
     }
-    this.props.incrementRound((this.props.currentRound + 1))
+    this.props.incrementRound(this.props.round + 1)
     this.props.updateDeck(deck)
     this.props.getHand('player1', hand1)
     this.props.getHand('player2', hand2)
@@ -115,16 +132,20 @@ class Player extends Component {
       </div>
     )
   }
-  }
+}
 
 const mapStateToProps = (state, ownProps) => {
-  const { playedCards } = state
+  const { playedCards, cut, cutIndex, crib, round } = state
   const { isPlayer1, isPlayer2 } = state.meta
 
   const isCurrentPlayer = (ownProps.num === '1' && isPlayer1) || (ownProps.num === '2' && isPlayer2)
   return {
     playedCards,
     isCurrentPlayer,
+    cut,
+    cutIndex,
+    crib,
+    round,
     myHandWithCut: (ownProps.hand || []).concat(ownProps.cut || []),
     hasFirstCrib: isPlayer1,
     opponentHasFirstCrib: isPlayer2

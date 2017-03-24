@@ -1,8 +1,6 @@
 const initialState = {
   isPlayer1: false,
-  isPlayer2: false,
-  firstCut: null,
-  secondCut: null
+  isPlayer2: false
 }
 export default (state = initialState, action) => {
   switch (action.type) {
@@ -12,13 +10,11 @@ export default (state = initialState, action) => {
           return {
             ...state,
             isPlayer1: true,
-            isMyCrib: true
           }
         case 'player2':
           return {
             ...state,
             isPlayer2: true,
-            isMyCrib: false
           }
         default:
           return state

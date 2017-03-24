@@ -10,11 +10,7 @@ class Deck extends Component {
     this.state = {
       hasFirstCut: false,
       hasBeenCut: false,
-      cutIndex: 0
     }
-    this.changeCutIndex = this.changeCutIndex.bind(this)
-    this.selectCutIndex = this.selectCutIndex.bind(this)
-    this.doCut = this.doCut.bind(this)
     this.doFirstCut = this.doFirstCut.bind(this)
     this.doSecondCut = this.doSecondCut.bind(this)
     this.updatePrompt = this.updatePrompt.bind(this)
@@ -55,46 +51,17 @@ class Deck extends Component {
   doSecondCut () {
     const myCut = this.props.deck[1]
     const theirCut = this.props.firstCut
-    console.log('>>> Here: ', myCut)
     this.props.cutForFirstCrib(false, myCut)
     // Assign players here:
     this.props.assignPlayer(myCut, theirCut)
   }
-  selectCutIndex () {
-    this.setState({
-      hasBeenCut: true
-    })
-    this.props.selectCutIndex(this.state.cutIndex)
-  }
-  changeCutIndex (e) {
-    this.setState({
-      cutIndex: e.target.value
-    })
-  }
-  doCut () {
-    const NUM_CARDS_DEALT = 12
-    this.props.doCut(this.props.deck[NUM_CARDS_DEALT + this.state.cutIndex])
-  }
+
   render () {
     return (
-      <div >
-        <div hidden={this.props.cut} >
-          <input
-            type='range'
-            min='0' max='40'
-            hidden={this.props.isMyCrib}
-            disabled={this.props.cutIndex}
-            onChange={this.changeCutIndex} />
-          <button
-            disabled={this.props.hasBeenCut}
-            onClick={this.selectCutIndex}>
-            Cut the deck!
-          </button>
-          <button
-            disabled={!this.props.isMyCrib || !this.props.cutIndex}
-            onClick={this.doCut}>
-            Cut 5th Card
-          </button>
+      <div>
+        <div hidden={this.props.round > 0}>
+          <Card card={this.props.firstCut} />
+          <Card card={this.props.secondCut} />
         </div>
         <div hidden={!this.props.cut}>
           <Card card={this.props.cut} isOnDeck />
@@ -104,13 +71,13 @@ class Deck extends Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
-  const { deck, cut, cutIndex, firstCut, secondCut, isPlayer1, isPlayer2, round } = state
+  const { deck, cut, firstCut, secondCut, isPlayer1, isPlayer2, round } = state
   return {
     firstCut,
     secondCut,
     deck,
-    cutIndex,
     cut,
+    round
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
@@ -120,8 +87,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       payload: cut
     }),
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
-    selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
-    doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut})
   }
 }
 

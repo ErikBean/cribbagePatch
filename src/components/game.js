@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createDeck, shuffle, valueOf } from '../deck'
+import { size } from 'lodash'
 
 import Player from './player'
 import Crib from './crib'
@@ -15,7 +16,11 @@ class Game extends Component {
 
     this.showMessage = this.showMessage.bind(this)
     this.assignPlayer = this.assignPlayer.bind(this)
+    this.changeCutIndex = this.changeCutIndex.bind(this)
+    this.selectCutIndex = this.selectCutIndex.bind(this)
+    this.cutDeck = this.cutDeck.bind(this)
     this.state = {
+      cutIndex: 20,
       message: 'Need to cut for first crib',
       nextAction: () => {},
       // this helps restore state on refresh
@@ -32,7 +37,6 @@ class Game extends Component {
     }
   }
   assignPlayer (myCut, theirCut) {
-    console.log('>>> Here: ', {myCut, theirCut})
     if (!myCut || !theirCut) console.error('!!!!!assign based on no cut!', {myCut, theirCut})
     if (valueOf(myCut) < valueOf(theirCut)) {
       this.props.assignPlayer('player1')
@@ -45,12 +49,29 @@ class Game extends Component {
   showMessage (message, cb = () => {}) {
     this.setState({message, nextAction: cb})
   }
-
-
+  selectCutIndex(){
+    this.props.selectCutIndex(this.state.cutIndex)
+  }
+  changeCutIndex (e) {
+    this.setState({
+      cutIndex: e.target.value
+    })
+  }
+  cutDeck(){
+    const NUM_CARDS_DEALT = 12
+    this.props.doCut(this.props.deck[NUM_CARDS_DEALT + parseInt(this.props.cutIndex)])
+  }
   render () {
+    const needsDiscard = size(this.props.player1Hand) > 4 || size(this.props.player2Hand) > 4
     return (
       <div>
-        <GameInfo text={this.state.message} onConfirm={this.state.nextAction} />
+        <GameInfo text={this.state.message} onConfirm={this.state.nextAction} >
+          <input
+            type='range'
+            min='0' max='40'
+            disabled={this.props.cutIndex}
+            onChange={this.changeCutIndex} />
+        </GameInfo>
         <Deck 
           showMessage={this.showMessage}
           assignPlayer={this.assignPlayer}/>
@@ -59,12 +80,16 @@ class Game extends Component {
             cut={this.props.cut}
             hand={this.props.player1Hand}
             theirHand={this.props.player2Hand}
-            showMessage={this.showMessage} />
+            showMessage={this.showMessage}
+            cutDeck={this.cutDeck}
+            selectCutIndex={this.selectCutIndex}/>
           <Player num='2' 
             cut={this.props.cut}
             hand={this.props.player2Hand}
             theirHand={this.props.player1Hand}
-            showMessage={this.showMessage} />
+            showMessage={this.showMessage}
+            cutDeck={this.cutDeck}
+            selectCutIndex={this.selectCutIndex}/>
           <Crib 
             visibleCards={this.props.crib || []} 
             cards={(this.props.crib || []).concat(this.props.cut || [])} />
@@ -82,27 +107,26 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { round, deck, cut, crib, player1Hand, player2Hand, playedCards, firstCut, secondCut } = state
-  const { isPlayer1, isPlayer2, isMyCrib } = state.meta
+  const { cutIndex, deck, cut, crib, player1Hand, player2Hand, playedCards } = state
+  const { isPlayer1, isPlayer2 } = state.meta
   const doneFirstDeal = (player1Hand || []).length > 0 || (player2Hand || []).length > 0
   return {
-    currentRound: round,
-    firstCut,
-    secondCut,
     doneFirstDeal,
     isPlayer1,
     isPlayer2,
     player1Hand,
     player2Hand,
     playedCards,
-    isMyCrib,
     crib,
     deck,
-    cut
+    cut,
+    cutIndex
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut}),
+    selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
     assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
   }
 }
