@@ -10,10 +10,10 @@ export function getPegPoints(playedCards, hand) {
   if(!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
   const fifteenPoints = sumOf(playedCards) === 15 ? 2 : 0
   
+  let pairsPoints = 0;
   const last4 = playedCards.slice(-4).map(valueOf) // can't be more than 4 of a kind
   let pointVal = 0
   let temp = last4.pop()
-  let pairsPoints = 0;
   while(last4.length){
     pointVal += 2
     if(temp === last4.pop()){
@@ -22,37 +22,29 @@ export function getPegPoints(playedCards, hand) {
   }
 
   let runsPoints = 0
-  if(playedCards.length >= 3){ // runs
-    let consecutive
-    let startOfRunIndex = -3
-    let playedVals = playedCards.map(valueOf)
-    let current
-    do {
-      runsPoints = 1
-      current = playedVals.slice(startOfRunIndex).sort()
-      let first = playedVals[0]
-      playedVals.forEach((val, i) => {
-        if(++val === playedVals[++i]){
-          runsPoints+=1
-        } else {
-          consecutive = false
+  if(playedCards.length >= 3){
+    let startIndex = -3
+    let currentRun = null
+    while(!currentRun || currentRun.length < playedCards.length){ // keep slicing backwards from end
+      currentRun = playedCards.slice(startIndex).map(valueOf).sort((a, b) => a > b)
+      runsPoints = 1 // first card in the run
+      let prevVal = currentRun[0]
+      for(let i=1; i < currentRun.length; i++){
+        const currentVal = currentRun[i]
+        if(currentVal === (prevVal + 1)){
+          prevVal = currentVal
+          runsPoints++
         }
-      })
-      startOfRunIndex++
-    } while (consecutive && current.length < playedVals.length)
+      }
+      startIndex--
+    }
     if(runsPoints < 3) runsPoints = 0
   }
-  console.log('>>> getPegPoints: ', {
-    pairsPoints,
-    fifteenPoints,
-    runsPoints
-  })
   return {
     pairsPoints,
     fifteenPoints,
     runsPoints
   }
-  // TODO: go backwards through played cards seeing if run is larger
 }
 
 function isArraySorted (array) {
