@@ -7,23 +7,40 @@ export function valueMaxTen (card) {
 
 export function getPegPoints(playedCards, hand) {
   const isLastCardPlayedByMe = includes(hand, last(playedCards))
-  if(!isLastCardPlayedByMe) return
+  if(!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
   const fifteenPoints = sumOf(playedCards) === 15 ? 2 : 0
-  const last4 = playedCards.slice(-4).map(valueOf)
+  
+  const last4 = playedCards.slice(-4).map(valueOf) // can't be more than 4 of a kind
+  let pointVal = 0
+  let temp = last4.pop()
   let pairsPoints = 0;
-  if(last4[3] === last4[2]){
-    pairsPoints += 2
-    if(last4[2] === last4[1]){
-      pairsPoints += 4
-      if(last4[1] === last4[0]){
-        pairsPoints += 6
-      }
-    }
+  while(last4.length){
+    pointVal += 2
+    if(temp === last4.pop()){
+      pairsPoints += pointVal
+    } 
   }
+
   let runsPoints = 0
-  const run = first(getRuns(playedCards))
-  if(run && includes(runs[0], last(playedCards))){
-    runsPoints = run.length
+  if(playedCards.length >= 3){ // runs
+    let consecutive
+    let startOfRunIndex = -3
+    let playedVals = playedCards.map(valueOf)
+    let current
+    do {
+      runsPoints = 1
+      current = playedVals.slice(startOfRunIndex).sort()
+      let first = playedVals[0]
+      playedVals.forEach((val, i) => {
+        if(++val === playedVals[++i]){
+          runsPoints+=1
+        } else {
+          consecutive = false
+        }
+      })
+      startOfRunIndex++
+    } while (consecutive && current.length < playedVals.length)
+    if(runsPoints < 3) runsPoints = 0
   }
   console.log('>>> getPegPoints: ', {
     pairsPoints,

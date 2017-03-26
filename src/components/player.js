@@ -25,7 +25,6 @@ function stateFromProps (props) {
   const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
   const isMyTurn = !didPlayLast || hasAGo
   const shouldDiscard = (props.hand || []).length > 4
-  const myPegPoints = getPegPoints(props.playedCards, props.hand)
   return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard, myUnplayed }
 }
 
@@ -100,7 +99,10 @@ class Player extends Component {
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
-    this.props.playPegCard(card, playedCards)
+    const pegPoints = getPegPoints(props.playedCards, props.hand)
+    console.log('>>> pegPoints: ', pegPoints)
+    if(pegPoints.value)this.props.getPoints()
+    this.props.playPegCard(card, playedCards || [])
   }
   onCardClick (card) {
     if (this.props.hand.length > 4) {
@@ -118,15 +120,14 @@ class Player extends Component {
           <div>
             <ScoreBoard cards={this.props.myHandWithCut} />
             Peg Count: {this.state.pegCount}
-            <div>
-              {this.state.myUnplayed.map((card) => (
-                <Card
-                  onClick={() => this.onCardClick(card)}
-                  isSelected={includes(this.state.selected, card)}
-                  card={card}
-                  key={card} />
-              ))}
-            </div>
+            <br />
+            {this.state.myUnplayed.map((card) => (
+              <Card
+                onClick={() => this.onCardClick(card)}
+                isSelected={includes(this.state.selected, card)}
+                card={card}
+                key={card} />
+            ))}
           </div>
         </div>
       </div>
