@@ -49,3 +49,72 @@ describe('#getPegPoints', () => {
     })
   })
 })
+
+describe('#getFifteens', () => {
+  it('should count single 2 card combos', () => {
+    const hand = ["B13", "C5"]
+    expect(points.getFifteens(hand)["2"]).to.have.length(1)
+    expect(points.getFifteens(hand)["2"][0]).to.contain(hand[0]) // order doesn't metter
+    expect(points.getFifteens(hand)["2"][0]).to.contain(hand[1])
+  })
+  it('should count multiple 2 card combos', () => {
+    let hand = ["B5", "C5", "D5", "E5", "B11"] // 29 hand!
+    expect(points.getFifteens(hand)["2"]).to.have.length(4)
+    expect(points.getFifteens(hand)["2"][0]).to.contain("B11")
+    expect(points.getFifteens(hand)["2"][1]).to.contain("B11")
+    expect(points.getFifteens(hand)["2"][2]).to.contain("B11")
+    expect(points.getFifteens(hand)["2"][3]).to.contain("B11")
+    
+    hand = ["B7", "C7", "D7", "E8", "B8"]
+    expect(points.getFifteens(hand)["2"]).to.have.length(6)
+  })
+  it('should count single 3 card combos', () => {
+    const hand = ["D3","B11","C2"]
+    expect(points.getFifteens(hand)["3"]).to.have.length(1)
+    expect(points.getFifteens(hand)["3"][0].sort()).to.eql(hand.sort()) // order doesn't matter
+  })
+  it('should count multiple 3 card combos', () => {
+    let hand = ["B4", "C5", "D5", "E5", "B6"] // 45556
+    expect(points.getFifteens(hand)["3"]).to.have.length(4)
+    expect(points.getFifteens(hand)["3"]).to.eql([ // order is arbitrary and subject to change
+       [ 'B6', 'C5', 'B4' ],
+       [ 'B6', 'D5', 'B4' ],
+       [ 'B6', 'E5', 'B4' ],
+       [ 'E5', 'D5', 'C5' ]
+     ])
+     hand = ["B5", "C5", "D5", "E5", "B11"]
+     expect(points.getFifteens(hand)["3"]).to.have.length(4)
+     expect(points.getFifteens(hand)["3"]).to.eql([ // order is arbitrary and subject to change
+       [ 'D5', 'C5', 'B5' ],
+       [ 'E5', 'C5', 'B5' ],
+       [ 'E5', 'D5', 'B5' ],
+       [ 'E5', 'D5', 'C5' ] 
+     ])
+  })
+  it('should count single 4 card combos', () => {
+    const hand = ["A2","B2","C1", "D10"]
+    expect(points.getFifteens(hand)["4"]).to.have.length(1)
+    expect(points.getFifteens(hand)["4"][0].sort()).to.eql(hand.sort()) // order doesn't matter
+  })
+  it('should count multiple 4 card combos', () => {
+    let hand = ["B3", "C3", "D4", "E5", "B5"] // 33455
+    expect(points.getFifteens(hand)["4"]).to.have.length(2)
+    expect(points.getFifteens(hand)["4"]).to.eql([ // order is arbitrary and subject to change
+      [ 'E5', 'D4', 'C3', 'B3' ],
+      [ 'B5', 'D4', 'C3', 'B3' ]
+    ])
+  })
+  it('should count single 5 card combos', () => {
+    const hand = ["A1", "D2","E10","B1","C1"]
+    expect(points.getFifteens(hand)["5"]).to.have.length(1)
+    expect(points.getFifteens(hand)["5"][0].sort()).to.eql(hand.sort()) // order doesn't matter
+  })
+})
+
+describe('#getRuns', () => {
+  it.only('should count single runs, however many they contain', () => {
+    const hand = ["A1", "D2","E3","B5","C6"]
+    // console.log('>>> Here: ', points.getRuns(hand))
+    expect(points.getRuns(hand)).to.eql(["A1", "D2","E3"])
+  })
+})

@@ -115,17 +115,18 @@ export function getPairs (hand) {
 }
 
 export function getRuns (hand) {
-  const values = uniq(hand.map(valueOf).sort((a, b) => a > b))
+  const values = uniq(hand.sort((a, b) => valueOf(a) > valueOf(b)))
   const run = []
   for (let i = 1; i < values.length; i++) {
     const thisVal = values[i]
     const lastVal = values[i - 1]
-    if (thisVal === (lastVal + 1)) {
+    if (valueOf(thisVal) === valueOf(lastVal + 1)) {
       run.length ? run.push(thisVal) : run.push(lastVal, thisVal)
     }
   }
   if (run.length < 3) return [] // no runs
   const pairs = toPairs(getPairs(hand))
+  
   if (!pairs.length) return [ run ] // no double run, because no pairs
   // compute doubles:
   let multiRuns = []
