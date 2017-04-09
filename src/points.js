@@ -1,44 +1,44 @@
 import { valueOf } from './deck'
-import { uniq, toPairs, times, last, includes, reverse, first } from 'lodash'
+import { uniq, toPairs, times, includes, reverse, first, last } from 'lodash'
 
 export function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
 }
 
-export function getPegPoints(playedCards, hand) {
+export function getPegPoints (playedCards, hand) {
   const isLastCardPlayedByMe = includes(hand, last(playedCards))
-  if(!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
+  if (!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
   const fifteenPoints = sumOf(playedCards) === 15 ? 2 : 0
-  
-  let pairsPoints = 0;
+
+  let pairsPoints = 0
   const last4 = playedCards.slice(-4).map(valueOf) // can't be more than 4 of a kind
   let pointVal = 0
   let temp = last4.pop()
-  while(last4.length){
+  while (last4.length) {
     pointVal += 2
-    if(temp === last4.pop()){
+    if (temp === last4.pop()) {
       pairsPoints += pointVal
-    } 
+    }
   }
 
   let runsPoints = 0
-  if(playedCards.length >= 3){
+  if (playedCards.length >= 3) {
     let startIndex = -3
     let currentRun = null
-    while(!currentRun || currentRun.length < playedCards.length){ // keep slicing backwards from end
+    while (!currentRun || currentRun.length < playedCards.length) { // keep slicing backwards from end
       currentRun = playedCards.slice(startIndex).map(valueOf).sort((a, b) => a > b)
       runsPoints = 1 // first card in the run
       let prevVal = currentRun[0]
-      for(let i=1; i < currentRun.length; i++){
+      for (let i = 1; i < currentRun.length; i++) {
         const currentVal = currentRun[i]
-        if(currentVal === (prevVal + 1)){
+        if (currentVal === (prevVal + 1)) {
           prevVal = currentVal
           runsPoints++
         }
       }
       startIndex--
     }
-    if(runsPoints < 3) runsPoints = 0
+    if (runsPoints < 3) runsPoints = 0
   }
   return {
     pairsPoints,
@@ -114,32 +114,45 @@ export function getPairs (hand) {
   return pairs
 }
 
+/**
+ * Sort the hand based on card value.
+ * Slice off any non-consecutive values from ends of array
+ * // Only works when hand has exactly 5 cards
+ * @param  {[Card]} hand Array of 5 cards, e.g. ["D12", "S1", ...]
+ * @return {[Card]} run     any type of run (double, triple, double-double)
+ *                          e.g. ['C1','D2','S3'] or ['D1','C1','D2','C3','D3']
+ */
 export function getRuns (hand) {
-  const values = uniq(hand.sort((a, b) => valueOf(a) > valueOf(b)))
-  const run = []
-  for (let i = 1; i < values.length; i++) {
-    const thisVal = values[i]
-    const lastVal = values[i - 1]
-    if (valueOf(thisVal) === valueOf(lastVal + 1)) {
-      run.length ? run.push(thisVal) : run.push(lastVal, thisVal)
+  const stableValueOf = (cardA, cardB) => {
+    const [ suitA, suitB ] = [ cardA, cardB ].map((c) => c[0])
+    const [ valueA, valueB ] = [ cardA, cardB ].map(valueOf)
+    if (valueA === valueB) {
+      return suitA > suitB
+    } else {
+      return valueA > valueB
     }
   }
-  if (run.length < 3) return [] // no runs
-  const pairs = toPairs(getPairs(hand))
+  const isSameOrConsecutive = (a, b) => {
+    if(!a || !b) return false
+    return valueOf(a) === valueOf(b) || (valueOf(a) + 1) === valueOf(b)
+  }
+  const sortedHand = hand.sort(stableValueOf)
+  const [first, prev, mid, next, last] = sortedHand
+  let run = [mid]
+  if(isSameOrConsecutive(prev, mid)){
+    run = [prev, ...run]
+    if(isSameOrConsecutive(first, prev)){
+      run = [first, ...run]
+    }
+  }
+  if(isSameOrConsecutive(mid, next)){
+    run = [...run, next]
+    if(isSameOrConsecutive(next, last)){
+      run = [...run, last]
+    }
+  }
   
-  if (!pairs.length) return [ run ] // no double run, because no pairs
-  // compute doubles:
-  let multiRuns = []
-  for (let [value, numPairs] of pairs) {
-    if (run.includes(parseInt(value))) {
-      switch (numPairs) {
-        case 1:
-          multiRuns = multiRuns.concat(times(2, () => run)) // double run
-          break
-        case 3:
-          multiRuns = multiRuns.concat(times(3, () => run)) // triple run
-      }
-    }
-  }
-  return multiRuns
+  // any run must include mid
+  if (uniq(run.map(valueOf)).length < 3) return [] // no runs
+  return run
 }

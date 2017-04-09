@@ -1,8 +1,8 @@
 var expect = require('expect.js')
 var points = require('../src/points')
 describe('#getPegPoints', () => {
-  describe('should count pairs/triples/quads', () => {
-    it('should count pairs', () => {
+  describe('when counting pairs', () => {
+    it('should count single pairs', () => {
       const hand = ["A1"] // only care that I played last card
       const played = ["B1", "A1"]
       const peg =  points.getPegPoints(played, hand)
@@ -112,9 +112,36 @@ describe('#getFifteens', () => {
 })
 
 describe('#getRuns', () => {
-  it.only('should count single runs, however many they contain', () => {
-    const hand = ["A1", "D2","E3","B5","C6"]
-    // console.log('>>> Here: ', points.getRuns(hand))
-    expect(points.getRuns(hand)).to.eql(["A1", "D2","E3"])
+  it('should count single runs, however many they contain', () => {
+    let hand = ["A1", "D2","E3","B5","C6"]
+    expect(points.getRuns(hand)).to.eql(hand.slice(0,3))
+    hand = ["A4", "D5","E6","B7","C13"]
+    expect(points.getRuns(hand)).to.eql(hand.slice(0,4))
+    hand = ["A4", "D5","E6","B7","C8"]
+    expect(points.getRuns(hand)).to.eql(hand)
+  })
+  it('should count double runs', () => {
+    const hand = ["A10", "D11","E11","A12","C6"]
+    expect(points.getRuns(hand)).to.eql(["A10", "D11","E11","A12"])
+  })
+  it('should count double runs (with five cards)', () => {
+    const hand = ["A3","C2", "A1", "A4", "B2"]
+    expect(points.getRuns(hand)).to.eql(["A1","B2","C2","A3","A4"])
+  })
+  it('should count triple runs', () => {
+      const hand = ["A13","B13", "C13", "A11", "B12"]
+      expect(points.getRuns(hand)).to.eql(["A11","B12","A13","B13","C13"])
+  })
+  it('should count double-double runs', () => {
+    const hand = ["A6", "B4", "A5", "A4", "B6"]
+    expect(points.getRuns(hand)).to.eql(["A4", "B4", "A5", "A6", "B6"])
+  })
+  it('should not count runs with less than three cards', () => {
+    let hand = ["A1", "A2", "B2", "C2", "D2"]
+    expect(points.getRuns(hand)).to.eql([])
+    hand = ["A1", "A2", "B4", "C5", "D7"]
+    expect(points.getRuns(hand)).to.eql([])
+    hand = ["B2", "A2", "C3", "D3", "D5"]
+    expect(points.getRuns(hand)).to.eql([])
   })
 })
