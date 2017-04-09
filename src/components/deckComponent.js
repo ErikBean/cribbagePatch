@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { createDeck, shuffle, valueOf } from '../deck'
+import { createDeck, shuffle } from '../deck'
 
 import Card from './card'
 
@@ -9,17 +9,17 @@ class Deck extends Component {
     super(props)
     this.state = {
       hasFirstCut: false,
-      hasBeenCut: false,
+      hasBeenCut: false
     }
     this.doFirstCut = this.doFirstCut.bind(this)
     this.doSecondCut = this.doSecondCut.bind(this)
     this.updatePrompt = this.updatePrompt.bind(this)
   }
-  componentWillMount(){
+  componentWillMount () {
     this.updatePrompt(this.props)
   }
-  
-  componentWillReceiveProps(nextProps) {
+
+  componentWillReceiveProps (nextProps) {
     this.updatePrompt(nextProps)
     if (nextProps.firstCut && nextProps.secondCut && this.state.hasFirstCut) {
       const myCut = nextProps.firstCut
@@ -27,12 +27,12 @@ class Deck extends Component {
       this.props.assignPlayer(myCut, theirCut)
     }
   }
-    
-  updatePrompt(props){
-    if(!props.firstCut && !props.secondCut){
+
+  updatePrompt (props) {
+    if (!props.firstCut && !props.secondCut) {
       props.showMessage('Cut for first crib #1', this.doFirstCut)
-    } else if(props.firstCut && !props.secondCut){
-      if(this.state.hasFirstCut){
+    } else if (props.firstCut && !props.secondCut) {
+      if (this.state.hasFirstCut) {
         props.showMessage('Waiting for cut for first crib #2', null)
       } else {
         props.showMessage('Cut for first crib #2', this.doSecondCut)
@@ -71,7 +71,7 @@ class Deck extends Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
-  const { deck, cut, firstCut, secondCut, isPlayer1, isPlayer2, round } = state
+  const { deck, cut, firstCut, secondCut, round } = state
   return {
     firstCut,
     secondCut,
@@ -86,7 +86,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       type: isFirst ? `FIRST_CUT` : 'SECOND_CUT',
       payload: cut
     }),
-    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
+    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck})
   }
 }
 

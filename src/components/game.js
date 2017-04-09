@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { createDeck, shuffle, valueOf } from '../deck'
-import { size } from 'lodash'
+import { valueOf } from '../deck'
 
 import Player from './player'
 import Crib from './crib'
 import Deck from './deckComponent'
-import Card from './card'
 import GameInfo from './infoMessage'
 import PeggingArea from './table'
 
@@ -26,7 +24,7 @@ class Game extends Component {
       // this helps restore state on refresh
       isPlayer1: window.localStorage.getItem('cribbagePatchPlayer1'),
       isPlayer2: window.localStorage.getItem('cribbagePatchPlayer2'),
-      didFirstCut: false,
+      didFirstCut: false
     }
   }
   componentWillMount () {
@@ -49,7 +47,7 @@ class Game extends Component {
   showMessage (message, cb = () => {}) {
     this.setState({message, nextAction: cb})
   }
-  selectCutIndex(){
+  selectCutIndex () {
     this.props.selectCutIndex(this.state.cutIndex)
   }
   changeCutIndex (e) {
@@ -57,12 +55,11 @@ class Game extends Component {
       cutIndex: e.target.value
     })
   }
-  cutDeck(){
+  cutDeck () {
     const NUM_CARDS_DEALT = 12
     this.props.doCut(this.props.deck[NUM_CARDS_DEALT + parseInt(this.props.cutIndex)])
   }
   render () {
-    const needsDiscard = size(this.props.player1Hand) > 4 || size(this.props.player2Hand) > 4
     return (
       <div>
         <GameInfo text={this.state.message} onConfirm={this.state.nextAction} >
@@ -72,26 +69,26 @@ class Game extends Component {
             disabled={this.props.cutIndex}
             onChange={this.changeCutIndex} />
         </GameInfo>
-        <Deck 
+        <Deck
           showMessage={this.showMessage}
-          assignPlayer={this.assignPlayer}/>
+          assignPlayer={this.assignPlayer} />
         <div>
-          <Player num='1' 
+          <Player num='1'
             cut={this.props.cut}
             hand={this.props.player1Hand}
             theirHand={this.props.player2Hand}
             showMessage={this.showMessage}
             cutDeck={this.cutDeck}
-            selectCutIndex={this.selectCutIndex}/>
-          <Player num='2' 
+            selectCutIndex={this.selectCutIndex} />
+          <Player num='2'
             cut={this.props.cut}
             hand={this.props.player2Hand}
             theirHand={this.props.player1Hand}
             showMessage={this.showMessage}
             cutDeck={this.cutDeck}
-            selectCutIndex={this.selectCutIndex}/>
-          <Crib 
-            visibleCards={this.props.crib || []} 
+            selectCutIndex={this.selectCutIndex} />
+          <Crib
+            visibleCards={this.props.crib || []}
             cards={(this.props.crib || []).concat(this.props.cut || [])} />
         </div>
         <br />
@@ -127,7 +124,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut}),
     selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
-    assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
+    assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player})
   }
 }
 

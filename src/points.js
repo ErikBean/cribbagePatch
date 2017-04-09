@@ -1,5 +1,5 @@
 import { valueOf } from './deck'
-import { uniq, toPairs, times, includes, reverse, first, last } from 'lodash'
+import { uniq, includes, last } from 'lodash'
 
 export function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
@@ -133,25 +133,25 @@ export function getRuns (hand) {
     }
   }
   const isSameOrConsecutive = (a, b) => {
-    if(!a || !b) return false
+    if (!a || !b) return false
     return valueOf(a) === valueOf(b) || (valueOf(a) + 1) === valueOf(b)
   }
   const sortedHand = hand.sort(stableValueOf)
   const [first, prev, mid, next, last] = sortedHand
   let run = [mid]
-  if(isSameOrConsecutive(prev, mid)){
+  if (isSameOrConsecutive(prev, mid)) {
     run = [prev, ...run]
-    if(isSameOrConsecutive(first, prev)){
+    if (isSameOrConsecutive(first, prev)) {
       run = [first, ...run]
     }
   }
-  if(isSameOrConsecutive(mid, next)){
+  if (isSameOrConsecutive(mid, next)) {
     run = [...run, next]
-    if(isSameOrConsecutive(next, last)){
+    if (isSameOrConsecutive(next, last)) {
       run = [...run, last]
     }
   }
-  
+
   // any run must include mid
   if (uniq(run.map(valueOf)).length < 3) return [] // no runs
   return run

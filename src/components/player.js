@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { difference, last, every, isEmpty, includes, size } from 'lodash'
 import { sumOf, valueMaxTen, getPegPoints } from '../points'
-import { createDeck, shuffle, valueOf } from '../deck'
+import { createDeck, shuffle } from '../deck'
 
 import Card from './card'
 import ScoreBoard from './scoreBoard'
@@ -49,20 +49,20 @@ class Player extends Component {
       this.props.showMessage('Opponent has the first crib. Waiting for deal.', null)
     }
   }
-  componentDidUpdate(){
+  componentDidUpdate () {
     const hasHand = this.props.hand && this.props.hand.length
     const { num, round, showMessage, isCurrentPlayer, cut, cutIndex, crib } = this.props
     const hasCrib = isMyCrib(num, round)
-    if(!hasHand || !isCurrentPlayer) return
+    if (!hasHand || !isCurrentPlayer) return
     if (this.state.shouldDiscard) {
       showMessage('please discard 2 cards', this.discard)
-    } else if(size(crib) < 4){
+    } else if (size(crib) < 4) {
       showMessage('Waiting for other player to discard', null)
-    } else if(!cutIndex && !hasCrib){ // need to cut 5th card
+    } else if (!cutIndex && !hasCrib) { // need to cut 5th card
       showMessage('Cut the Deck!', this.props.selectCutIndex)
-    } else if (cutIndex && !cut && hasCrib){
+    } else if (cutIndex && !cut && hasCrib) {
       showMessage('Cut 5th card!', this.props.cutDeck)
-    } else if(!cut) {
+    } else if (!cut) {
       showMessage('Waiting for other player to cut', null) // either index or 5th card
     } else {
       showMessage('click a card to start pegging', null)
@@ -70,8 +70,8 @@ class Player extends Component {
   }
   discard () {
     if (!this.state.selected[0] || !this.state.selected[1]) {
-     window.alert('select 2 cards!')
-     return
+      window.alert('select 2 cards!')
+      return
     }
     this.props.discard(this.state.selected)
   }
@@ -99,9 +99,9 @@ class Player extends Component {
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
-    const pegPoints = getPegPoints(props.playedCards, props.hand)
+    const pegPoints = getPegPoints(this.props.playedCards, this.props.hand)
     console.log('>>> pegPoints: ', pegPoints)
-    if(pegPoints.value)this.props.getPoints()
+    if (pegPoints.value) this.props.getPoints()
     this.props.playPegCard(card, playedCards || [])
   }
   onCardClick (card) {
@@ -170,7 +170,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     })
   }
 
-  return { 
+  return {
     discard,
     playPegCard,
     incrementRound: (nextRound) => dispatch({type: 'INCREMENT_ROUND', payload: nextRound}),
