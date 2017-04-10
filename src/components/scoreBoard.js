@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { getFifteens, getRuns, getPairs } from '../points'
+import { isEmpty } from 'lodash'
 
 // Sum the length of all arrays in obj
 function sumLengths (obj) {
@@ -31,7 +32,9 @@ export default class ScoreBoard extends Component {
     }
   }
   componentWillMount(){
+    if(!isEmpty(this.props.cards)){
       this.computePoints(this.props.cards)
+    }
   }
   computePoints (cards) {
     const fifteens = getFifteens(cards)

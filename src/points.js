@@ -6,6 +6,7 @@ export function valueMaxTen (card) {
 }
 
 export function getPegPoints (playedCards, hand) {
+  console.log('>>> getPegPoints: ', playedCards, hand)
   const isLastCardPlayedByMe = includes(hand, last(playedCards))
   if (!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
   const fifteenPoints = sumOf(playedCards) === 15 ? 2 : 0
@@ -58,7 +59,7 @@ function isArraySorted (array) {
   return false
 }
 
-export function sumOf (cards) { // for pegging to 31
+export function sumOf (cards) {
   return cards.map(valueMaxTen).reduce((curr, acc) => curr + acc, 0)
 }
 

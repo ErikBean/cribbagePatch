@@ -4,7 +4,14 @@ import { isNull, isUndefined, isEqual, isArray, keys } from 'lodash'
 import reducers from './reducers'
 
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-const store = createStore(combineReducers(reducers), enhancer)
+const rootReducer = combineReducers(reducers)
+const overrideState = (state = {}, action) => { // used to test the app, in a certain state
+  if(action.type === 'TEST_STATE'){
+    return action.testState
+  }
+  return rootReducer(state, action)
+}
+const store = createStore(overrideState, enhancer)
 
 export default store
 
@@ -108,4 +115,25 @@ window.getHand = (hand, player) => {
     type: `GET_${player.toUpperCase()}_HAND`,
     payload: hand || ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
   })
+}
+window.assignPlayer = (num = 2) => {
+  store.dispatch({type: 'ASSIGN_PLAYER', payload: `player${num}`})
+  window.localStorage.setItem(`cribbagePatchPlayer${num}`, true)
+}
+window.startPegging = () => {
+  const oldState = store.getState()
+  const newState = {
+    meta: {
+      isPlayer1: true,
+      isPlayer2: false
+    },
+    player1Hand: ['S3', 'S4', 'S5', 'S6'],
+    player2Hand: ['H3', 'H4', 'H5', 'H6'],
+    crib: ['S1', 'S2', 'H1', 'H2'],
+    cut: 'C4',
+    cutIndex: 23
+  }
+  const desiredStoreState = Object.assign({}, oldState, newState)
+  console.log('>>> desiredStoreState: ', desiredStoreState)
+  store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
 }

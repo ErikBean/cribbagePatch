@@ -15,7 +15,7 @@ const isMyCrib = (playerNum, round) => {
   // on first crib, playerNum = 1, round = 1
   return (parseInt(playerNum) + round) % 2 === 0
 }
-
+let prevPegRoundsCards = []
 function stateFromProps (props) {
   const isWaitingForLead = isEmpty(props.playedCards) && props.hasFirstCrib
   const didPlayLast = includes(props.hand, last(props.playedCards))
@@ -58,6 +58,8 @@ class Player extends Component {
   componentDidUpdate(){
     if(this.state.isRoundDone){
       alert('restart the pegging!')
+      prevPegRoundsCards.push(this.props.playedCards)
+      this.props.playPegCard([],[])
     }
   }
   displayMessage () {
@@ -75,8 +77,12 @@ class Player extends Component {
       showMessage('Cut 5th card!', this.props.cutDeck)
     } else if (!cut) {
       showMessage('Waiting for other player to cut', null) // either index or 5th card
-    } else {
-      showMessage('click a card to start pegging', null)
+    } else if(isEmpty(this.props.playedCards)){
+      if(hasCrib){
+        showMessage('Waitng for other player to lead', null)
+      } else {
+        showMessage('Click a card to start pegging', null)
+      }
     }
   }
   discard () {
@@ -111,7 +117,7 @@ class Player extends Component {
       return
     }
 
-    const {runsPoints, fifteenPoints, pairsPoints} = getPegPoints(this.props.playedCards, this.props.hand)
+    const {runsPoints, fifteenPoints, pairsPoints} = getPegPoints([...this.props.playedCards, card], this.props.hand)
     console.log('>>> pegPoints: ', {runsPoints, fifteenPoints, pairsPoints})
     if (runsPoints || fifteenPoints || pairsPoints) {
       const pegPointsForLastCard = runsPoints + fifteenPoints + pairsPoints
@@ -139,7 +145,7 @@ class Player extends Component {
     if(runsPoints){
       messages.push(`a run of ${runsPoints}`)
     }
-    this.props.showMessage(`You got ${messages.join(' and ')}!`)
+    this.props.showMessage(`You got ${messages.join(' and ')}!`, null)
   }
   onCardClick (card) {
     if (this.props.hand.length > 4) {
