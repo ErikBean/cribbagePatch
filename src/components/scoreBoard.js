@@ -26,7 +26,12 @@ export default class ScoreBoard extends Component {
     this.computePoints = this.computePoints.bind(this)
   }
   componentWillReceiveProps (newProps) {
-    this.computePoints(newProps.cards)
+    if(newProps.cards.length){
+      this.computePoints(newProps.cards)
+    }
+  }
+  componentWillMount(){
+      this.computePoints(this.props.cards)
   }
   computePoints (cards) {
     const fifteens = getFifteens(cards)
@@ -38,7 +43,7 @@ export default class ScoreBoard extends Component {
       runs,
       numPairs: sumValues(pairs),
       numFifteens: sumLengths(fifteens),
-      numRuns: runs.length
+      // numRuns: runs.length
     })
   }
 
@@ -53,7 +58,7 @@ export default class ScoreBoard extends Component {
             pairs: {this.state.numPairs}
           </li>
           <li>
-            runs: {this.state.numRuns}
+            runs: {JSON.stringify(this.state.runs)}
           </li>
         </ul>
       </div>

@@ -6,7 +6,7 @@ import Player from './player'
 import Crib from './crib'
 import Deck from './deckComponent'
 import GameInfo from './infoMessage'
-import PeggingArea from './table'
+import PeggingArea from './peggingArea'
 
 class Game extends Component {
   constructor (props) {
@@ -95,7 +95,13 @@ class Game extends Component {
         <br />
         <div id='played-cards' hidden={!this.props.cut}>
           On the Table:<br />
-          <PeggingArea playedCards={this.props.playedCards || []} />
+          <PeggingArea 
+            playedCards={this.props.playedCards || []}
+            player1Hand={this.props.player1Hand}
+            player2Hand={this.props.player2Hand}
+            isPlayer1={this.props.isPlayer1}
+            isPlayer2={this.props.isPlayer2}
+          />
         </div>
         <br />
         <br />

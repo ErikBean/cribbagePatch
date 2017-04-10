@@ -115,9 +115,8 @@ export function getPairs (hand) {
 }
 
 /**
- * Sort the hand based on card value.
- * Slice off any non-consecutive values from ends of array
- * // Only works when hand has exactly 5 cards
+ * Find runs, double runs, triple runs, and double-double
+ * Any cards not in run will not be in returned run array
  * @param  {[Card]} hand Array of 5 cards, e.g. ["D12", "S1", ...]
  * @return {[Card]} run     any type of run (double, triple, double-double)
  *                          e.g. ['C1','D2','S3'] or ['D1','C1','D2','C3','D3']

@@ -22,10 +22,13 @@ function stateFromProps (props) {
   const pegCount = sumOf(props.playedCards || [])
   const myUnplayed = difference(props.hand, props.playedCards)
   const theirUnplayed = difference(props.theirHand, props.playedCards)
-  const hasAGo = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount)) && didPlayLast
+  
+  const notAbleToPlayCard = (unplayed) => every(unplayed, (c) => isTooHighToPlay(c, pegCount))
+  const hasAGo = notAbleToPlayCard(theirUnplayed) && didPlayLast
+  const isRoundDone = notAbleToPlayCard(myUnplayed) && hasAGo
   const isMyTurn = !didPlayLast || hasAGo
   const shouldDiscard = (props.hand || []).length > 4
-  return { isWaitingForLead, isMyTurn, pegCount, hasAGo, shouldDiscard, myUnplayed }
+  return { isWaitingForLead, isMyTurn, pegCount, shouldDiscard, myUnplayed, isRoundDone }
 }
 
 class Player extends Component {
@@ -42,14 +45,22 @@ class Player extends Component {
     this.discard = this.discard.bind(this)
   }
   componentWillReceiveProps (nextProps) {
-    this.setState(stateFromProps(nextProps), this.componentDidUpdate)
+    this.setState(stateFromProps(nextProps), this.displayMessage)
     if (nextProps.hasFirstCrib && !(nextProps.hand || []).length) {
       this.props.showMessage('You win the first crib! Deal the cards.', this.deal)
     } else if (nextProps.opponentHasFirstCrib && !(nextProps.hand || []).length) {
       this.props.showMessage('Opponent has the first crib. Waiting for deal.', null)
     }
   }
-  componentDidUpdate () {
+  componentWillMount () {
+    this.displayMessage()
+  }
+  componentDidUpdate(){
+    if(this.state.isRoundDone){
+      alert('restart the pegging!')
+    }
+  }
+  displayMessage () {
     const hasHand = this.props.hand && this.props.hand.length
     const { num, round, showMessage, isCurrentPlayer, cut, cutIndex, crib } = this.props
     const hasCrib = isMyCrib(num, round)
@@ -99,10 +110,36 @@ class Player extends Component {
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
-    const pegPoints = getPegPoints(this.props.playedCards, this.props.hand)
-    console.log('>>> pegPoints: ', pegPoints)
-    if (pegPoints.value) this.props.getPoints()
+
+    const {runsPoints, fifteenPoints, pairsPoints} = getPegPoints(this.props.playedCards, this.props.hand)
+    console.log('>>> pegPoints: ', {runsPoints, fifteenPoints, pairsPoints})
+    if (runsPoints || fifteenPoints || pairsPoints) {
+      const pegPointsForLastCard = runsPoints + fifteenPoints + pairsPoints
+      this.showPegPointsMessage({runsPoints, fifteenPoints, pairsPoints})
+      this.props.getPoints(pegPointsForLastCard)
+    }
     this.props.playPegCard(card, playedCards || [])
+  }
+  showPegPointsMessage ({runsPoints, fifteenPoints, pairsPoints}) {
+    let messages = []
+    if (fifteenPoints) {
+      messages.push('fifteen for two')
+    }
+    switch (pairsPoints) {
+      case 2:
+        messages.push('a pair for two')
+        break
+      case 6:
+        messages.push('three-of-a-kind for six')
+        break
+      case 12:
+        messages.push('four-of-a-kind for tweleve')
+        break
+    }
+    if(runsPoints){
+      messages.push(`a run of ${runsPoints}`)
+    }
+    this.props.showMessage(`You got ${messages.join(' and ')}!`)
   }
   onCardClick (card) {
     if (this.props.hand.length > 4) {
@@ -178,7 +215,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     getHand: (player, hand) => dispatch({
       type: `GET_${player.toUpperCase()}_HAND`,
       payload: hand
-    })
+    }),
+    getPoints: (points) => dispatch({type: `PLAYER${ownProps.num}_POINTS`, payload: points})
   }
 }
 

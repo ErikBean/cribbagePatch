@@ -22,7 +22,7 @@ export default class Crib extends Component {
           Show the Crib
         </button>
         <div hidden={this.state.isHidden}>
-          <ScoreBoard cards={this.props.cards} />
+          {/* <ScoreBoard cards={this.props.cards} /> */}
           {this.props.visibleCards.map((card) => <Card key={card} card={card} />)}
         </div>
       </div>
