@@ -124,7 +124,7 @@ export function getPairs (hand) {
  */
 export function getRuns (hand) {
   const stableValueOf = (cardA, cardB) => {
-    const [ suitA, suitB ] = [ cardA, cardB ].map((c) => c[0])
+    const [ suitA, suitB ] = [ cardA, cardB ].map((c) => c ? c[0] : -1)
     const [ valueA, valueB ] = [ cardA, cardB ].map(valueOf)
     if (valueA === valueB) {
       return suitA > suitB

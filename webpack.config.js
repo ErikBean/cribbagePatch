@@ -1,7 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 module.exports = {
-  devtool: 'eval-source-map',
+  devtool: 'source-map',
   entry: {
     hmr: ['react-hot-loader/patch',
     // activate HMR for React

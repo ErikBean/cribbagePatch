@@ -32,6 +32,7 @@ export default class ScoreBoard extends Component {
     }
   }
   componentWillMount(){
+    // console.log('>>> Here: ', this.props.cards)
     if(!isEmpty(this.props.cards)){
       this.computePoints(this.props.cards)
     }
