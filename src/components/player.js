@@ -1,16 +1,24 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { createSelector } from 'reselect'
-import { difference, last, every, isEmpty, includes, size } from 'lodash'
-import { sumOf, valueMaxTen, getPegPoints } from '../points'
+import { isEmpty, includes, size } from 'lodash'
+import { sumOf, valueMaxTen, getPegPoints, isTooHighToPlay } from '../points'
 import { createDeck, shuffle } from '../deck'
-
+import {
+  shouldPeggingRestartSelector,
+  myUnplayedSelector,
+  didPlayLastSelector,
+  pegCountSelector,
+  isWaitingForLead,
+  isMyTurnSelector,
+  playedCardsSelector,
+  isCurrentPlayerSelector,
+  myHandWithCutSelector,
+  hasFirstCribSelector,
+  opponentHasFirstCribSelector
+} from './playerSelectors'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
-const isTooHighToPlay = (c, pegCount) => {
-  return valueMaxTen(c) > (31 - pegCount)
-}
 
 const isMyCrib = (playerNum, round) => {
   // on first crib, playerNum = 1, round = 1
@@ -163,77 +171,20 @@ class Player extends Component {
   }
 }
 
-const isP1Selector = (state, props) => state.meta.isPlayer1 && props.num === '1'
-const isP2Selector = (state, props) => state.meta.isPlayer2 && props.num === '2'
-const myHandSelector = (state, props) => props.hand
-const theirHandSelector = (state, props) => props.theirHand
-const myHandWithCutSelector = (state, props) => (props.hand || []).concat(props.cut || [])
-
-const playedCardsSelector = (state) => state.playedCards
-const isCurrentPlayer = createSelector(
-  [isP1Selector, isP2Selector],
-  (isP1=false, isP2=false) => isP1 || isP2
-)
-const isWaitingForLead = createSelector(
-  [playedCardsSelector, isP1Selector],
-  (played=[], isP1=false) => isEmpty(played) && isP1
-)
-const pegCountSelector = createSelector(
-  [playedCardsSelector],
-  (played=[]) => sumOf(played)
-)
-const myUnplayedSelector = createSelector(
-  [myHandSelector, playedCardsSelector],
-  (myHand=[], played=[]) => difference(myHand, played)
-)
-const theirUnplayedSelector = createSelector(
-  [theirHandSelector, playedCardsSelector],
-  (theirHand=[], played=[]) => difference(theirHand, played)
-)
-const didPlayLastSelector = createSelector(
-  [myHandSelector, playedCardsSelector],
-  (myHand=[], played=[]) => includes(myHand, last(played))
-)
-const hasAGoSelector = createSelector(
-  [theirUnplayedSelector, pegCountSelector, didPlayLastSelector],
-  (theirUnplayed=[], pegCount=0, didPlayLast=false) => {
-    const opponentCannotPlay = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount))
-    return opponentCannotPlay && didPlayLast
-  }
-)
-const isMyTurnSelector = createSelector(
-  [didPlayLastSelector, hasAGoSelector],
-  (didPlayLast, hasAGo) => !didPlayLast || hasAGo
-)
-const shouldPeggingRestartSelector = createSelector(
-  [myUnplayedSelector, pegCountSelector, hasAGoSelector],
-  (myUnplayed=[], pegCount, hasAGo=false) => {
-    const cannotPlay = every(myUnplayed, (c) => isTooHighToPlay(c, pegCount))
-    return cannotPlay && hasAGo
-  }
-)
-
-
 const mapStateToProps = (state, ownProps) => {
-  const { playedCards, cut, cutIndex, crib, round } = state
-  const { isPlayer1, isPlayer2 } = state.meta
   return {
-    cut,
-    cutIndex,
-    crib,
-    round,
     shouldDiscard: (ownProps.hand || []).length > 4,
     isRoundDone: shouldPeggingRestartSelector(state, ownProps),
     myUnplayed: myUnplayedSelector(state, ownProps),
     didPlayLast: didPlayLastSelector(state, ownProps),
     pegCount: pegCountSelector(state),
     isWaitingForLead: isWaitingForLead(state, ownProps),
-    isMyTurn: isMyTurnSelector(state, props),
+    isMyTurn: isMyTurnSelector(state, ownProps),
     playedCards: playedCardsSelector(state),
-    isCurrentPlayer: isCurrentPlayer(state, ownProps),
-    myHandWithCut: myHandWithCutSelector(ownProps, ownProps),
-    hasFirstCrib: isPlayer1,
-    opponentHasFirstCrib: isPlayer2
+    isCurrentPlayer: isCurrentPlayerSelector(state, ownProps),
+    myHandWithCut: myHandWithCutSelector(null, ownProps),
+    hasFirstCrib: hasFirstCribSelector(state, ownProps),
+    opponentHasFirstCrib: opponentHasFirstCribSelector(state, ownProps),
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

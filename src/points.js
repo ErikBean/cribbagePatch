@@ -4,6 +4,9 @@ import { uniq, includes, last } from 'lodash'
 export function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
 }
+export const isTooHighToPlay = (c, pegCount) => {
+  return valueMaxTen(c) > (31 - pegCount)
+}
 
 export function getPegPoints (playedCards, hand) {
   console.log('>>> getPegPoints: ', playedCards, hand)

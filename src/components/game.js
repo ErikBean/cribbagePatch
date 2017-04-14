@@ -75,17 +75,23 @@ class Game extends Component {
         <div>
           <Player num='1'
             cut={this.props.cut}
+            cutIndex={this.props.cutIndex}
+            cutDeck={this.cutDeck}
             hand={this.props.player1Hand}
+            crib={this.props.crib}
             theirHand={this.props.player2Hand}
             showMessage={this.showMessage}
-            cutDeck={this.cutDeck}
+            round={this.props.round}
             selectCutIndex={this.selectCutIndex} />
           <Player num='2'
             cut={this.props.cut}
+            cutIndex={this.props.cutIndex}
+            cutDeck={this.cutDeck}
             hand={this.props.player2Hand}
+            crib={this.props.crib}
             theirHand={this.props.player1Hand}
             showMessage={this.showMessage}
-            cutDeck={this.cutDeck}
+            round={this.props.round}
             selectCutIndex={this.selectCutIndex} />
           <Crib
             visibleCards={this.props.crib || []}
