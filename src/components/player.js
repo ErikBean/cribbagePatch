@@ -162,20 +162,7 @@ class Player extends Component {
     )
   }
 }
-/*
-function stateFromProps (props) {
-  const pegCount = sumOf(props.playedCards || [])
-  const myUnplayed = difference(props.hand, props.playedCards)
-  const theirUnplayed = difference(props.theirHand, props.playedCards)
-  
-  const notAbleToPlayCard = (unplayed) => every(unplayed, (c) => isTooHighToPlay(c, pegCount))
-  const hasAGo = notAbleToPlayCard(theirUnplayed) && didPlayLast
-  const isRoundDone = notAbleToPlayCard(myUnplayed) && hasAGo
-  const isMyTurn = !didPlayLast || hasAGo
-  const shouldDiscard = (props.hand || []).length > 4
-  return { isWaitingForLead, isMyTurn, pegCount, shouldDiscard, myUnplayed, isRoundDone }
-}
-*/
+
 const isP1Selector = (state, props) => state.meta.isPlayer1 && props.num === '1'
 const isP2Selector = (state, props) => state.meta.isPlayer2 && props.num === '2'
 const myHandSelector = (state, props) => props.hand
@@ -216,7 +203,7 @@ const hasAGoSelector = createSelector(
 )
 const isMyTurnSelector = createSelector(
   [didPlayLastSelector, hasAGoSelector],
-  (didPlayLast, hasAGo) => didPlayLast || hasAGo
+  (didPlayLast, hasAGo) => !didPlayLast || hasAGo
 )
 const shouldPeggingRestartSelector = createSelector(
   [myUnplayedSelector, pegCountSelector, hasAGoSelector],
@@ -241,6 +228,7 @@ const mapStateToProps = (state, ownProps) => {
     didPlayLast: didPlayLastSelector(state, ownProps),
     pegCount: pegCountSelector(state),
     isWaitingForLead: isWaitingForLead(state, ownProps),
+    isMyTurn: isMyTurnSelector(state, props),
     playedCards: playedCardsSelector(state),
     isCurrentPlayer: isCurrentPlayer(state, ownProps),
     myHandWithCut: myHandWithCutSelector(ownProps, ownProps),

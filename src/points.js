@@ -60,7 +60,7 @@ function isArraySorted (array) {
 }
 
 export function sumOf (cards) {
-  return cards.map(valueMaxTen).reduce((curr, acc) => curr + acc, 0)
+  return (cards || []).map(valueMaxTen).reduce((curr, acc) => curr + acc, 0)
 }
 
 export function isFifteen (...cards) {
