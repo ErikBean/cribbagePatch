@@ -2,12 +2,12 @@
 real time cribbage game
 
 Refactor TODO:
-1. DONE! Need someplace to put derived data (this.state...not the best)
-2. Need message to cut the deck
-3. DONE! Update gun to 0.6.1
+1. Hide scoreboard before hands counted
+2. Hide cuts after first crib determination 
+3. Need to display scoreboard runs as not JSON array 
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. BUG: doing first cut doesn't grey out button for second cut
-6. Serious trouble restarting the game
+6. 
 Rules TODO:
 
 1. DONE! Init deck with 52 cards

@@ -8,8 +8,7 @@ class Deck extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      hasFirstCut: false,
-      hasBeenCut: false
+      hasFirstCut: false
     }
     this.doFirstCut = this.doFirstCut.bind(this)
     this.doSecondCut = this.doSecondCut.bind(this)

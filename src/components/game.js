@@ -116,7 +116,7 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { cutIndex, deck, cut, crib, player1Hand, player2Hand, playedCards } = state
+  const { cutIndex, deck, cut, crib, player1Hand, player2Hand, playedCards, round } = state
   const { isPlayer1, isPlayer2 } = state.meta
   const doneFirstDeal = (player1Hand || []).length > 0 || (player2Hand || []).length > 0
   return {
@@ -129,7 +129,8 @@ const mapStateToProps = (state) => {
     crib,
     deck,
     cut,
-    cutIndex
+    cutIndex,
+    round
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

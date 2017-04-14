@@ -39,6 +39,7 @@ class Player extends Component {
     this.discard = this.discard.bind(this)
   }
   componentWillReceiveProps (nextProps) {
+    console.log('>>> Here: ', nextProps)
     if (nextProps.hasFirstCrib && !(nextProps.hand || []).length) {
       this.props.showMessage('You win the first crib! Deal the cards.', this.deal)
     } else if (nextProps.opponentHasFirstCrib && !(nextProps.hand || []).length) {
@@ -94,7 +95,7 @@ class Player extends Component {
       hand1[i] = deck[i]
       hand2[i] = deck[ i + 6 ]
     }
-    this.props.incrementRound(this.props.round + 1)
+    this.props.incrementRound((this.props.round || 0) + 1)
     this.props.updateDeck(deck)
     this.props.getHand('player1', hand1)
     this.props.getHand('player2', hand2)

@@ -12,11 +12,11 @@ const playedCardsSelector = (state) => state.playedCards
 
 const hasFirstCribSelector = createSelector(
   [isP1Selector, roundSelector],
-  (isP1, round) => round===0 && isP1
+  (isP1, round) => round<2 && isP1
 )
 const opponentHasFirstCribSelector = createSelector(
   [isP2Selector, roundSelector],
-  (isP2, round) => round===0 && isP2
+  (isP2, round) => round<2 && isP2
 )
 const isCurrentPlayerSelector = createSelector(
   [isP1Selector, isP2Selector],
