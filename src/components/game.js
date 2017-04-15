@@ -101,7 +101,8 @@ class Game extends Component {
         <br />
         <div id='played-cards' hidden={!this.props.cut}>
           On the Table:<br />
-          <PeggingArea 
+          <PeggingArea
+            invert={this.props.isPlayer2}
             playedCards={this.props.playedCards || []}
             player1Hand={this.props.player1Hand}
             player2Hand={this.props.player2Hand}

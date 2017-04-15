@@ -6,25 +6,17 @@ import { createDeck, shuffle } from '../deck'
 import {
   shouldPeggingRestartSelector,
   myUnplayedSelector,
-  didPlayLastSelector,
   pegCountSelector,
   isWaitingForLead,
   isMyTurnSelector,
   playedCardsSelector,
   isCurrentPlayerSelector,
   myHandWithCutSelector,
-  hasFirstCribSelector,
-  opponentHasFirstCribSelector
+  playerPromptSelector
 } from './playerSelectors'
+import { DEAL_FIRST_ROUND } from './playerMessages'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
-
-
-const isMyCrib = (playerNum, round) => {
-  // on first crib, playerNum = 1, round = 1
-  return (parseInt(playerNum) + round) % 2 === 0
-}
-let prevPegRoundsCards = []
 
 class Player extends Component {
   constructor (props) {
@@ -37,47 +29,27 @@ class Player extends Component {
     this.toggleSelect = this.toggleSelect.bind(this)
     this.deal = this.deal.bind(this)
     this.discard = this.discard.bind(this)
+    this.getNextAction = this.getNextAction.bind(this)
   }
   componentWillReceiveProps (nextProps) {
-    console.log('>>> Here: ', nextProps)
-    if (nextProps.hasFirstCrib && !(nextProps.hand || []).length) {
-      this.props.showMessage('You win the first crib! Deal the cards.', this.deal)
-    } else if (nextProps.opponentHasFirstCrib && !(nextProps.hand || []).length) {
-      this.props.showMessage('Opponent has the first crib. Waiting for deal.', null)
+    if(nextProps.prompt !== this.props.prompt){
+      console.log('>>> prompt: ', nextProps.prompt)
+      this.props.showMessage(nextProps.prompt, this.getNextAction(nextProps.prompt))
     }
-  }
-  componentWillMount () {
-    this.displayMessage()
   }
   componentDidUpdate(){
     if(this.props.isRoundDone){
       alert('restart the pegging!')
-      prevPegRoundsCards.push(this.props.playedCards)
-      this.props.playPegCard([],[])
+      this.props.playPegCard(['RESTART'],this.props.playedCards)
     }
-    this.displayMessage()
   }
-  displayMessage () {
-    const hasHand = this.props.hand && this.props.hand.length
-    const { num, round, showMessage, isCurrentPlayer, cut, cutIndex, crib } = this.props
-    const hasCrib = isMyCrib(num, round)
-    if (!hasHand || !isCurrentPlayer) return
-    if (this.props.shouldDiscard) {
-      showMessage('please discard 2 cards', this.discard)
-    } else if (size(crib) < 4) {
-      showMessage('Waiting for other player to discard', null)
-    } else if (!cutIndex && !hasCrib) { // need to cut 5th card
-      showMessage('Cut the Deck!', this.props.selectCutIndex)
-    } else if (cutIndex && !cut && hasCrib) {
-      showMessage('Cut 5th card!', this.props.cutDeck)
-    } else if (!cut) {
-      showMessage('Waiting for other player to cut', null) // either index or 5th card
-    } else if(isEmpty(this.props.playedCards)){
-      if(hasCrib){
-        showMessage('Waitng for other player to lead', null)
-      } else {
-        showMessage('Click a card to start pegging', null)
-      }
+  getNextAction (prompt) {
+    console.log('>>> Here: ', prompt, DEAL_FIRST_ROUND, this.deal)
+    switch(prompt){
+      case DEAL_FIRST_ROUND:
+        return this.deal
+      default:
+        return null
     }
   }
   discard () {
@@ -174,18 +146,15 @@ class Player extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    shouldDiscard: (ownProps.hand || []).length > 4,
     isRoundDone: shouldPeggingRestartSelector(state, ownProps),
     myUnplayed: myUnplayedSelector(state, ownProps),
-    didPlayLast: didPlayLastSelector(state, ownProps),
     pegCount: pegCountSelector(state),
     isWaitingForLead: isWaitingForLead(state, ownProps),
     isMyTurn: isMyTurnSelector(state, ownProps),
     playedCards: playedCardsSelector(state),
     isCurrentPlayer: isCurrentPlayerSelector(state, ownProps),
     myHandWithCut: myHandWithCutSelector(null, ownProps),
-    hasFirstCrib: hasFirstCribSelector(state, ownProps),
-    opponentHasFirstCrib: opponentHasFirstCribSelector(state, ownProps),
+    prompt: playerPromptSelector(state, ownProps)
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

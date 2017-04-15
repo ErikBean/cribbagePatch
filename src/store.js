@@ -129,6 +129,7 @@ window.startPegging = () => {
     },
     player1Hand: ['S3', 'S4', 'S5', 'S6'],
     player2Hand: ['H3', 'H4', 'H5', 'H6'],
+    playedCards: [],
     crib: ['S1', 'S2', 'H1', 'H2'],
     cut: 'C4',
     cutIndex: 23

@@ -30,11 +30,13 @@ export default (props) => {
       </Card>
     </div>
   )
+  const renderP1 = <div>{cardsPlayedByP1.map(renderPegCard)}</div>
+  const renderP2 = <div>{cardsPlayedByP2.map(renderPegCard)}</div>
   return (
     <div>
-      <div>{cardsPlayedByP1.map(renderPegCard)}</div>
+      <div>{props.invert ? renderP1 : renderP2}</div>
       <hr />
-      <div>{cardsPlayedByP2.map(renderPegCard)}</div>
+      <div>{props.invert ? renderP2 : renderP1}</div>
     </div>
   )
 }
