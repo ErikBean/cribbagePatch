@@ -14,7 +14,7 @@ import {
   myHandWithCutSelector,
   playerPromptSelector
 } from './playerSelectors'
-import { DEAL_FIRST_ROUND } from './playerMessages'
+import { DEAL_FIRST_ROUND, CUT_FOR_FIRST_CRIB_1, CUT_FOR_FIRST_CRIB_2 } from './playerMessages'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
@@ -31,6 +31,9 @@ class Player extends Component {
     this.discard = this.discard.bind(this)
     this.getNextAction = this.getNextAction.bind(this)
   }
+  componentWillMount(){
+    this.props.showMessage(this.props.prompt, this.getNextAction(this.props.prompt))
+  }
   componentWillReceiveProps (nextProps) {
     if(nextProps.prompt !== this.props.prompt){
       console.log('>>> prompt: ', nextProps.prompt)
@@ -44,8 +47,11 @@ class Player extends Component {
     }
   }
   getNextAction (prompt) {
-    console.log('>>> Here: ', prompt, DEAL_FIRST_ROUND, this.deal)
     switch(prompt){
+      case CUT_FOR_FIRST_CRIB_1:
+        return this.props.doFirstCut
+      case CUT_FOR_FIRST_CRIB_2:
+        return this.props.doSecondCut
       case DEAL_FIRST_ROUND:
         return this.deal
       default:

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { valueOf } from '../deck'
+import { valueOf, shuffle, createDeck } from '../deck'
 
 import Player from './player'
 import Crib from './crib'
@@ -16,6 +16,8 @@ class Game extends Component {
     this.assignPlayer = this.assignPlayer.bind(this)
     this.changeCutIndex = this.changeCutIndex.bind(this)
     this.selectCutIndex = this.selectCutIndex.bind(this)
+    this.doFirstCut = this.doFirstCut.bind(this)
+    this.doSecondCut = this.doSecondCut.bind(this)
     this.cutDeck = this.cutDeck.bind(this)
     this.state = {
       cutIndex: 20,
@@ -24,7 +26,6 @@ class Game extends Component {
       // this helps restore state on refresh
       isPlayer1: window.localStorage.getItem('cribbagePatchPlayer1'),
       isPlayer2: window.localStorage.getItem('cribbagePatchPlayer2'),
-      didFirstCut: false
     }
   }
   componentWillMount () {
@@ -59,6 +60,21 @@ class Game extends Component {
     const NUM_CARDS_DEALT = 12
     this.props.doCut(this.props.deck[NUM_CARDS_DEALT + parseInt(this.props.cutIndex)])
   }
+  doFirstCut () {
+    const deck = shuffle(createDeck())
+    const myCut = deck[0]
+    this.props.updateDeck(deck)
+    this.props.cutForFirstCrib(true, myCut)
+    this.setState({hasFirstCut: true})
+    // then wait for remote player to make second cut
+  }
+  doSecondCut () {
+    const myCut = this.props.deck[1]
+    const theirCut = this.props.firstCut
+    this.props.cutForFirstCrib(false, myCut)
+    // Assign players here:
+    this.props.assignPlayer(myCut, theirCut)
+  }
   render () {
     return (
       <div>
@@ -76,22 +92,24 @@ class Game extends Component {
           <Player num='1'
             cut={this.props.cut}
             cutIndex={this.props.cutIndex}
-            cutDeck={this.cutDeck}
             hand={this.props.player1Hand}
             crib={this.props.crib}
             theirHand={this.props.player2Hand}
             showMessage={this.showMessage}
-            round={this.props.round}
+            doFirstCut={this.doFirstCut}
+            doSecondCut={this.doSecondCut}
+            cutDeck={this.cutDeck}
             selectCutIndex={this.selectCutIndex} />
           <Player num='2'
             cut={this.props.cut}
             cutIndex={this.props.cutIndex}
-            cutDeck={this.cutDeck}
             hand={this.props.player2Hand}
             crib={this.props.crib}
             theirHand={this.props.player1Hand}
             showMessage={this.showMessage}
-            round={this.props.round}
+            doFirstCut={this.doFirstCut}
+            doSecondCut={this.doSecondCut}
+            cutDeck={this.cutDeck}
             selectCutIndex={this.selectCutIndex} />
           <Crib
             visibleCards={this.props.crib || []}
@@ -138,7 +156,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut}),
     selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
-    assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player})
+    assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
+    cutForFirstCrib: (isFirst, cut) => dispatch({
+      type: isFirst ? `FIRST_CUT` : 'SECOND_CUT',
+      payload: cut
+    }),
+    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck})
   }
 }
 

@@ -9,12 +9,23 @@ const myHandSelector = (state, props) => props.hand
 const theirHandSelector = (state, props) => props.theirHand
 const playerNumSelector = (state, props) => props.num
 const myHandWithCutSelector = (state, props) => (props.hand || []).concat(props.cut || [])
+
+const firstCutSelector = (state) => state.firstCut
+const secondCutSelector = (state) => state.secondCut
 const roundSelector = (state, props) => state.round
 const playedCardsSelector = (state) => state.playedCards
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
 
+const needsFirstCutSelector = createSelector(
+  [firstCutSelector, secondCutSelector],
+  (firstCut, secondCut)=>!firstCut && !secondCut
+)
+const needsSecondCutSelector = createSelector(
+  [firstCutSelector, secondCutSelector],
+  (firstCut, secondCut)=>firstCut && !secondCut
+)
 const visiblePegCardsSelector = createSelector(
   [playedCardsSelector],
   (played = []) => {
@@ -113,10 +124,12 @@ const noCardsPlayedSelector = createSelector(
 )
 
 const playerPromptSelector = createSelector(
-  [isCurrentPlayerSelector, hasHandSelector, shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector, noCardsPlayedSelector, isMyCribSelector],
-  (isCurrentPlayer=false, hasHand=false, shouldDiscard=false, waitingForCrib=false, needsCut=false, needsToCutFifth=false, waitForFifth=false, nonePlayed=false, isMyCrib=false) => {
+  [isCurrentPlayerSelector, hasHandSelector, shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector, noCardsPlayedSelector, isMyCribSelector, needsFirstCutSelector, needsSecondCutSelector],
+  (isCurrentPlayer=false, hasHand=false, shouldDiscard=false, waitingForCrib=false, needsCut=false, needsToCutFifth=false, waitForFifth=false, nonePlayed=false, isMyCrib=false, needsFirstCut, needsSecondCut) => {
     // console.log('>>> Here: ', {hasHand, isCurrentPlayer, shouldDiscard, waitingForCrib, needsCut})
-    if(!isCurrentPlayer) return 'early return'
+    // if(!isCurrentPlayer) return 'early return'
+    if(needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
+    else if(needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
     else if(isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND
     else if(!isMyCrib && !hasHand) return messages.WAIT_FOR_DEAL_FIRST_ROUND
     else if(shouldDiscard) return messages.DO_DISCARD
