@@ -135,6 +135,5 @@ window.startPegging = () => {
     cutIndex: 23
   }
   const desiredStoreState = Object.assign({}, oldState, newState)
-  console.log('>>> desiredStoreState: ', desiredStoreState)
   store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
 }

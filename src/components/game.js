@@ -127,7 +127,7 @@ class Game extends Component {
           On the Table:<br />
           <PeggingArea
             invert={this.props.isPlayer2}
-            playedCards={this.props.playedCards || []}
+            playedCards={this.props.playedCards || []} // TODO: need to slice on RESTART
             player1Hand={this.props.player1Hand}
             player2Hand={this.props.player2Hand}
             isPlayer1={this.props.isPlayer1}

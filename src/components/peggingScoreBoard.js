@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
-import { getPegPoints } from '../points'
+import { calcPegPoints } from '../points'
 
 
 
 export default class PeggingScoreBoard extends Component {
   constructor (props) {
     super(props)
-    this.state = getPegPoints(props.playedCards)
+    this.state = calcPegPoints(props.playedCards)
   }
   componentWillReceiveProps (newProps) {
-    this.setState(getPegPoints(newProps.playedCards))
+    this.setState(calcPegPoints(newProps.playedCards))
   }
   
   render () {

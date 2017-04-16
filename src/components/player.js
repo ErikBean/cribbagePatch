@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isEmpty, includes, size } from 'lodash'
-import { sumOf, valueMaxTen, getPegPoints, isTooHighToPlay } from '../points'
+import { sumOf, valueMaxTen, calcPegPoints, isTooHighToPlay } from '../points'
 import { createDeck, shuffle } from '../deck'
 import {
   shouldPeggingRestartSelector,
@@ -48,8 +48,7 @@ class Player extends Component {
     this.props.showMessage(this.props.prompt, this.getNextAction(this.props.prompt))
   }
   componentWillReceiveProps (nextProps) {
-    const isNewPrompt = nextProps.prompt !== this.props.prompt 
-    if(nextProps.isCurrentPlayer){
+    if(nextProps.isCurrentPlayer){ // race condition with non-current player setting message
       this.props.showMessage(nextProps.prompt, this.getNextAction(nextProps.prompt))
     }
   }
@@ -60,7 +59,7 @@ class Player extends Component {
     }
   }
   getNextAction (prompt) {
-    switch(prompt){
+    switch(prompt){ // TODO: move first 2 someplace else? Player not assigned yet 
       case CUT_FOR_FIRST_CRIB_1:
         return this.props.doFirstCut
       case CUT_FOR_FIRST_CRIB_2:
@@ -69,6 +68,10 @@ class Player extends Component {
         return this.deal
       case DO_DISCARD:
         return this.discard
+      case CUT_DECK:
+        return this.props.selectCutIndex
+      case CUT_FIFTH_CARD:
+        return this.props.cutDeck
       default:
         return null
     }
@@ -98,14 +101,13 @@ class Player extends Component {
       selected: [ card, this.state.selected[0] ]
     })
   }
-  tryPlayCard (card) {
+  tryPlayCard (card) { // lift this up? 
     const { cut, playedCards, isWaitingForLead, pegCount, isMyTurn } = this.props
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
-
-    const {runsPoints, fifteenPoints, pairsPoints} = getPegPoints([...this.props.playedCards, card], this.props.hand)
-    console.log('>>> pegPoints: ', {runsPoints, fifteenPoints, pairsPoints})
+    const allCardsThisRound = [...this.props.playedCards, card] // prempt store update. TODO: Need to slice on RESTART
+    const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(allCardsThisRound, this.props.hand)
     if (runsPoints || fifteenPoints || pairsPoints) {
       const pegPointsForLastCard = runsPoints + fifteenPoints + pairsPoints
       this.showPegPointsMessage({runsPoints, fifteenPoints, pairsPoints})
@@ -113,7 +115,7 @@ class Player extends Component {
     }
     this.props.playPegCard(card, playedCards || [])
   }
-  showPegPointsMessage ({runsPoints, fifteenPoints, pairsPoints}) {
+  showPegPointsMessage ({runsPoints, fifteenPoints, pairsPoints}) { // lift this up?
     let messages = []
     if (fifteenPoints) {
       messages.push('fifteen for two')
