@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createDeck, shuffle } from '../deck'
+import { CUT_FOR_FIRST_CRIB_2 } from './playerMessages'
 
 import Card from './card'
 
@@ -10,6 +11,9 @@ class Deck extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    if(nextProps.firstCut && !nextProps.secondCut && !nextProps.hasFirstCut){
+      this.props.showMessage(CUT_FOR_FIRST_CRIB_2, this.props.doSecondCut)
+    }
     if (nextProps.firstCut && nextProps.secondCut && this.props.hasFirstCut && !this.props.playerAssigned) {
       const myCut = nextProps.firstCut
       const theirCut = nextProps.secondCut

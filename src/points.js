@@ -9,7 +9,6 @@ export const isTooHighToPlay = (c, pegCount) => {
 }
 
 export function getPegPoints (playedCards, hand) {
-  console.log('>>> getPegPoints: ', playedCards, hand)
   const isLastCardPlayedByMe = includes(hand, last(playedCards))
   if (!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
   const fifteenPoints = sumOf(playedCards) === 15 ? 2 : 0

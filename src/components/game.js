@@ -11,7 +11,6 @@ import PeggingArea from './peggingArea'
 class Game extends Component {
   constructor (props) {
     super(props)
-
     this.showMessage = this.showMessage.bind(this)
     this.assignPlayerByCut = this.assignPlayerByCut.bind(this)
     this.changeCutIndex = this.changeCutIndex.bind(this)
@@ -31,22 +30,17 @@ class Game extends Component {
   }
   componentWillMount () {
     if (this.state.isPlayer1) {
-      console.log('>>> componentWillMount player1: ')
       this.props.assignPlayer('player1')
     } else if (this.state.isPlayer2) {
-      console.log('>>> componentWillMount player2: ')
       this.props.assignPlayer('player2')
     }
   }
   assignPlayerByCut (myCut, theirCut) {
-    console.trace('>>> cutz: ', {myCut, theirCut}, valueOf(myCut) < valueOf(theirCut))
     if (!myCut || !theirCut) console.error('!!!!!assign based on no cut!', {myCut, theirCut})
     if (valueOf(myCut) < valueOf(theirCut)) {
-      console.log('>>> assignP1: ')
       this.props.assignPlayer('player1')
       window.localStorage.setItem('cribbagePatchPlayer1', true)
     } else if (valueOf(myCut) > valueOf(theirCut)) {
-      console.log('>>> assignP2: ')
       this.props.assignPlayer('player2')
       window.localStorage.setItem('cribbagePatchPlayer2', true)
     }
@@ -95,7 +89,9 @@ class Game extends Component {
           showMessage={this.showMessage}
           assignPlayer={this.assignPlayerByCut}
           playerAssigned={this.props.isPlayer1 || this.props.isPlayer2}
-          hasFirstCut={this.state.hasFirstCut}/>
+          hasFirstCut={this.state.hasFirstCut}
+          doSecondCut={this.doSecondCut}
+        />
         <div>
           <Player num='1'
             cut={this.props.cut}

@@ -14,7 +14,20 @@ import {
   myHandWithCutSelector,
   playerPromptSelector
 } from './playerSelectors'
-import { DEAL_FIRST_ROUND, CUT_FOR_FIRST_CRIB_1, CUT_FOR_FIRST_CRIB_2 } from './playerMessages'
+import {
+  CUT_FOR_FIRST_CRIB_1,
+  CUT_FOR_FIRST_CRIB_2,
+  WAIT_FOR_FIRST_CRIB_2,
+  DEAL_FIRST_ROUND,
+  WAIT_FOR_DEAL_FIRST_ROUND,
+  DO_DISCARD,
+  WAIT_FOR_DISCARD,
+  CUT_DECK,
+  CUT_FIFTH_CARD,
+  WAIT_FOR_CUT,
+  LEAD_PEGGING,
+  WAIT_FOR_LEAD_PEGGING
+} from './playerMessages'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
@@ -35,10 +48,8 @@ class Player extends Component {
     this.props.showMessage(this.props.prompt, this.getNextAction(this.props.prompt))
   }
   componentWillReceiveProps (nextProps) {
-    const isCurrentOrUnassigned = nextProps.isCurrentPlayer || nextProps.isUnassigned
     const isNewPrompt = nextProps.prompt !== this.props.prompt 
-    if(isNewPrompt && isCurrentOrUnassigned){
-      console.log(`>>> player: ${this.props.num} says: `, nextProps.prompt, nextProps.isCurrentPlayer)
+    if(nextProps.isCurrentPlayer){
       this.props.showMessage(nextProps.prompt, this.getNextAction(nextProps.prompt))
     }
   }
@@ -56,6 +67,8 @@ class Player extends Component {
         return this.props.doSecondCut
       case DEAL_FIRST_ROUND:
         return this.deal
+      case DO_DISCARD:
+        return this.discard
       default:
         return null
     }

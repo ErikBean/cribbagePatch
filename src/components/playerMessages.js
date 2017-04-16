@@ -15,4 +15,3 @@ export const WAIT_FOR_CUT = 'Waiting for other player to cut'
 
 export const LEAD_PEGGING = 'Click a card to start pegging'
 export const WAIT_FOR_LEAD_PEGGING = 'Waitng for other player to lead'
-

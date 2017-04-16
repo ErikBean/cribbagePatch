@@ -103,7 +103,6 @@ const isMyCribSelector = createSelector(
   (round=0, playerNum='1') => {
     if(!round && playerNum === '1') return true
     if(!round && playerNum === '2') return false
-    // console.log(`>>> it is my crib ${(parseInt(playerNum) + round) % 2 === 0} because: `, {playerNum, round})
     return (parseInt(playerNum) + round) % 2 === 0
   }
 )
@@ -129,8 +128,6 @@ const noCardsPlayedSelector = createSelector(
 const playerPromptSelector = createSelector(
   [isCurrentPlayerSelector, hasHandSelector, shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector, noCardsPlayedSelector, isMyCribSelector, needsFirstCutSelector, needsSecondCutSelector],
   (isCurrentPlayer=false, hasHand=false, shouldDiscard=false, waitingForCrib=false, needsCut=false, needsToCutFifth=false, waitForFifth=false, nonePlayed=false, isMyCrib=false, needsFirstCut, needsSecondCut) => {
-    // console.log('>>> Here: ', {hasHand, isCurrentPlayer, shouldDiscard, waitingForCrib, needsCut})
-    // if(!isCurrentPlayer) return 'early return'
     if(needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
     else if(needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
     else if(isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND
