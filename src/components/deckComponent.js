@@ -7,13 +7,10 @@ import Card from './card'
 class Deck extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      hasFirstCut: false
-    }
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.firstCut && nextProps.secondCut && this.state.hasFirstCut) {
+    if (nextProps.firstCut && nextProps.secondCut && this.props.hasFirstCut && !this.props.playerAssigned) {
       const myCut = nextProps.firstCut
       const theirCut = nextProps.secondCut
       this.props.assignPlayer(myCut, theirCut)

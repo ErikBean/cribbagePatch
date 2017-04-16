@@ -100,7 +100,10 @@ const hasHandSelector = createSelector(
 )
 const isMyCribSelector = createSelector(
   [roundSelector,playerNumSelector],
-  (round=0, playerNum=1) => {
+  (round=0, playerNum='1') => {
+    if(!round && playerNum === '1') return true
+    if(!round && playerNum === '2') return false
+    // console.log(`>>> it is my crib ${(parseInt(playerNum) + round) % 2 === 0} because: `, {playerNum, round})
     return (parseInt(playerNum) + round) % 2 === 0
   }
 )

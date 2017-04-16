@@ -13,7 +13,7 @@ class Game extends Component {
     super(props)
 
     this.showMessage = this.showMessage.bind(this)
-    this.assignPlayer = this.assignPlayer.bind(this)
+    this.assignPlayerByCut = this.assignPlayerByCut.bind(this)
     this.changeCutIndex = this.changeCutIndex.bind(this)
     this.selectCutIndex = this.selectCutIndex.bind(this)
     this.doFirstCut = this.doFirstCut.bind(this)
@@ -26,21 +26,27 @@ class Game extends Component {
       // this helps restore state on refresh
       isPlayer1: window.localStorage.getItem('cribbagePatchPlayer1'),
       isPlayer2: window.localStorage.getItem('cribbagePatchPlayer2'),
+      hasFirstCut: false
     }
   }
   componentWillMount () {
     if (this.state.isPlayer1) {
+      console.log('>>> componentWillMount player1: ')
       this.props.assignPlayer('player1')
     } else if (this.state.isPlayer2) {
+      console.log('>>> componentWillMount player2: ')
       this.props.assignPlayer('player2')
     }
   }
-  assignPlayer (myCut, theirCut) {
+  assignPlayerByCut (myCut, theirCut) {
+    console.trace('>>> cutz: ', {myCut, theirCut}, valueOf(myCut) < valueOf(theirCut))
     if (!myCut || !theirCut) console.error('!!!!!assign based on no cut!', {myCut, theirCut})
     if (valueOf(myCut) < valueOf(theirCut)) {
+      console.log('>>> assignP1: ')
       this.props.assignPlayer('player1')
       window.localStorage.setItem('cribbagePatchPlayer1', true)
     } else if (valueOf(myCut) > valueOf(theirCut)) {
+      console.log('>>> assignP2: ')
       this.props.assignPlayer('player2')
       window.localStorage.setItem('cribbagePatchPlayer2', true)
     }
@@ -63,9 +69,9 @@ class Game extends Component {
   doFirstCut () {
     const deck = shuffle(createDeck())
     const myCut = deck[0]
+    this.setState({hasFirstCut: true})
     this.props.updateDeck(deck)
     this.props.cutForFirstCrib(true, myCut)
-    this.setState({hasFirstCut: true})
     // then wait for remote player to make second cut
   }
   doSecondCut () {
@@ -73,7 +79,7 @@ class Game extends Component {
     const theirCut = this.props.firstCut
     this.props.cutForFirstCrib(false, myCut)
     // Assign players here:
-    this.props.assignPlayer(myCut, theirCut)
+    this.assignPlayerByCut(myCut, theirCut)
   }
   render () {
     return (
@@ -87,10 +93,13 @@ class Game extends Component {
         </GameInfo>
         <Deck
           showMessage={this.showMessage}
-          assignPlayer={this.assignPlayer} />
+          assignPlayer={this.assignPlayerByCut}
+          playerAssigned={this.props.isPlayer1 || this.props.isPlayer2}
+          hasFirstCut={this.state.hasFirstCut}/>
         <div>
           <Player num='1'
             cut={this.props.cut}
+            isUnassigned={!this.props.isPlayer1 && !this.props.isPlayer2}
             cutIndex={this.props.cutIndex}
             hand={this.props.player1Hand}
             crib={this.props.crib}
@@ -101,6 +110,7 @@ class Game extends Component {
             cutDeck={this.cutDeck}
             selectCutIndex={this.selectCutIndex} />
           <Player num='2'
+            isUnassigned={!this.props.isPlayer1 && !this.props.isPlayer2}
             cut={this.props.cut}
             cutIndex={this.props.cutIndex}
             hand={this.props.player2Hand}
@@ -135,11 +145,10 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { cutIndex, deck, cut, crib, player1Hand, player2Hand, playedCards, round } = state
+  const { firstCut, cutIndex, deck, cut, crib, player1Hand, player2Hand, playedCards, round } = state
   const { isPlayer1, isPlayer2 } = state.meta
-  const doneFirstDeal = (player1Hand || []).length > 0 || (player2Hand || []).length > 0
   return {
-    doneFirstDeal,
+    firstCut,
     isPlayer1,
     isPlayer2,
     player1Hand,

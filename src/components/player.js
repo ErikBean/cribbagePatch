@@ -35,8 +35,10 @@ class Player extends Component {
     this.props.showMessage(this.props.prompt, this.getNextAction(this.props.prompt))
   }
   componentWillReceiveProps (nextProps) {
-    if(nextProps.prompt !== this.props.prompt){
-      console.log('>>> prompt: ', nextProps.prompt)
+    const isCurrentOrUnassigned = nextProps.isCurrentPlayer || nextProps.isUnassigned
+    const isNewPrompt = nextProps.prompt !== this.props.prompt 
+    if(isNewPrompt && isCurrentOrUnassigned){
+      console.log(`>>> player: ${this.props.num} says: `, nextProps.prompt, nextProps.isCurrentPlayer)
       this.props.showMessage(nextProps.prompt, this.getNextAction(nextProps.prompt))
     }
   }
