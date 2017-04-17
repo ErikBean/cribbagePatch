@@ -31,6 +31,7 @@ export function calcPegPoints (playedCards, hand) {
     let currentRun = null
     while (!currentRun || currentRun.length < playedCards.length) { // keep slicing backwards from end
       currentRun = playedCards.slice(startIndex).map(valueOf).sort((a, b) => a > b)
+      // if(currentRun[currentRun.length -1] !== (currentRun[currentRun.length - 2] + 1)) break;
       runsPoints = 1 // first card in the run
       let prevVal = currentRun[0]
       for (let i = 1; i < currentRun.length; i++) {
@@ -42,7 +43,7 @@ export function calcPegPoints (playedCards, hand) {
       }
       startIndex--
     }
-    if (runsPoints < 3) runsPoints = 0
+    if (runsPoints < 3 || currentRun[currentRun.length -2] !== (currentRun[currentRun.length -3] + 1)) runsPoints = 0
   }
   return {
     pairsPoints,

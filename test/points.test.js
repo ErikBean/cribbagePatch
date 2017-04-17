@@ -42,7 +42,7 @@ describe('#calcPegPoints', () => {
       peg = points.calcPegPoints(played, hand)
       expect(peg.runsPoints).to.be(3)
     })
-    it('should count runs (out of order)', () => {
+    it.only('should count runs (out of order)', () => {
       const hand = ['F6']
       const played = ['A13', 'B4', 'C5', 'D3', 'E2', 'F6']
       const peg = points.calcPegPoints(played, hand)
