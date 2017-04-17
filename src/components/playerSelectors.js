@@ -128,6 +128,8 @@ const noCardsPlayedSelector = createSelector(
 const playerPromptSelector = createSelector(
   [isCurrentPlayerSelector, hasHandSelector, shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector, noCardsPlayedSelector, isMyCribSelector, needsFirstCutSelector, needsSecondCutSelector],
   (isCurrentPlayer=false, hasHand=false, shouldDiscard=false, waitingForCrib=false, needsCut=false, needsToCutFifth=false, waitForFifth=false, nonePlayed=false, isMyCrib=false, needsFirstCut, needsSecondCut) => {
+    // TODO: break this up into selectors that return one of N messages ?
+    // selector dependency tree vs. flatmap
     if(needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
     else if(needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
     else if(isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND

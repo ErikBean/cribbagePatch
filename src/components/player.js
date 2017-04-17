@@ -106,6 +106,7 @@ class Player extends Component {
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
+    // wouldnt need to do this if just did it based off props.... 
     const allCardsThisRound = [...this.props.playedCards, card] // prempt store update. TODO: Need to slice on RESTART
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(allCardsThisRound, this.props.hand)
     if (runsPoints || fifteenPoints || pairsPoints) {
