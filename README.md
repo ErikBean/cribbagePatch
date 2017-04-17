@@ -8,6 +8,8 @@ Refactor TODO:
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. Redux gun middleware?
 6. Using  a magic string in an array is not the best way to restart pegging, instead just keep track of where last round ended in a separate metadata thing 
+7. disable button after click!
+8. What if I do the pegging calc, and next action, in the SELECTOR ? 
 
 Rules TODO / Roadmap:
 1. Hide/grey out previously pegged cards after first pegging round

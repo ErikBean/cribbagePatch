@@ -134,6 +134,7 @@ class Player extends Component {
     if(runsPoints){
       messages.push(`a run of ${runsPoints}`)
     }
+    console.info(`You got ${messages.join(' and ')}!`)
     this.props.showMessage(`You got ${messages.join(' and ')}!`, null)
   }
   onCardClick (card) {
@@ -149,18 +150,18 @@ class Player extends Component {
         <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
         <div id='player-hand' hidden={!this.props.isCurrentPlayer}>
           Your Hand:
-          <div>
-            <ScoreBoard cards={this.props.myHandWithCut} />
-            Peg Count: {this.props.pegCount}
-            <br />
-            {this.props.myUnplayed.map((card) => (
-              <Card
-                onClick={() => this.onCardClick(card)}
-                isSelected={includes(this.state.selected, card)}
-                card={card}
-                key={card} />
-            ))}
-          </div>
+          <br />
+          {this.props.myUnplayed.map((card) => (
+            <Card
+              onClick={() => this.onCardClick(card)}
+              isSelected={includes(this.state.selected, card)}
+              card={card}
+              key={card} />
+          ))}
+          <ScoreBoard cards={this.props.myHandWithCut} />
+          <br />
+          <br />
+          <br />
         </div>
       </div>
     )

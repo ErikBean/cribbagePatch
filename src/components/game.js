@@ -107,7 +107,7 @@ class Game extends Component {
             isPlayer1={this.props.isPlayer1}
             isPlayer2={this.props.isPlayer2} />
         </div>
-        {renderPlayer('1')}
+        {this.props.isPlayer1 ? renderPlayer('2') : renderPlayer('1')}
         <Deck
           showMessage={this.showMessage}
           assignPlayer={this.assignPlayerByCut}
@@ -117,7 +117,7 @@ class Game extends Component {
         <Crib
           visibleCards={this.props.crib || []}
           cards={(this.props.crib || []).concat(this.props.cut || [])} />
-        {renderPlayer('2')}
+        {this.props.isPlayer1 ? renderPlayer('1') : renderPlayer('2')}
       </div>
     )
   }
