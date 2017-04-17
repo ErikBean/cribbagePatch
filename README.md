@@ -1,26 +1,25 @@
 # cribbagePatch
-real time cribbage game
+realtime cribbage game
 
 Refactor TODO:
 1. Hide scoreboard before hands counted
 2. Hide cuts after first crib determination 
 3. Need to display scoreboard runs as not JSON array 
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
-5. BUG: doing first cut doesn't grey out button for second cut
-6. 
-Rules TODO:
+5. Redux gun middleware?
+6. Using  a magic string in an array is not the best way to restart pegging, instead just keep track of where last round ended in a separate metadata thing 
 
-1. DONE! Init deck with 52 cards
-2. DONE! choose crib - each player chooses random index for first crib
-3. DONE! client machine with lower number randomizes deck Array, and 
-remove 6 cards from top into hand array for each player, push all this to gun
-5. DONE! Each player selects 2 cards for crib
-6. DONE! player w/o crib selects slot in array to beginGameCut the deck, move card to game.beginGameCut
-7. DONE! Compute score of hands
-8. DONE! Player w/o crib has to select card to lead, copy this from hand to playedCards
-9. DONE! Player w/o crib needs to start the pegging
-10. Need to know if local player says its a go, not just opponent. ( If I say it's a go && they say it's a go, we know to start over pegging )
-11. Points does not account for cutting a jack, or the right jack
+Rules TODO / Roadmap:
+1. Hide/grey out previously pegged cards after first pegging round
+2. Show both hands after pegging over
+3. Show total hand points, and add to score
+5. Reveal the crib, and show the score
+6. Need a way to goto the next round
+7. New prompt for P2 dealing the cards, (round other than first)
+8. 
+9. 
+10. Points does not account for cutting a jack, or the right jack
+11. Points should count flushes of 4-5 in hand, or 5 in crib
 
 
 State@3-13-17:

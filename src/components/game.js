@@ -76,6 +76,18 @@ class Game extends Component {
     this.assignPlayerByCut(myCut, theirCut)
   }
   render () {
+    const renderPlayer = (num) => (<Player num={num}
+      cut={this.props.cut}
+      isUnassigned={!this.props.isPlayer1 && !this.props.isPlayer2}
+      cutIndex={this.props.cutIndex}
+      hand={this.props[`player${num}Hand`]}
+      theirHand={this.props[`player${3 - parseInt(num)}Hand`]} // 3-2=1, 3=1=2
+      crib={this.props.crib}
+      showMessage={this.showMessage}
+      doFirstCut={this.doFirstCut}
+      doSecondCut={this.doSecondCut}
+      cutDeck={this.cutDeck}
+      selectCutIndex={this.selectCutIndex} />)
     return (
       <div>
         <GameInfo text={this.state.message} onConfirm={this.state.nextAction} >
@@ -85,44 +97,6 @@ class Game extends Component {
             disabled={this.props.cutIndex}
             onChange={this.changeCutIndex} />
         </GameInfo>
-        <Deck
-          showMessage={this.showMessage}
-          assignPlayer={this.assignPlayerByCut}
-          playerAssigned={this.props.isPlayer1 || this.props.isPlayer2}
-          hasFirstCut={this.state.hasFirstCut}
-          doSecondCut={this.doSecondCut}
-        />
-        <div>
-          <Player num='1'
-            cut={this.props.cut}
-            isUnassigned={!this.props.isPlayer1 && !this.props.isPlayer2}
-            cutIndex={this.props.cutIndex}
-            hand={this.props.player1Hand}
-            crib={this.props.crib}
-            theirHand={this.props.player2Hand}
-            showMessage={this.showMessage}
-            doFirstCut={this.doFirstCut}
-            doSecondCut={this.doSecondCut}
-            cutDeck={this.cutDeck}
-            selectCutIndex={this.selectCutIndex} />
-          <Player num='2'
-            isUnassigned={!this.props.isPlayer1 && !this.props.isPlayer2}
-            cut={this.props.cut}
-            cutIndex={this.props.cutIndex}
-            hand={this.props.player2Hand}
-            crib={this.props.crib}
-            theirHand={this.props.player1Hand}
-            showMessage={this.showMessage}
-            doFirstCut={this.doFirstCut}
-            doSecondCut={this.doSecondCut}
-            cutDeck={this.cutDeck}
-            selectCutIndex={this.selectCutIndex} />
-          <Crib
-            visibleCards={this.props.crib || []}
-            cards={(this.props.crib || []).concat(this.props.cut || [])} />
-        </div>
-        <br />
-        <br />
         <div id='played-cards' hidden={!this.props.cut}>
           On the Table:<br />
           <PeggingArea
@@ -131,11 +105,19 @@ class Game extends Component {
             player1Hand={this.props.player1Hand}
             player2Hand={this.props.player2Hand}
             isPlayer1={this.props.isPlayer1}
-            isPlayer2={this.props.isPlayer2}
-          />
+            isPlayer2={this.props.isPlayer2} />
         </div>
-        <br />
-        <br />
+        {renderPlayer('1')}
+        <Deck
+          showMessage={this.showMessage}
+          assignPlayer={this.assignPlayerByCut}
+          playerAssigned={this.props.isPlayer1 || this.props.isPlayer2}
+          hasFirstCut={this.state.hasFirstCut}
+          doSecondCut={this.doSecondCut} />
+        <Crib
+          visibleCards={this.props.crib || []}
+          cards={(this.props.crib || []).concat(this.props.cut || [])} />
+        {renderPlayer('2')}
       </div>
     )
   }
