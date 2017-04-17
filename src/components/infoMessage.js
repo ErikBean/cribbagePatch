@@ -9,7 +9,6 @@ class OkButton extends Component {
     this.onClick = this.onClick.bind(this)
   }
   componentWillReceiveProps (nextProps) {
-    console.log('>>> clickAction: ', nextProps.clickAction, this.props.clickAction)
     if (nextProps.clickAction !== this.props.clickAction) {
       this.setState({wasClicked: false})
     }

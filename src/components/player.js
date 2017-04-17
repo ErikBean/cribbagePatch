@@ -36,6 +36,11 @@ class Player extends Component {
     super(props)
     this.state = {
       selected: [null, null],
+      lastPeggedPoints: { 
+        runs: 0,
+        fifteens: 0,
+        pairs: 0
+      }
     }
     this.tryPlayCard = this.tryPlayCard.bind(this)
     this.onCardClick = this.onCardClick.bind(this)
@@ -53,9 +58,15 @@ class Player extends Component {
     }
   }
   componentDidUpdate(){
-    if(this.props.isRoundDone){
+    const { runs, fifteens, pairs } = this.state.lastPeggedPoints
+    const hasPeggedPoints = runs || pairs || fifteens
+    if(hasPeggedPoints) {
+      console.log('>>> try and say it! : ', {runs, fifteens, pairs})
+      this.showPegPointsMessage({runs, fifteens, pairs}) // this doesnt work, because props
+    }
+    if(this.props.isRoundDone) {
       alert('restart the pegging!')
-      this.props.playPegCard(['RESTART'],this.props.playedCards)
+      this.props.playPegCard(['RESTART'], this.props.playedCards)
     }
   }
   getNextAction (prompt) {
@@ -109,19 +120,25 @@ class Player extends Component {
     // wouldnt need to do this if just did it based off props.... 
     const allCardsThisRound = [...this.props.playedCards, card] // prempt store update. TODO: Need to slice on RESTART
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(allCardsThisRound, this.props.hand)
+    this.setState({
+      lastPeggedPoints: {
+        runs: runsPoints,
+        pairs: pairsPoints,
+        fifteens: fifteenPoints
+      }
+    })
     if (runsPoints || fifteenPoints || pairsPoints) {
       const pegPointsForLastCard = runsPoints + fifteenPoints + pairsPoints
-      this.showPegPointsMessage({runsPoints, fifteenPoints, pairsPoints})
       this.props.getPoints(pegPointsForLastCard)
     }
     this.props.playPegCard(card, playedCards || [])
   }
-  showPegPointsMessage ({runsPoints, fifteenPoints, pairsPoints}) { // lift this up?
+  showPegPointsMessage ({runs, fifteens, pairs}) { // lift this up?
     let messages = []
-    if (fifteenPoints) {
+    if (fifteens) {
       messages.push('fifteen for two')
     }
-    switch (pairsPoints) {
+    switch (pairs) {
       case 2:
         messages.push('a pair for two')
         break
@@ -132,8 +149,8 @@ class Player extends Component {
         messages.push('four-of-a-kind for tweleve')
         break
     }
-    if(runsPoints){
-      messages.push(`a run of ${runsPoints}`)
+    if(runs){
+      messages.push(`a run of ${runs}`)
     }
     console.info(`You got ${messages.join(' and ')}!`)
     this.props.showMessage(`You got ${messages.join(' and ')}!`, null)

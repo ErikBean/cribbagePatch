@@ -116,9 +116,22 @@ window.getHand = (hand, player) => {
     payload: hand || ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
   })
 }
-window.assignPlayer = (num = 2) => {
-  store.dispatch({type: 'ASSIGN_PLAYER', payload: `player${num}`})
-  window.localStorage.setItem(`cribbagePatchPlayer${num}`, true)
+window.assignPlayer = () => {
+  const oldState = store.getState()
+  const newState = {
+    meta: {
+      isPlayer1: false,
+      isPlayer2: true
+    },
+    player1Hand: ['S3', 'S4', 'S5', 'S6'],
+    player2Hand: ['H3', 'H4', 'H5', 'H6'],
+    playedCards: [],
+    crib: ['S1', 'S2', 'H1', 'H2'],
+    cut: 'C4',
+    cutIndex: 23
+  }
+  const desiredStoreState = Object.assign({}, oldState, newState)
+  store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
 }
 window.startPegging = () => {
   const oldState = store.getState()

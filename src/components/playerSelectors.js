@@ -142,7 +142,7 @@ const playerPromptSelector = createSelector(
     else if(nonePlayed){
       if(isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
       return messages.LEAD_PEGGING
-    }
+    } else return 'I dont know what to say'
   }
 )
 

@@ -8,7 +8,7 @@ export const isTooHighToPlay = (c, pegCount) => {
   return valueMaxTen(c) > (31 - pegCount)
 }
 
-// TODO: determine goPoints: 1pt for a go, 2pts for 31. But have to know other hand...
+
 export function calcPegPoints (playedCards, hand) {
   const isLastCardPlayedByMe = includes(hand, last(playedCards))
   if (!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
