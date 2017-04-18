@@ -9,7 +9,7 @@ Refactor TODO:
 5. 
 6. Using  a magic string in an array is not the best way to restart pegging, instead just keep track of where last round ended in a separate metadata thing 
 7. 
-8. What if I do the showPegPointsMessage, (and next action based on props) in the SELECTOR ? 
+8. What if I do the showPegPointsMessage, in the SELECTOR (message can be a selector (idempotent), and nextAction too if on PROPS)? 
 
 Rules TODO / Roadmap:
 1. Hide/grey out previously pegged cards after first pegging round

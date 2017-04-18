@@ -85,7 +85,7 @@ function createAction (path, data) {
   return actionFor(remotePaths[path], data)
 }
 
-// Debug helpers
+// Everything below is for help debugging
 window.store = store
 window.game = game
 window.cache = cache
@@ -116,6 +116,17 @@ window.getHand = (hand, player) => {
     payload: hand || ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
   })
 }
+const pegState = {
+  player1Hand: ['S3', 'S4', 'S5', 'S6'],
+  player2Hand: ['H3', 'H4', 'H5', 'H6'],
+  playedCards: [],
+  crib: ['S1', 'S2', 'H1', 'H2'],
+  cut: 'C4',
+  cutIndex: 23,
+  firstCut: 'C3',
+  secondCut: 'C4',
+  round: 1
+}
 window.assignPlayer = () => {
   const oldState = store.getState()
   const newState = {
@@ -123,12 +134,7 @@ window.assignPlayer = () => {
       isPlayer1: false,
       isPlayer2: true
     },
-    player1Hand: ['S3', 'S4', 'S5', 'S6'],
-    player2Hand: ['H3', 'H4', 'H5', 'H6'],
-    playedCards: [],
-    crib: ['S1', 'S2', 'H1', 'H2'],
-    cut: 'C4',
-    cutIndex: 23
+    ...pegState
   }
   const desiredStoreState = Object.assign({}, oldState, newState)
   store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
@@ -140,12 +146,7 @@ window.startPegging = () => {
       isPlayer1: true,
       isPlayer2: false
     },
-    player1Hand: ['S3', 'S4', 'S5', 'S6'],
-    player2Hand: ['H3', 'H4', 'H5', 'H6'],
-    playedCards: [],
-    crib: ['S1', 'S2', 'H1', 'H2'],
-    cut: 'C4',
-    cutIndex: 23
+    ...pegState
   }
   const desiredStoreState = Object.assign({}, oldState, newState)
   store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
