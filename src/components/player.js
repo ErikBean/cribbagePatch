@@ -4,14 +4,15 @@ import { isEmpty, includes, size, last } from 'lodash'
 import { sumOf, valueMaxTen, calcPegPoints, isTooHighToPlay } from '../points'
 import { createDeck, shuffle } from '../deck'
 import {
-  shouldPeggingRestartSelector,
-  myUnplayedSelector,
-  pegCountSelector,
-  isWaitingForLead,
-  isMyTurnSelector,
-  playedCardsSelector,
   isCurrentPlayerSelector,
+  isMyTurnSelector,
+  isWaitingForLead,
   myHandWithCutSelector,
+  myUnplayedSelector,
+  shouldPeggingRestartSelector,
+  pegCountSelector,
+  playedCardsSelector,
+  playerActionSelector,
   playerPromptSelector
 } from './playerSelectors'
 import {
@@ -40,16 +41,14 @@ class Player extends Component {
     this.tryPlayCard = this.tryPlayCard.bind(this)
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
-    this.deal = this.deal.bind(this)
-    this.discard = this.discard.bind(this)
     this.getNextAction = this.getNextAction.bind(this)
   }
   componentWillMount(){
-    this.props.showMessage(this.props.prompt, this.getNextAction(this.props.prompt))
+    this.props.showMessage(this.props.prompt, this.props.nextAction)
   }
   componentWillReceiveProps (nextProps) {
     if(nextProps.isCurrentPlayer){ // race condition with non-current player setting message
-      this.props.showMessage(nextProps.prompt, this.getNextAction(nextProps.prompt))
+      this.props.showMessage(nextProps.prompt, nextProps.nextAction)
     }
   }
   componentDidUpdate(){
@@ -64,9 +63,9 @@ class Player extends Component {
       case CUT_FOR_FIRST_CRIB_2:
         return this.props.doSecondCut
       case DEAL_FIRST_ROUND:
-        return this.deal
+        return this.props.deal
       case DO_DISCARD:
-        return this.discard
+        return this.props.discard
       case CUT_DECK:
         return this.props.selectCutIndex
       case CUT_FIFTH_CARD:
@@ -74,26 +73,6 @@ class Player extends Component {
       default:
         return null
     }
-  }
-  discard () {
-    if (!this.state.selected[0] || !this.state.selected[1]) {
-      window.alert('select 2 cards!')
-      return
-    }
-    this.props.discard(this.state.selected)
-  }
-  deal () {
-    const deck = shuffle(createDeck())
-    const hand1 = []
-    const hand2 = []
-    for (let i = 0; i < 6; i++) {
-      hand1[i] = deck[i]
-      hand2[i] = deck[ i + 6 ]
-    }
-    this.props.incrementRound((this.props.round || 0) + 1)
-    this.props.updateDeck(deck)
-    this.props.getHand('player1', hand1)
-    this.props.getHand('player2', hand2)
   }
   toggleSelect (card) {
     this.setState({
@@ -155,6 +134,7 @@ const mapStateToProps = (state, ownProps) => {
     playedCards: playedCardsSelector(state),
     isCurrentPlayer: isCurrentPlayerSelector(state, ownProps),
     myHandWithCut: myHandWithCutSelector(null, ownProps),
+    nextAction: playerActionSelector(state, ownProps),
     prompt: playerPromptSelector(state, ownProps)
   }
 }

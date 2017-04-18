@@ -17,6 +17,12 @@ const playedCardsSelector = (state) => state.playedCards
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
+const actionsSelector = (state, props) => {
+  const {doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex} = props
+  const actions = {doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex}
+  return actions
+}
+
 
 const needsFirstCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
@@ -185,14 +191,37 @@ const playerPromptSelector = createSelector(
   }
 )
 
+const playerActionSelector = createSelector(
+  [playerPromptSelector, actionsSelector],
+  (prompt, actions) =>{
+    switch(prompt){ // TODO: move first 2 someplace else? Player not assigned yet 
+      case messages.CUT_FOR_FIRST_CRIB_1:
+        return actions.doFirstCut
+      case messages.CUT_FOR_FIRST_CRIB_2:
+        return actions.doSecondCut
+      case messages.DEAL_FIRST_ROUND:
+        return actions.deal
+      case messages.DO_DISCARD:
+        return actions.discard
+      case messages.CUT_DECK:
+        return actions.selectCutIndex
+      case messages.CUT_FIFTH_CARD:
+        return actions.cutDeck
+      default:
+        return null
+    }
+  }
+)
+
 export {
-  shouldPeggingRestartSelector,
-  myUnplayedSelector,
-  pegCountSelector,
-  isWaitingForLead,
-  isMyTurnSelector,
-  playedCardsSelector,
   isCurrentPlayerSelector,
+  isMyTurnSelector,
+  isWaitingForLead,
   myHandWithCutSelector,
+  myUnplayedSelector,
+  shouldPeggingRestartSelector,
+  pegCountSelector,
+  playedCardsSelector,
+  playerActionSelector,
   playerPromptSelector
 }

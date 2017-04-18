@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { valueOf, shuffle, createDeck } from '../deck'
+import { playerActionSelector } from './playerSelectors'
 
 import Player from './player'
 import Crib from './crib'
@@ -18,6 +19,8 @@ class Game extends Component {
     this.doFirstCut = this.doFirstCut.bind(this)
     this.doSecondCut = this.doSecondCut.bind(this)
     this.cutDeck = this.cutDeck.bind(this)
+    this.deal = this.deal.bind(this)
+    this.discard = this.discard.bind(this)
     this.state = {
       cutIndex: 20,
       message: 'Need to cut for first crib',
@@ -75,18 +78,42 @@ class Game extends Component {
     // Assign players here:
     this.assignPlayerByCut(myCut, theirCut)
   }
+  discard ([cardA, cardB]) {
+    if (!cardA || !cardB) {
+      window.alert('select 2 cards!')
+      return
+    }
+    this.props.discard([cardA, cardB])
+  }
+  deal () {
+    const deck = shuffle(createDeck())
+    const hand1 = []
+    const hand2 = []
+    for (let i = 0; i < 6; i++) {
+      hand1[i] = deck[i]
+      hand2[i] = deck[ i + 6 ]
+    }
+    this.props.incrementRound((this.props.round || 0) + 1)
+    this.props.updateDeck(deck)
+    this.props.getHand('player1', hand1)
+    this.props.getHand('player2', hand2)
+  }
   render () {
-    const renderPlayer = (num) => (<Player num={num}
-      hand={this.props[`player${num}Hand`]}
-      theirHand={this.props[`player${3 - parseInt(num)}Hand`]} // 3-2=1, 3=1=2
-      cut={this.props.cut}
-      cutIndex={this.props.cutIndex}
-      crib={this.props.crib}
-      showMessage={this.showMessage}
-      doFirstCut={this.doFirstCut}
-      doSecondCut={this.doSecondCut}
-      cutDeck={this.cutDeck}
-      selectCutIndex={this.selectCutIndex} />)
+    const renderPlayer = (num) => {
+      return (<Player num={num}
+        hand={this.props[`player${num}Hand`]}
+        theirHand={this.props[`player${3 - parseInt(num)}Hand`]} // 3-2=1, 3=1=2
+        cut={this.props.cut}
+        cutIndex={this.props.cutIndex}
+        crib={this.props.crib}
+        showMessage={this.showMessage}
+        doFirstCut={this.doFirstCut}
+        doSecondCut={this.doSecondCut} //TODO: just pass next action (det by selector), instead of all these
+        cutDeck={this.cutDeck}
+        deal={this.deal}
+        discard={this.discard}
+        selectCutIndex={this.selectCutIndex} />)
+    }
     return (
       <div>
         <GameInfo text={this.state.message} onConfirm={this.state.nextAction} >
@@ -140,13 +167,18 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut}),
-    selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
     assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
     cutForFirstCrib: (isFirst, cut) => dispatch({
       type: isFirst ? `FIRST_CUT` : 'SECOND_CUT',
       payload: cut
     }),
+    doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut}),
+    getHand: (player, hand) => dispatch({
+      type: `GET_${player.toUpperCase()}_HAND`,
+      payload: hand
+    }),
+    incrementRound: (nextRound) => dispatch({type: 'INCREMENT_ROUND', payload: nextRound}),
+    selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck})
   }
 }
