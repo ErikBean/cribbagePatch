@@ -21,6 +21,12 @@ describe('#calcPegPoints', () => {
       const peg = points.calcPegPoints(played, hand)
       expect(peg.pairsPoints).to.be(12)
     })
+    it('should not count if the last two arent consecutive', () => {
+      const hand = ["S3", "S4", "S5", "S6"]
+      const played = ["H6", "S6", "H5", "S4", "H4", "S5"]
+      const peg = points.calcPegPoints(played, hand)
+      expect(peg.pairsPoints).to.be(0)
+    })
   })
   it('should count fifteens', () => {
     const hand = ['A13']
@@ -32,7 +38,7 @@ describe('#calcPegPoints', () => {
     const hand = ['F6']
     let played, peg
     it('should count runs (in order)', () => {
-      played = ['A13', 'B2', 'C3', 'D4', 'E5', 'F6']
+      played = ['A13', 'D12', 'B2', 'C3', 'D4', 'E5', 'F6']
       peg = points.calcPegPoints(played, hand)
       expect(peg.runsPoints).to.be(5)
       const reverse = points.calcPegPoints(played.reverse(), hand)
@@ -42,7 +48,7 @@ describe('#calcPegPoints', () => {
       peg = points.calcPegPoints(played, hand)
       expect(peg.runsPoints).to.be(3)
     })
-    it.only('should count runs (out of order)', () => {
+    it('should count runs (out of order)', () => {
       const hand = ['F6']
       const played = ['A13', 'B4', 'C5', 'D3', 'E2', 'F6']
       const peg = points.calcPegPoints(played, hand)
@@ -53,7 +59,7 @@ describe('#calcPegPoints', () => {
       const played = ["H6", "S6", "H5", "S4", "H4", "S5"]
       const peg = points.calcPegPoints(played, hand)
       expect(peg.runsPoints).to.be(0)
-      expect(peg.pairsPoints).to.be(0)
+      // expect(peg.pairsPoints).to.be(0)
     })
   })
 })

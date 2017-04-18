@@ -22,28 +22,14 @@ export function calcPegPoints (playedCards, hand) {
     pointVal += 2
     if (temp === last4.pop()) {
       pairsPoints += pointVal
+    } else {
+      break;
     }
   }
 
   let runsPoints = 0
   if (playedCards.length >= 3) {
-    let startIndex = -3
-    let currentRun = null
-    while (!currentRun || currentRun.length < playedCards.length) { // keep slicing backwards from end
-      currentRun = playedCards.slice(startIndex).map(valueOf).sort((a, b) => a > b)
-      // if(currentRun[currentRun.length -1] !== (currentRun[currentRun.length - 2] + 1)) break;
-      runsPoints = 1 // first card in the run
-      let prevVal = currentRun[0]
-      for (let i = 1; i < currentRun.length; i++) {
-        const currentVal = currentRun[i]
-        if (currentVal === (prevVal + 1)) {
-          prevVal = currentVal
-          runsPoints++
-        }
-      }
-      startIndex--
-    }
-    if (runsPoints < 3 || currentRun[currentRun.length -2] !== (currentRun[currentRun.length -3] + 1)) runsPoints = 0
+    runsPoints = getPeggingRun(playedCards)
   }
   return {
     pairsPoints,
@@ -51,6 +37,35 @@ export function calcPegPoints (playedCards, hand) {
     runsPoints
   }
 }
+function getPeggingRun (playedCards) {
+  let runsPoints
+  let startIndex = -3
+  let currentRun = null
+  while (!currentRun || currentRun.length < playedCards.length) { // keep slicing backwards from end
+    currentRun = playedCards.slice(startIndex).map(valueOf).sort((a, b) => a > b)
+    console.log('>>> cu: ', currentRun)
+    // if(currentRun[currentRun.length -1] !== (currentRun[currentRun.length - 2] + 1)) { // doesnt work for long, out-of-order runs
+    //   currentRun = currentRun.slice(0,-1) // last element needs to go, not part of run
+    //   break;
+    // }
+    runsPoints = 1 // first card in the run
+    let prevVal = currentRun[0]
+    for (let i = 1; i < currentRun.length; i++) {
+      const currentVal = currentRun[i]
+      if (currentVal === (prevVal + 1)) {
+        prevVal = currentVal
+        runsPoints++
+      } else {
+        console.log('>>> broke! : ', runsPoints)
+        break
+      }
+    }
+    startIndex--
+  }
+  if (runsPoints < 3) runsPoints = 0
+  return runsPoints
+}
+
 
 function isArraySorted (array) {
   for (let i = 1; i < array.length; i++) {
