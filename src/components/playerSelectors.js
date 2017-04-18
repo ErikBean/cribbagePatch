@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { difference, last, every, isEmpty, includes, isNull } from 'lodash'
-import { sumOf, isTooHighToPlay } from '../points'
+import { sumOf, isTooHighToPlay, calcPegPoints } from '../points'
 import * as messages from './playerMessages'
 
 const isP1Selector = (state, props, meta = state.meta || {}) => meta.isPlayer1 && props.num === '1'
@@ -149,11 +149,32 @@ const prePegPromptSelector = createSelector(
 )
 
 const peggingPromptSelector = createSelector(
-  [noCardsPlayedSelector, isMyCribSelector],
-  (noCardsPlayed, isMyCrib) => {
+  [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector],
+  (noCardsPlayed, isMyCrib, playedCards, myHand) => {
+    const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(playedCards, myHand)
     if(noCardsPlayed){
       if(isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
       return messages.LEAD_PEGGING
+    } else if(runsPoints || fifteenPoints || pairsPoints){
+      let messages = []
+      if (fifteenPoints) {
+        messages.push('fifteen for two')
+      }
+      switch (pairsPoints) {
+        case 2:
+          messages.push('a pair for two')
+          break
+        case 6:
+          messages.push('three-of-a-kind for six')
+          break
+        case 12:
+          messages.push('four-of-a-kind for tweleve')
+          break
+      }
+      if(runsPoints){
+        messages.push(`a run of ${runsPoints}`)
+      }
+      return `You got ${messages.join(' and ')}!`
     } else return ''
   }
 )
@@ -163,28 +184,6 @@ const playerPromptSelector = createSelector(
     return startGamePrompt || prePegPrompt || peggingPrompt || 'I dont know what to say'
   }
 )
-
-const OLDplayerPromptSelector = createSelector(
-  [isCurrentPlayerSelector, hasHandSelector, shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector, noCardsPlayedSelector, isMyCribSelector, needsFirstCutSelector, needsSecondCutSelector],
-  (isCurrentPlayer=false, hasHand=false, shouldDiscard=false, waitingForCrib=false, needsCut=false, needsToCutFifth=false, waitForFifth=false, nonePlayed=false, isMyCrib=false, needsFirstCut, needsSecondCut) => {
-    // TODO: break this up into selectors that return one of N messages ?
-    // selector dependency tree vs. flatmap
-    if(needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
-    else if(needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
-    else if(isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND
-    else if(!isMyCrib && !hasHand) return messages.WAIT_FOR_DEAL_FIRST_ROUND
-    else if(shouldDiscard) return messages.DO_DISCARD
-    else if(waitingForCrib) return messages.WAIT_FOR_DISCARD
-    else if(needsCut) return messages.CUT_DECK
-    else if(needsToCutFifth) return messages.CUT_FIFTH_CARD
-    else if(waitForFifth) return messages.WAIT_FOR_CUT
-    else if(nonePlayed){
-      if(isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
-      return messages.LEAD_PEGGING
-    } else return 'I dont know what to say'
-  }
-)
-
 
 export {
   shouldPeggingRestartSelector,

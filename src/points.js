@@ -43,11 +43,6 @@ function getPeggingRun (playedCards) {
   let currentRun = null
   while (!currentRun || currentRun.length < playedCards.length) { // keep slicing backwards from end
     currentRun = playedCards.slice(startIndex).map(valueOf).sort((a, b) => a > b)
-    console.log('>>> cu: ', currentRun)
-    // if(currentRun[currentRun.length -1] !== (currentRun[currentRun.length - 2] + 1)) { // doesnt work for long, out-of-order runs
-    //   currentRun = currentRun.slice(0,-1) // last element needs to go, not part of run
-    //   break;
-    // }
     runsPoints = 1 // first card in the run
     let prevVal = currentRun[0]
     for (let i = 1; i < currentRun.length; i++) {
@@ -56,7 +51,6 @@ function getPeggingRun (playedCards) {
         prevVal = currentVal
         runsPoints++
       } else {
-        console.log('>>> broke! : ', runsPoints)
         break
       }
     }

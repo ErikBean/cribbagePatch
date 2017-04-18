@@ -136,6 +136,8 @@ window.assignPlayer = () => {
     },
     ...pegState
   }
+  window.localStorage.clear()
+  window.localStorage.setItem('cribbagePatchPlayer2', true)
   const desiredStoreState = Object.assign({}, oldState, newState)
   store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
 }
@@ -148,6 +150,8 @@ window.startPegging = () => {
     },
     ...pegState
   }
+  window.localStorage.clear()
+  window.localStorage.setItem('cribbagePatchPlayer1', true)
   const desiredStoreState = Object.assign({}, oldState, newState)
   store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
 }

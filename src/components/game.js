@@ -77,11 +77,10 @@ class Game extends Component {
   }
   render () {
     const renderPlayer = (num) => (<Player num={num}
-      cut={this.props.cut}
-      isUnassigned={!this.props.isPlayer1 && !this.props.isPlayer2}
-      cutIndex={this.props.cutIndex}
       hand={this.props[`player${num}Hand`]}
       theirHand={this.props[`player${3 - parseInt(num)}Hand`]} // 3-2=1, 3=1=2
+      cut={this.props.cut}
+      cutIndex={this.props.cutIndex}
       crib={this.props.crib}
       showMessage={this.showMessage}
       doFirstCut={this.doFirstCut}
