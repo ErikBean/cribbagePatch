@@ -125,7 +125,46 @@ const noCardsPlayedSelector = createSelector(
   (played) => (played || []).length === 0
 )
 
+const startGamePromptSelector = createSelector(
+  [needsFirstCutSelector, needsSecondCutSelector, isMyCribSelector, hasHandSelector],
+  (needsFirstCut, needsSecondCut, isMyCrib, hasHand) => {
+    if(needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
+    else if(needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
+    else if(isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND
+    else if(!isMyCrib && !hasHand) return messages.WAIT_FOR_DEAL_FIRST_ROUND
+    else return ''
+  }
+)
+
+const prePegPromptSelector = createSelector(
+  [shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector],
+  (shouldDiscard, waitingForCrib, needsCut, needsFifth, waitForFifth) => {
+    if(shouldDiscard) return messages.DO_DISCARD
+    else if(waitingForCrib) return messages.WAIT_FOR_DISCARD
+    else if(needsCut) return messages.CUT_DECK
+    else if(needsFifth) return messages.CUT_FIFTH_CARD
+    else if(waitForFifth) return messages.WAIT_FOR_CUT
+    else return ''
+  }
+)
+
+const peggingPromptSelector = createSelector(
+  [noCardsPlayedSelector, isMyCribSelector],
+  (noCardsPlayed, isMyCrib) => {
+    if(noCardsPlayed){
+      if(isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
+      return messages.LEAD_PEGGING
+    } else return ''
+  }
+)
 const playerPromptSelector = createSelector(
+  [startGamePromptSelector, prePegPromptSelector, peggingPromptSelector],
+  (startGamePrompt, prePegPrompt, peggingPrompt) => {
+    return startGamePrompt || prePegPrompt || peggingPrompt || 'I dont know what to say'
+  }
+)
+
+const OLDplayerPromptSelector = createSelector(
   [isCurrentPlayerSelector, hasHandSelector, shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector, noCardsPlayedSelector, isMyCribSelector, needsFirstCutSelector, needsSecondCutSelector],
   (isCurrentPlayer=false, hasHand=false, shouldDiscard=false, waitingForCrib=false, needsCut=false, needsToCutFifth=false, waitForFifth=false, nonePlayed=false, isMyCrib=false, needsFirstCut, needsSecondCut) => {
     // TODO: break this up into selectors that return one of N messages ?
