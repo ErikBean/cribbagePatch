@@ -1,7 +1,7 @@
 const initialState = {
   isPlayer1: false,
   isPlayer2: false,
-  pastPeggedCardsIndex: 0
+  pastPlayedCardsIndex: 0
 }
 export default (state = initialState, action) => {
   switch (action.type) {
@@ -23,7 +23,7 @@ export default (state = initialState, action) => {
     case 'MARK_CARDS_PEGGED':
       return {
         ...state,
-        pastPeggedCardsIndex: action.payload
+        pastPlayedCardsIndex: action.payload
       }
     default:
       return state

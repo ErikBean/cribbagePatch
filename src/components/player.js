@@ -46,18 +46,17 @@ class Player extends Component {
     this.props.actions.showMessage(this.props.prompt, this.props.nextAction)
   }
   componentWillReceiveProps (nextProps) {
-    if(nextProps.isCurrentPlayer && nextProps.prompt !== this.props.prompt){
+    const hasNewPrompt = nextProps.prompt !== this.props.prompt
+    if(nextProps.isCurrentPlayer && hasNewPrompt){
       if(nextProps.nextAction === this.props.actions.discard) {
         this.props.actions.showMessage(nextProps.prompt, () => nextProps.nextAction(this.state.selected, this.props.num))
       } else {
         this.props.actions.showMessage(nextProps.prompt, nextProps.nextAction)
       }
     }
-    if(nextProps.isRoundDone && nextProps.playedCards.length !== nextProps.pastPeggedCardsIndex) {
-      this.props.restartPegging(nextProps.playedCards.length)
-    }
   }
   componentDidUpdate(){
+
   }
   toggleSelect (card) {
     this.setState({
@@ -122,7 +121,7 @@ const mapStateToProps = (state, ownProps) => {
     myHandWithCut: myHandWithCutSelector(null, ownProps),
     nextAction: playerActionSelector(state, ownProps),
     prompt: playerPromptSelector(state, ownProps),
-    pastPeggedCardsIndex: state.meta.pastPeggedCardsIndex
+    pastPlayedCardsIndex: state.meta.pastPlayedCardsIndex
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
@@ -136,7 +135,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     playPegCard,
     getPoints: (points) => dispatch({type: `PLAYER${ownProps.num}_POINTS`, payload: points}),
-    restartPegging: (numCardsPlayed) => dispatch({type: 'MARK_CARDS_PEGGED', payload: numCardsPlayed})
+    OLDrestartPegging: (numCardsPlayed) => dispatch({type: 'MARK_CARDS_PEGGED', payload: numCardsPlayed})
   }
 }
 

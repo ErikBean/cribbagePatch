@@ -18,7 +18,7 @@ const playedCardsSelector = (state) => state.playedCards
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
-// const pegStartIndexSelector = (state) => state.
+const pastPlayedCardsIndexSelector = (state) => state.meta.pastPlayedCardsIndex
 
 const needsFirstCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
@@ -86,10 +86,11 @@ const shouldDiscardSelector = createSelector(
   (myHand) => (myHand || []).length > 4
 )
 const shouldPeggingRestartSelector = createSelector(
-  [myUnplayedSelector, pegCountSelector, hasAGoSelector],
-  (myUnplayed=[], pegCount, hasAGo=false) => {
+  [myUnplayedSelector, pegCountSelector, hasAGoSelector, playedCardsSelector, pastPlayedCardsIndexSelector ],
+  (myUnplayed=[], pegCount, hasAGo=false, playedCards, pastPlayedCardsIndex=0) => {
+    const hasPlayedCardsThisRound = (playedCards || []).length !== pastPlayedCardsIndex
     const cannotPlay = every(myUnplayed, (c) => isTooHighToPlay(c, pegCount))
-    return cannotPlay && hasAGo
+    return hasPlayedCardsThisRound && cannotPlay && hasAGo // player with go responsible for restarting pegging
   }
 )
 const waitingForCribSelector = createSelector(
@@ -150,39 +151,42 @@ const cutDeckPromptSelector = createSelector(
   }
 )
 
-
 const playPegCardPromptSelector = createSelector(
   [isMyTurnSelector],
   (isMyTurn) => isMyTurn ? 'Click a card to play' : 'Waiting for opponent to play a card'
 )
 
 const pegPointsPromptSelector = createSelector(
-  [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector],
-  (noCardsPlayed, isMyCrib, playedCards, myHand) => {
+  [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector, hasAGoSelector, pegCountSelector],
+  (noCardsPlayed, isMyCrib, playedCards, myHand, hasAGo, pegCount) => {
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(playedCards, myHand)
     if(noCardsPlayed){
       if(isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
       return messages.LEAD_PEGGING
-    } else if(runsPoints || fifteenPoints || pairsPoints){
-      let messages = []
+    } else if(runsPoints || fifteenPoints || pairsPoints || hasAGo){
+      let joinMessages = []
       if (fifteenPoints) {
-        messages.push('fifteen for two')
+        joinMessages.push('fifteen for two')
       }
       switch (pairsPoints) {
         case 2:
-          messages.push('a pair for two')
+          joinMessages.push('a pair for two')
           break
         case 6:
-          messages.push('three-of-a-kind for six')
+          joinMessages.push('three-of-a-kind for six')
           break
         case 12:
-          messages.push('four-of-a-kind for tweleve')
+          joinMessages.push('four-of-a-kind for tweleve')
           break
       }
       if(runsPoints){
-        messages.push(`a run of ${runsPoints}`)
+        joinMessages.push(`a run of ${runsPoints}`)
       }
-      return `You got ${messages.join(' and ')}!`
+      if (hasAGo) {
+        pegCount === 31 ? joinMessages.push(messages.HAS_DOUBLE_GO) : joinMessages.push(messages.HAS_NORMAL_GO)
+        console.log('>>> Here: ', joinMessages)
+      }
+      return `You got ${joinMessages.join(' and ')}!`
     } else return ''
   }
 )
@@ -198,8 +202,8 @@ const playerPromptSelector = createSelector(
 )
 
 const playerActionSelector = createSelector(
-  [playerPromptSelector, actionsSelector],
-  (prompt, actions) =>{
+  [playerPromptSelector, actionsSelector, playerNumSelector],
+  (prompt, actions, playerNum) =>{
     switch(prompt){ // TODO: move first 2 someplace else? Player not assigned yet 
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
@@ -214,8 +218,15 @@ const playerActionSelector = createSelector(
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
       default:
-        return null
+        break
     }
+    console.log('>>> Here: ', prompt)
+    if (prompt.indexOf(messages.HAS_NORMAL_GO) !== -1){
+      return () => actions.restartPegging(1, parseInt(playerNum))
+    } else if (prompt.indexOf(messages.HAS_DOUBLE_GO) !== -1){
+      return () => actions.restartPegging(2, parseInt(playerNum))
+    }
+    return null
   }
 )
 

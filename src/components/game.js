@@ -103,13 +103,15 @@ class Game extends Component {
       const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
       const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3=1=2
       const { showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex } = this
+      const numCardsPlayed = (this.props.playedCards || []).length
+      const restartPegging = (goPoints, playerNum) => this.props.restartPegging(goPoints, playerNum, numCardsPlayed)
       return (<Player num={num}
         hand={myHand}
         theirHand={theirHand}
         cut={this.props.cut}
         cutIndex={this.props.cutIndex}
         crib={this.props.crib}
-        actions={{showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex}} />)
+        actions={{showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, restartPegging, selectCutIndex}} />)
     }
     return (
       <div>
@@ -189,7 +191,11 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     }),
     incrementRound: (nextRound) => dispatch({type: 'INCREMENT_ROUND', payload: nextRound}),
     selectCutIndex: (index) => dispatch({type: 'GET_CUT_INDEX', payload: index}),
-    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck})
+    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
+    restartPegging: (goPoints, playerNum, numCardsPlayed) => {
+      dispatch({type: `PLAYER${playerNum}_POINTS`, payload: goPoints}) // take points for the go
+      dispatch({type: 'MARK_CARDS_PEGGED', payload: numCardsPlayed}) // grey-out cards from last round (future)
+    }
   }
 }
 
