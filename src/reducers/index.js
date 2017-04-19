@@ -11,6 +11,7 @@ import player1Points from './player1Points'
 import player2Points from './player2Points'
 import playedCards from './playedCards'
 import round from './round'
+import pastPlayedCardsIndex from './pastPlayedCardsIndex'
 
 export default {
   crib,
@@ -24,6 +25,7 @@ export default {
   player1Points,
   player2Points,
   playedCards,
+  pastPlayedCardsIndex,
   round,
   secondCut
 }

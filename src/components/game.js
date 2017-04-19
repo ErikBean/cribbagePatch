@@ -127,7 +127,8 @@ class Game extends Component {
           On the Table:<br />
           <PeggingArea
             invert={this.props.isPlayer2}
-            playedCards={this.props.playedCards || []} // TODO: need to slice on RESTART
+            playedCards={this.props.playedCards || []}
+            pastPlayedCardsIndex={this.props.pastPlayedCardsIndex}
             player1Hand={this.props.player1Hand}
             player2Hand={this.props.player2Hand}
             isPlayer1={this.props.isPlayer1}
@@ -150,20 +151,11 @@ class Game extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { firstCut, cutIndex, deck, cut, crib, player1Hand, player2Hand, playedCards, round } = state
   const { isPlayer1, isPlayer2 } = state.meta
   return {
-    firstCut,
     isPlayer1,
     isPlayer2,
-    player1Hand,
-    player2Hand,
-    playedCards,
-    crib,
-    deck,
-    cut,
-    cutIndex,
-    round
+    ...state
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

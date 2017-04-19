@@ -29,7 +29,8 @@ const remotePaths = { // keys = reducers - meta
   player2Hand: 'GET_PLAYER2_HAND',
   playedCards: 'PLAY_CARD',
   secondCut: 'SECOND_CUT',
-  round: 'INCREMENT_ROUND'
+  round: 'INCREMENT_ROUND',
+  pastPlayedCardsIndex: 'MARK_CARDS_PEGGED'
 }
 
 store.subscribe(() => {

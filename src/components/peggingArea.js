@@ -20,10 +20,15 @@ export default (props) => {
   const tableStyle = {
     backgroundColor: 'brown'
   }
+  const pastPlayedCards = props.playedCards.slice(0, props.pastPlayedCardsIndex)
+  const currentPegCards = props.playedCards.slice(props.pastPlayedCardsIndex)
+  console.log('>>> Here: ', props.playedCards, props.pastPlayedCardsIndex)
   const isLast = (card) => card === last(props.playedCards)
-  const pegCount = sumOf(props.playedCards)
-  const cardsPlayedByP1 = intersection(props.playedCards, props.player1Hand)
-  const cardsPlayedByP2 = intersection(props.playedCards, props.player2Hand)
+  const pegCount = sumOf(currentPegCards)
+  const pastPlayedP1 = intersection(pastPlayedCards, props.player1Hand)
+  const pastPlayedP2 = intersection(pastPlayedCards, props.player2Hand)
+  const cardsPlayedByP1 = intersection(currentPegCards, props.player1Hand)
+  const cardsPlayedByP2 = intersection(currentPegCards, props.player2Hand)
   const renderPegCard = (card) => (
     <div key={card} style={cardContainer}>
       <Card card={card}>
@@ -36,7 +41,7 @@ export default (props) => {
   const renderP1 = <div>{cardsPlayedByP1.map(renderPegCard)}</div>
   const renderP2 = <div>{cardsPlayedByP2.map(renderPegCard)}</div>
   return (
-    <div style={tableStyle} id='brown'>
+    <div style={tableStyle}>
       <div>{props.invert ? renderP1 : renderP2}</div>
       {props.children}
       <div>{props.invert ? renderP2 : renderP1}</div>

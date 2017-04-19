@@ -65,6 +65,7 @@ class Player extends Component {
   }
   tryPlayCard (card) { // lift this up? 
     const { cut, playedCards, isWaitingForLead, pegCount, isMyTurn } = this.props
+    console.log('>>> Here: ', {cut, isWaitingForLead, isMyTurn})
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
@@ -135,7 +136,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     playPegCard,
     getPoints: (points) => dispatch({type: `PLAYER${ownProps.num}_POINTS`, payload: points}),
-    OLDrestartPegging: (numCardsPlayed) => dispatch({type: 'MARK_CARDS_PEGGED', payload: numCardsPlayed})
   }
 }
 

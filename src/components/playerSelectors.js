@@ -18,7 +18,7 @@ const playedCardsSelector = (state) => state.playedCards
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
-const pastPlayedCardsIndexSelector = (state) => state.meta.pastPlayedCardsIndex
+const pastPlayedCardsIndexSelector = (state) => state.pastPlayedCardsIndex
 
 const needsFirstCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
@@ -54,8 +54,8 @@ const isWaitingForLead = createSelector(
   (played=[], isP1=false) => isEmpty(played) && isP1
 )
 const pegCountSelector = createSelector(
-  [playedCardsSelector],
-  (played=[]) => sumOf(played)
+  [playedCardsSelector, pastPlayedCardsIndexSelector],
+  (played=[], index) => sumOf(played.slice(index))
 )
 
 const myUnplayedSelector = createSelector(
