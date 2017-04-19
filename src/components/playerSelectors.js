@@ -55,7 +55,7 @@ const isWaitingForLead = createSelector(
 )
 const pegCountSelector = createSelector(
   [playedCardsSelector, pastPlayedCardsIndexSelector],
-  (played=[], index) => sumOf(played.slice(index))
+  (played=[], index) => sumOf((played || []).slice((index || 0)))
 )
 
 const myUnplayedSelector = createSelector(
@@ -220,7 +220,6 @@ const playerActionSelector = createSelector(
       default:
         break
     }
-    console.log('>>> Here: ', prompt)
     if (prompt.indexOf(messages.HAS_NORMAL_GO) !== -1){
       return () => actions.restartPegging(1, parseInt(playerNum))
     } else if (prompt.indexOf(messages.HAS_DOUBLE_GO) !== -1){

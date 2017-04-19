@@ -27,6 +27,8 @@ const remotePaths = { // keys = reducers - meta
   firstCut: 'FIRST_CUT',
   player1Hand: 'GET_PLAYER1_HAND',
   player2Hand: 'GET_PLAYER2_HAND',
+  player1Points: 'PLAYER1_POINTS',
+  player2Points: 'PLAYER2_POINTS',
   playedCards: 'PLAY_CARD',
   secondCut: 'SECOND_CUT',
   round: 'INCREMENT_ROUND',

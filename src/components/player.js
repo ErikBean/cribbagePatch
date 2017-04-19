@@ -65,12 +65,12 @@ class Player extends Component {
   }
   tryPlayCard (card) { // lift this up? 
     const { cut, playedCards, isWaitingForLead, pegCount, isMyTurn } = this.props
-    console.log('>>> Here: ', {cut, isWaitingForLead, isMyTurn})
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
     // wouldnt need to do this if just did it based off props.... 
-    const allCardsThisRound = [...this.props.playedCards, card] // prempt store update. TODO: Need to slice on RESTART
+    
+    const allCardsThisRound = this.props.playedCards.slice(this.props.pastPlayedCardsIndex).concat(card) // prempt store update. TODO: Need to slice on RESTART
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(allCardsThisRound, this.props.hand)
     if (runsPoints || fifteenPoints || pairsPoints) {
       const pegPointsForLastCard = runsPoints + fifteenPoints + pairsPoints
