@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
-import { includes, last, intersection } from 'lodash'
+import React from 'react'
+import { last, intersection } from 'lodash'
 import Card from './card'
-import PeggingScoreBoard from './peggingScoreBoard'
 import { sumOf } from '../points'
 
 export default (props) => {
@@ -20,12 +19,12 @@ export default (props) => {
   const tableStyle = {
     backgroundColor: 'brown'
   }
-  const pastPlayedCards = props.playedCards.slice(0, props.pastPlayedCardsIndex)
+  // const pastPlayedCards = props.playedCards.slice(0, props.pastPlayedCardsIndex)
   const currentPegCards = props.playedCards.slice(props.pastPlayedCardsIndex)
   const isLast = (card) => card === last(props.playedCards)
   const pegCount = sumOf(currentPegCards)
-  const pastPlayedP1 = intersection(pastPlayedCards, props.player1Hand)
-  const pastPlayedP2 = intersection(pastPlayedCards, props.player2Hand)
+  // const pastPlayedP1 = intersection(pastPlayedCards, props.player1Hand) // TODO: show these greyed-out
+  // const pastPlayedP2 = intersection(pastPlayedCards, props.player2Hand)
   const cardsPlayedByP1 = intersection(currentPegCards, props.player1Hand)
   const cardsPlayedByP2 = intersection(currentPegCards, props.player2Hand)
   const renderPegCard = (card) => (

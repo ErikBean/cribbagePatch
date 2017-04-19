@@ -14,7 +14,7 @@ class OkButton extends Component {
     }
   }
   onClick () {
-    if(this.state.wasClicked) return
+    if (this.state.wasClicked) return
     this.setState({wasClicked: true})
     this.props.clickAction()
   }

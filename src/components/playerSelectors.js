@@ -22,57 +22,49 @@ const pastPlayedCardsIndexSelector = (state) => state.pastPlayedCardsIndex
 
 const needsFirstCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
-  (firstCut, secondCut)=>!firstCut && !secondCut
+  (firstCut, secondCut) => !firstCut && !secondCut
 )
 const needsSecondCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
-  (firstCut, secondCut)=>firstCut && !secondCut
+  (firstCut, secondCut) => firstCut && !secondCut
 )
 const visiblePegCardsSelector = createSelector(
   [playedCardsSelector],
   (played = []) => {
-    if(isNull(played)) return []
+    if (isNull(played)) return []
     const isFirstRound = played.indexOf('RESTART') !== -1
     return isFirstRound ? played : played.slice(played.lastIndexOf('RESTART') + 1)
   }
 )
 
-const hasFirstCribSelector = createSelector(
-  [isP1Selector, roundSelector],
-  (isP1, round) => round<2 && isP1
-)
-const opponentHasFirstCribSelector = createSelector(
-  [isP2Selector, roundSelector],
-  (isP2, round) => round<2 && isP2
-)
 const isCurrentPlayerSelector = createSelector(
   [isP1Selector, isP2Selector],
-  (isP1=false, isP2=false) => isP1 || isP2
+  (isP1 = false, isP2 = false) => isP1 || isP2
 )
 const isWaitingForLead = createSelector(
   [playedCardsSelector, isP1Selector],
-  (played=[], isP1=false) => isEmpty(played) && isP1
+  (played = [], isP1 = false) => isEmpty(played) && isP1
 )
 const pegCountSelector = createSelector(
   [playedCardsSelector, pastPlayedCardsIndexSelector],
-  (played=[], index) => sumOf((played || []).slice((index || 0)))
+  (played = [], index) => sumOf((played || []).slice((index || 0)))
 )
 
 const myUnplayedSelector = createSelector(
   [myHandSelector, visiblePegCardsSelector],
-  (myHand=[], played=[]) => difference(myHand, played)
+  (myHand = [], played = []) => difference(myHand, played)
 )
 const theirUnplayedSelector = createSelector(
   [theirHandSelector, playedCardsSelector],
-  (theirHand=[], played=[]) => difference(theirHand, played)
+  (theirHand = [], played = []) => difference(theirHand, played)
 )
 const didPlayLastSelector = createSelector(
   [myHandSelector, playedCardsSelector],
-  (myHand=[], played=[]) => includes(myHand, last(played))
+  (myHand = [], played = []) => includes(myHand, last(played))
 )
 const hasAGoSelector = createSelector(
   [theirUnplayedSelector, pegCountSelector, didPlayLastSelector],
-  (theirUnplayed=[], pegCount=0, didPlayLast=false) => {
+  (theirUnplayed = [], pegCount = 0, didPlayLast = false) => {
     const opponentCannotPlay = every(theirUnplayed, (c) => isTooHighToPlay(c, pegCount))
     return opponentCannotPlay && didPlayLast
   }
@@ -86,8 +78,8 @@ const shouldDiscardSelector = createSelector(
   (myHand) => (myHand || []).length > 4
 )
 const shouldPeggingRestartSelector = createSelector(
-  [myUnplayedSelector, pegCountSelector, hasAGoSelector, playedCardsSelector, pastPlayedCardsIndexSelector ],
-  (myUnplayed=[], pegCount, hasAGo=false, playedCards, pastPlayedCardsIndex=0) => {
+  [myUnplayedSelector, pegCountSelector, hasAGoSelector, playedCardsSelector, pastPlayedCardsIndexSelector],
+  (myUnplayed = [], pegCount, hasAGo = false, playedCards, pastPlayedCardsIndex = 0) => {
     const hasPlayedCardsThisRound = (playedCards || []).length !== pastPlayedCardsIndex
     const cannotPlay = every(myUnplayed, (c) => isTooHighToPlay(c, pegCount))
     return hasPlayedCardsThisRound && cannotPlay && hasAGo // player with go responsible for restarting pegging
@@ -102,22 +94,22 @@ const hasHandSelector = createSelector(
   (hand) => (hand || []).length > 0
 )
 const isMyCribSelector = createSelector(
-  [roundSelector,playerNumSelector],
-  (round=0, playerNum='1') => {
-    if(!round && playerNum === '1') return true
-    if(!round && playerNum === '2') return false
+  [roundSelector, playerNumSelector],
+  (round = 0, playerNum = '1') => {
+    if (!round && playerNum === '1') return true
+    if (!round && playerNum === '2') return false
     return (parseInt(playerNum) + round) % 2 === 0
   }
 )
 const needsCutSelector = createSelector(
   [isMyCribSelector, cutIndexSelector],
-  (isMyCrib, cutIndex)=> {
+  (isMyCrib, cutIndex) => {
     return !cutIndex && !isMyCrib
   }
 )
 const needsFifthSelector = createSelector(
   [cutIndexSelector, cutSelector, isMyCribSelector],
-  (cutIndex, cut, isMyCrib)=> !!(cutIndex) && !cut && isMyCrib
+  (cutIndex, cut, isMyCrib) => !!(cutIndex) && !cut && isMyCrib
 )
 const waitForFifthSelector = createSelector(
   [cutSelector],
@@ -131,10 +123,10 @@ const noCardsPlayedSelector = createSelector(
 const startGamePromptSelector = createSelector(
   [needsFirstCutSelector, needsSecondCutSelector, isMyCribSelector, hasHandSelector],
   (needsFirstCut, needsSecondCut, isMyCrib, hasHand) => {
-    if(needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
-    else if(needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
-    else if(isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND
-    else if(!isMyCrib && !hasHand) return messages.WAIT_FOR_DEAL_FIRST_ROUND
+    if (needsFirstCut) return messages.CUT_FOR_FIRST_CRIB_1
+    else if (needsSecondCut) return messages.CUT_FOR_FIRST_CRIB_2
+    else if (isMyCrib && !hasHand) return messages.DEAL_FIRST_ROUND
+    else if (!isMyCrib && !hasHand) return messages.WAIT_FOR_DEAL_FIRST_ROUND
     else return ''
   }
 )
@@ -142,11 +134,11 @@ const startGamePromptSelector = createSelector(
 const cutDeckPromptSelector = createSelector(
   [shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector],
   (shouldDiscard, waitingForCrib, needsCut, needsFifth, waitForFifth) => {
-    if(shouldDiscard) return messages.DO_DISCARD
-    else if(waitingForCrib) return messages.WAIT_FOR_DISCARD
-    else if(needsCut) return messages.CUT_DECK
-    else if(needsFifth) return messages.CUT_FIFTH_CARD
-    else if(waitForFifth) return messages.WAIT_FOR_CUT
+    if (shouldDiscard) return messages.DO_DISCARD
+    else if (waitingForCrib) return messages.WAIT_FOR_DISCARD
+    else if (needsCut) return messages.CUT_DECK
+    else if (needsFifth) return messages.CUT_FIFTH_CARD
+    else if (waitForFifth) return messages.WAIT_FOR_CUT
     else return ''
   }
 )
@@ -160,10 +152,10 @@ const pegPointsPromptSelector = createSelector(
   [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector, hasAGoSelector, pegCountSelector],
   (noCardsPlayed, isMyCrib, playedCards, myHand, hasAGo, pegCount) => {
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(playedCards, myHand)
-    if(noCardsPlayed){
-      if(isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
+    if (noCardsPlayed) {
+      if (isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
       return messages.LEAD_PEGGING
-    } else if(runsPoints || fifteenPoints || pairsPoints || hasAGo){
+    } else if (runsPoints || fifteenPoints || pairsPoints || hasAGo) {
       let joinMessages = []
       if (fifteenPoints) {
         joinMessages.push('fifteen for two')
@@ -179,12 +171,11 @@ const pegPointsPromptSelector = createSelector(
           joinMessages.push('four-of-a-kind for tweleve')
           break
       }
-      if(runsPoints){
+      if (runsPoints) {
         joinMessages.push(`a run of ${runsPoints}`)
       }
       if (hasAGo) {
         pegCount === 31 ? joinMessages.push(messages.HAS_DOUBLE_GO) : joinMessages.push(messages.HAS_NORMAL_GO)
-        console.log('>>> Here: ', joinMessages)
       }
       return `You got ${joinMessages.join(' and ')}!`
     } else return ''
@@ -192,7 +183,7 @@ const pegPointsPromptSelector = createSelector(
 )
 const playerPromptSelector = createSelector(
   [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector],
-  (startGamePrompt, cutDeckPrompt, pegPointsPrompt , playPegCardPrompt) => {
+  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt) => {
     return startGamePrompt ||
       cutDeckPrompt ||
       pegPointsPrompt ||
@@ -203,8 +194,8 @@ const playerPromptSelector = createSelector(
 
 const playerActionSelector = createSelector(
   [playerPromptSelector, actionsSelector, playerNumSelector],
-  (prompt, actions, playerNum) =>{
-    switch(prompt){ // TODO: move first 2 someplace else? Player not assigned yet 
+  (prompt, actions, playerNum) => {
+    switch (prompt) { // TODO: move first 2 someplace else? Player not assigned yet
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
       case messages.CUT_FOR_FIRST_CRIB_2:
@@ -220,9 +211,9 @@ const playerActionSelector = createSelector(
       default:
         break
     }
-    if (prompt.indexOf(messages.HAS_NORMAL_GO) !== -1){
+    if (prompt.indexOf(messages.HAS_NORMAL_GO) !== -1) {
       return () => actions.restartPegging(1, parseInt(playerNum))
-    } else if (prompt.indexOf(messages.HAS_DOUBLE_GO) !== -1){
+    } else if (prompt.indexOf(messages.HAS_DOUBLE_GO) !== -1) {
       return () => actions.restartPegging(2, parseInt(playerNum))
     }
     return null

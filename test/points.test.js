@@ -22,8 +22,8 @@ describe('#calcPegPoints', () => {
       expect(peg.pairsPoints).to.be(12)
     })
     it('should not count if the last two arent consecutive', () => {
-      const hand = ["S3", "S4", "S5", "S6"]
-      const played = ["H6", "S6", "H5", "S4", "H4", "S5"]
+      const hand = ['S3', 'S4', 'S5', 'S6']
+      const played = ['H6', 'S6', 'H5', 'S4', 'H4', 'S5']
       const peg = points.calcPegPoints(played, hand)
       expect(peg.pairsPoints).to.be(0)
     })
@@ -55,8 +55,8 @@ describe('#calcPegPoints', () => {
       expect(peg.runsPoints).to.be(5)
     })
     it('should not count double runs (must be strictly consecutive)', () => {
-      const hand = ["S3", "S4", "S5", "S6"]
-      const played = ["H6", "S6", "H5", "S4", "H4", "S5"]
+      const hand = ['S3', 'S4', 'S5', 'S6']
+      const played = ['H6', 'S6', 'H5', 'S4', 'H4', 'S5']
       const peg = points.calcPegPoints(played, hand)
       expect(peg.runsPoints).to.be(0)
       // expect(peg.pairsPoints).to.be(0)

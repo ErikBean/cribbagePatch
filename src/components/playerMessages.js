@@ -5,7 +5,6 @@ export const WAIT_FOR_FIRST_CRIB_2 = 'Waiting for other players cut for first cr
 export const DEAL_FIRST_ROUND = 'You win the first crib! Deal the cards.'
 export const WAIT_FOR_DEAL_FIRST_ROUND = 'Opponent has the first crib. Waiting for deal.'
 
-
 export const DO_DISCARD = 'Please discard 2 cards'
 export const WAIT_FOR_DISCARD = 'Waiting for other player to discard'
 

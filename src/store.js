@@ -6,7 +6,7 @@ import reducers from './reducers'
 const enhancer = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 const rootReducer = combineReducers(reducers)
 const overrideState = (state = {}, action) => { // used to test the app, in a certain state
-  if(action.type === 'TEST_STATE'){
+  if (action.type === 'TEST_STATE') {
     return action.testState
   }
   return rootReducer(state, action)

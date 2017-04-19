@@ -8,7 +8,6 @@ export const isTooHighToPlay = (c, pegCount) => {
   return valueMaxTen(c) > (31 - pegCount)
 }
 
-
 export function calcPegPoints (playedCards, hand) {
   const isLastCardPlayedByMe = includes(hand, last(playedCards))
   if (!isLastCardPlayedByMe) return { pairsPoints: 0, fifteenPoints: 0, runsPoints: 0 }
@@ -23,7 +22,7 @@ export function calcPegPoints (playedCards, hand) {
     if (temp === last4.pop()) {
       pairsPoints += pointVal
     } else {
-      break;
+      break
     }
   }
 
@@ -59,7 +58,6 @@ function getPeggingRun (playedCards) {
   if (runsPoints < 3) runsPoints = 0
   return runsPoints
 }
-
 
 function isArraySorted (array) {
   for (let i = 1; i < array.length; i++) {

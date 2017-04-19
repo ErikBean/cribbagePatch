@@ -15,31 +15,31 @@ describe('#playerPromptSelector', () => {
             isPlayer1: true
           },
           firstCut: 'A1',
-          secondCut: 'A2',
+          secondCut: 'A2'
         }
         const props = {
-          hand: [1,2,3,4,5,6],
+          hand: [1, 2, 3, 4, 5, 6],
           num: '1'
         }
         expect(promptSelector(state, props)).to.be(messages.DO_DISCARD)
       })
     })
     describe('when remote player has not discarded (and local player has)', () => {
-        it('should show waiting message', () => {
-          const state = {
-            meta: {
-              isPlayer1: true
-            },
-            firstCut: 'A1',
-            secondCut: 'A2',
-            crib: [1,2] // crib length indicates waiting
-          }
-          const props = {
-            hand: [1,2,3,4],
-            num: '1'
-          }
-          expect(promptSelector(state, props)).to.be(messages.WAIT_FOR_DISCARD)
-        })
+      it('should show waiting message', () => {
+        const state = {
+          meta: {
+            isPlayer1: true
+          },
+          firstCut: 'A1',
+          secondCut: 'A2',
+          crib: [1, 2] // crib length indicates waiting
+        }
+        const props = {
+          hand: [1, 2, 3, 4],
+          num: '1'
+        }
+        expect(promptSelector(state, props)).to.be(messages.WAIT_FOR_DISCARD)
+      })
     })
   })
   describe('when remote player has discarded', () => {
@@ -51,10 +51,10 @@ describe('#playerPromptSelector', () => {
         firstCut: 'A1',
         secondCut: 'A2',
         round: 1,
-        crib: [1,2,3,4] // crib length indicates done waiting
+        crib: [1, 2, 3, 4] // crib length indicates done waiting
       }
       const props = {
-        hand: [1,2,3,4],
+        hand: [1, 2, 3, 4],
         num: '1'
       }
       expect(promptSelector(state, props)).to.be(messages.WAIT_FOR_CUT)
@@ -65,10 +65,10 @@ describe('#playerPromptSelector', () => {
         firstCut: 'A1',
         secondCut: 'A2',
         round: 1,
-        crib: [1,2,3,4]
+        crib: [1, 2, 3, 4]
       }
       const otherProps = {
-        hand: [1,2,3,4],
+        hand: [1, 2, 3, 4],
         num: '2'
       }
       expect(promptSelector(otherState, otherProps)).to.be(messages.CUT_DECK)

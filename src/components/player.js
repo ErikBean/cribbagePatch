@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { isEmpty, includes, size, last } from 'lodash'
-import { sumOf, valueMaxTen, calcPegPoints, isTooHighToPlay } from '../points'
-import { createDeck, shuffle } from '../deck'
+import { includes } from 'lodash'
+import { calcPegPoints, isTooHighToPlay } from '../points'
 import {
   isCurrentPlayerSelector,
   isMyTurnSelector,
@@ -15,20 +14,6 @@ import {
   playerActionSelector,
   playerPromptSelector
 } from './playerSelectors'
-import {
-  CUT_FOR_FIRST_CRIB_1,
-  CUT_FOR_FIRST_CRIB_2,
-  WAIT_FOR_FIRST_CRIB_2,
-  DEAL_FIRST_ROUND,
-  WAIT_FOR_DEAL_FIRST_ROUND,
-  DO_DISCARD,
-  WAIT_FOR_DISCARD,
-  CUT_DECK,
-  CUT_FIFTH_CARD,
-  WAIT_FOR_CUT,
-  LEAD_PEGGING,
-  WAIT_FOR_LEAD_PEGGING
-} from './playerMessages'
 import Card from './card'
 import ScoreBoard from './scoreBoard'
 
@@ -36,26 +21,26 @@ class Player extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      selected: [null, null],
+      selected: [null, null]
     }
     this.tryPlayCard = this.tryPlayCard.bind(this)
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
   }
-  componentWillMount(){
+  componentWillMount () {
     this.props.actions.showMessage(this.props.prompt, this.props.nextAction)
   }
   componentWillReceiveProps (nextProps) {
     const hasNewPrompt = nextProps.prompt !== this.props.prompt
-    if(nextProps.isCurrentPlayer && hasNewPrompt){
-      if(nextProps.nextAction === this.props.actions.discard) {
+    if (nextProps.isCurrentPlayer && hasNewPrompt) {
+      if (nextProps.nextAction === this.props.actions.discard) {
         this.props.actions.showMessage(nextProps.prompt, () => nextProps.nextAction(this.state.selected, this.props.num))
       } else {
         this.props.actions.showMessage(nextProps.prompt, nextProps.nextAction)
       }
     }
   }
-  componentDidUpdate(){
+  componentDidUpdate () {
 
   }
   toggleSelect (card) {
@@ -63,14 +48,12 @@ class Player extends Component {
       selected: [ card, this.state.selected[0] ]
     })
   }
-  tryPlayCard (card) { // lift this up? 
+  tryPlayCard (card) { // lift this up?
     const { cut, playedCards, isWaitingForLead, pegCount, isMyTurn } = this.props
     if (!cut || isWaitingForLead || !isMyTurn || isTooHighToPlay(card, pegCount)) {
       return
     }
-    // wouldnt need to do this if just did it based off props.... 
-    
-    const allCardsThisRound = this.props.playedCards.slice(this.props.pastPlayedCardsIndex).concat(card) // prempt store update. TODO: Need to slice on RESTART
+    const allCardsThisRound = this.props.playedCards.slice(this.props.pastPlayedCardsIndex).concat(card) // prempt store update.
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(allCardsThisRound, this.props.hand)
     if (runsPoints || fifteenPoints || pairsPoints) {
       const pegPointsForLastCard = runsPoints + fifteenPoints + pairsPoints
@@ -110,7 +93,6 @@ class Player extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const isCurrentPlayer = isCurrentPlayerSelector(state, ownProps)
   return {
     isRoundDone: shouldPeggingRestartSelector(state, ownProps),
     myUnplayed: myUnplayedSelector(state, ownProps),
@@ -126,7 +108,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
-
   const playPegCard = (pegCard, played) => {
     dispatch({
       type: `PLAY_CARD`,
@@ -135,7 +116,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
   return {
     playPegCard,
-    getPoints: (points) => dispatch({type: `PLAYER${ownProps.num}_POINTS`, payload: points}),
+    getPoints: (points) => dispatch({type: `PLAYER${ownProps.num}_POINTS`, payload: points})
   }
 }
 

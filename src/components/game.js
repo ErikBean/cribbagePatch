@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { valueOf, shuffle, createDeck } from '../deck'
-import { playerActionSelector } from './playerSelectors'
 
 import Player from './player'
 import Crib from './crib'
@@ -134,7 +133,7 @@ class Game extends Component {
             isPlayer1={this.props.isPlayer1}
             isPlayer2={this.props.isPlayer2} >
             {/* put <Board /> here */}
-            </PeggingArea>
+          </PeggingArea>
         </div>
         {this.props.isPlayer1 ? renderPlayer('1') : renderPlayer('2')}
         <Deck
