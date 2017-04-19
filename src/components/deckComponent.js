@@ -29,6 +29,7 @@ class Deck extends Component {
           <Card card={this.props.secondCut} />
         </div>
         <div hidden={!this.props.cut}>
+          <div>CUT:</div>
           <Card card={this.props.cut} isOnDeck />
         </div>
       </div>

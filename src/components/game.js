@@ -78,12 +78,12 @@ class Game extends Component {
     // Assign players here:
     this.assignPlayerByCut(myCut, theirCut)
   }
-  discard ([cardA, cardB]) {
+  discard ([cardA, cardB], playerNum) {
     if (!cardA || !cardB) {
       window.alert('select 2 cards!')
       return
     }
-    this.props.discard([cardA, cardB])
+    this.props.discard([cardA, cardB], playerNum)
   }
   deal () {
     const deck = shuffle(createDeck())
@@ -100,19 +100,14 @@ class Game extends Component {
   }
   render () {
     const renderPlayer = (num) => {
+      const { showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex } = this
       return (<Player num={num}
         hand={this.props[`player${num}Hand`]}
         theirHand={this.props[`player${3 - parseInt(num)}Hand`]} // 3-2=1, 3=1=2
         cut={this.props.cut}
         cutIndex={this.props.cutIndex}
         crib={this.props.crib}
-        showMessage={this.showMessage}
-        doFirstCut={this.doFirstCut}
-        doSecondCut={this.doSecondCut} //TODO: just pass next action (det by selector), instead of all these
-        cutDeck={this.cutDeck}
-        deal={this.deal}
-        discard={this.discard}
-        selectCutIndex={this.selectCutIndex} />)
+        actions={{showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex}} />)
     }
     return (
       <div>
@@ -123,6 +118,7 @@ class Game extends Component {
             disabled={this.props.cutIndex}
             onChange={this.changeCutIndex} />
         </GameInfo>
+        {this.props.isPlayer1 ? renderPlayer('2') : renderPlayer('1')}
         <div id='played-cards' hidden={!this.props.cut}>
           On the Table:<br />
           <PeggingArea
@@ -131,9 +127,11 @@ class Game extends Component {
             player1Hand={this.props.player1Hand}
             player2Hand={this.props.player2Hand}
             isPlayer1={this.props.isPlayer1}
-            isPlayer2={this.props.isPlayer2} />
+            isPlayer2={this.props.isPlayer2} >
+            {/* put <Board /> here */}
+            </PeggingArea>
         </div>
-        {this.props.isPlayer1 ? renderPlayer('2') : renderPlayer('1')}
+        {this.props.isPlayer1 ? renderPlayer('1') : renderPlayer('2')}
         <Deck
           showMessage={this.showMessage}
           assignPlayer={this.assignPlayerByCut}
@@ -143,7 +141,6 @@ class Game extends Component {
         <Crib
           visibleCards={this.props.crib || []}
           cards={(this.props.crib || []).concat(this.props.cut || [])} />
-        {this.props.isPlayer1 ? renderPlayer('1') : renderPlayer('2')}
       </div>
     )
   }
@@ -166,12 +163,23 @@ const mapStateToProps = (state) => {
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {
+  const discard = (discards, num) => {
+    dispatch({
+      type: `PLAYER${num}_DISCARD`,
+      payload: discards
+    })
+    dispatch({
+      type: 'ADD_TO_CRIB',
+      payload: discards
+    })
+  }
   return {
     assignPlayer: (player) => dispatch({type: `ASSIGN_PLAYER`, payload: player}),
     cutForFirstCrib: (isFirst, cut) => dispatch({
       type: isFirst ? `FIRST_CUT` : 'SECOND_CUT',
       payload: cut
     }),
+    discard,
     doCut: (cut) => dispatch({type: 'GET_CUT', payload: cut}),
     getHand: (player, hand) => dispatch({
       type: `GET_${player.toUpperCase()}_HAND`,

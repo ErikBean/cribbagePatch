@@ -41,37 +41,22 @@ class Player extends Component {
     this.tryPlayCard = this.tryPlayCard.bind(this)
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
-    this.getNextAction = this.getNextAction.bind(this)
   }
   componentWillMount(){
-    this.props.showMessage(this.props.prompt, this.props.nextAction)
+    this.props.actions.showMessage(this.props.prompt, this.props.nextAction)
   }
   componentWillReceiveProps (nextProps) {
-    if(nextProps.isCurrentPlayer){ // race condition with non-current player setting message
-      this.props.showMessage(nextProps.prompt, nextProps.nextAction)
+    if(nextProps.isCurrentPlayer && nextProps.prompt !== this.props.prompt){
+      if(nextProps.nextAction === this.props.actions.discard) {
+        this.props.actions.showMessage(nextProps.prompt, () => nextProps.nextAction(this.state.selected, this.props.num))
+      } else {
+        this.props.actions.showMessage(nextProps.prompt, nextProps.nextAction)
+      }
     }
   }
   componentDidUpdate(){
     if(this.props.isRoundDone) {
       this.props.restartPegging(this.props.playedCards.length)
-    }
-  }
-  getNextAction (prompt) {
-    switch(prompt){ // TODO: move first 2 someplace else? Player not assigned yet 
-      case CUT_FOR_FIRST_CRIB_1:
-        return this.props.doFirstCut
-      case CUT_FOR_FIRST_CRIB_2:
-        return this.props.doSecondCut
-      case DEAL_FIRST_ROUND:
-        return this.props.deal
-      case DO_DISCARD:
-        return this.props.discard
-      case CUT_DECK:
-        return this.props.selectCutIndex
-      case CUT_FIFTH_CARD:
-        return this.props.cutDeck
-      default:
-        return null
     }
   }
   toggleSelect (card) {
@@ -146,26 +131,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       payload: played.concat(pegCard)
     })
   }
-  const discard = (discards) => {
-    dispatch({
-      type: `PLAYER${ownProps.num}_DISCARD`,
-      payload: discards
-    })
-    dispatch({
-      type: 'ADD_TO_CRIB',
-      payload: discards
-    })
-  }
-
   return {
-    discard,
     playPegCard,
-    incrementRound: (nextRound) => dispatch({type: 'INCREMENT_ROUND', payload: nextRound}),
-    updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
-    getHand: (player, hand) => dispatch({
-      type: `GET_${player.toUpperCase()}_HAND`,
-      payload: hand
-    }),
     getPoints: (points) => dispatch({type: `PLAYER${ownProps.num}_POINTS`, payload: points}),
     restartPegging: (numCardsPlayed) => dispatch({type: 'MARK_CARDS_PEGGED', payload: numCardsPlayed})
   }

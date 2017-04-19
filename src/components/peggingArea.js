@@ -17,6 +17,9 @@ export default (props) => {
   const cardContainer = {
     display: 'inline-block'
   }
+  const tableStyle = {
+    backgroundColor: 'brown'
+  }
   const isLast = (card) => card === last(props.playedCards)
   const pegCount = sumOf(props.playedCards)
   const cardsPlayedByP1 = intersection(props.playedCards, props.player1Hand)
@@ -33,9 +36,9 @@ export default (props) => {
   const renderP1 = <div>{cardsPlayedByP1.map(renderPegCard)}</div>
   const renderP2 = <div>{cardsPlayedByP2.map(renderPegCard)}</div>
   return (
-    <div>
+    <div style={tableStyle} id='brown'>
       <div>{props.invert ? renderP1 : renderP2}</div>
-      <hr />
+      {props.children}
       <div>{props.invert ? renderP2 : renderP1}</div>
     </div>
   )

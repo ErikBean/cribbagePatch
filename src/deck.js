@@ -19,7 +19,7 @@ export function shuffle (array) {
 }
 
 export function valueOf (card) {
-  return typeof card === 'string' ? parseInt(card.slice(1)) : console.error(`cannot find value of ${card}`)
+  return typeof card === 'string' ? parseInt(card.slice(1)) : console.trace(`cannot find value of ${card}`)
 }
 
 export function getNumberOrFace (card) {

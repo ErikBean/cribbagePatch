@@ -9,6 +9,7 @@ const myHandSelector = (state, props) => props.hand
 const theirHandSelector = (state, props) => props.theirHand
 const playerNumSelector = (state, props) => props.num
 const myHandWithCutSelector = (state, props) => (props.hand || []).concat(props.cut || [])
+const actionsSelector = (state, props) => props.actions
 
 const firstCutSelector = (state) => state.firstCut
 const secondCutSelector = (state) => state.secondCut
@@ -17,11 +18,6 @@ const playedCardsSelector = (state) => state.playedCards
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
-const actionsSelector = (state, props) => {
-  const {doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex} = props
-  const actions = {doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex}
-  return actions
-}
 
 
 const needsFirstCutSelector = createSelector(
