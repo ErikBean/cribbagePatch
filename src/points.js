@@ -149,7 +149,7 @@ export function getRuns (hand) {
     if (!a || !b) return false
     return valueOf(a) === valueOf(b) || (valueOf(a) + 1) === valueOf(b)
   }
-  const sortedHand = hand.sort(stableValueOf)
+  const sortedHand = Array.from(hand).sort(stableValueOf)
   const [first, prev, mid, next, last] = sortedHand
   let run = [mid]
   if (isSameOrConsecutive(prev, mid)) {

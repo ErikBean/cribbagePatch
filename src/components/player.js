@@ -53,11 +53,11 @@ class Player extends Component {
         this.props.actions.showMessage(nextProps.prompt, nextProps.nextAction)
       }
     }
+    if(nextProps.isRoundDone && nextProps.playedCards.length !== nextProps.pastPeggedCardsIndex) {
+      this.props.restartPegging(nextProps.playedCards.length)
+    }
   }
   componentDidUpdate(){
-    if(this.props.isRoundDone) {
-      this.props.restartPegging(this.props.playedCards.length)
-    }
   }
   toggleSelect (card) {
     this.setState({
@@ -110,6 +110,7 @@ class Player extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  const isCurrentPlayer = isCurrentPlayerSelector(state, ownProps)
   return {
     isRoundDone: shouldPeggingRestartSelector(state, ownProps),
     myUnplayed: myUnplayedSelector(state, ownProps),
@@ -120,7 +121,8 @@ const mapStateToProps = (state, ownProps) => {
     isCurrentPlayer: isCurrentPlayerSelector(state, ownProps),
     myHandWithCut: myHandWithCutSelector(null, ownProps),
     nextAction: playerActionSelector(state, ownProps),
-    prompt: playerPromptSelector(state, ownProps)
+    prompt: playerPromptSelector(state, ownProps),
+    pastPeggedCardsIndex: state.meta.pastPeggedCardsIndex
   }
 }
 const mapDispatchToProps = (dispatch, ownProps) => {

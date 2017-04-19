@@ -18,7 +18,7 @@ const playedCardsSelector = (state) => state.playedCards
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
-
+// const pegStartIndexSelector = (state) => state.
 
 const needsFirstCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
@@ -138,7 +138,7 @@ const startGamePromptSelector = createSelector(
   }
 )
 
-const prePegPromptSelector = createSelector(
+const cutDeckPromptSelector = createSelector(
   [shouldDiscardSelector, waitingForCribSelector, needsCutSelector, needsFifthSelector, waitForFifthSelector],
   (shouldDiscard, waitingForCrib, needsCut, needsFifth, waitForFifth) => {
     if(shouldDiscard) return messages.DO_DISCARD
@@ -150,7 +150,13 @@ const prePegPromptSelector = createSelector(
   }
 )
 
-const peggingPromptSelector = createSelector(
+
+const playPegCardPromptSelector = createSelector(
+  [isMyTurnSelector],
+  (isMyTurn) => isMyTurn ? 'Click a card to play' : 'Waiting for opponent to play a card'
+)
+
+const pegPointsPromptSelector = createSelector(
   [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector],
   (noCardsPlayed, isMyCrib, playedCards, myHand) => {
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(playedCards, myHand)
@@ -181,9 +187,13 @@ const peggingPromptSelector = createSelector(
   }
 )
 const playerPromptSelector = createSelector(
-  [startGamePromptSelector, prePegPromptSelector, peggingPromptSelector],
-  (startGamePrompt, prePegPrompt, peggingPrompt) => {
-    return startGamePrompt || prePegPrompt || peggingPrompt || 'I dont know what to say'
+  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector],
+  (startGamePrompt, cutDeckPrompt, pegPointsPrompt , playPegCardPrompt) => {
+    return startGamePrompt ||
+      cutDeckPrompt ||
+      pegPointsPrompt ||
+      playPegCardPrompt ||
+      'I dont know what to say'
   }
 )
 

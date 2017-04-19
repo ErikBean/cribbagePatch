@@ -100,10 +100,12 @@ class Game extends Component {
   }
   render () {
     const renderPlayer = (num) => {
+      const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
+      const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3=1=2
       const { showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex } = this
       return (<Player num={num}
-        hand={this.props[`player${num}Hand`]}
-        theirHand={this.props[`player${3 - parseInt(num)}Hand`]} // 3-2=1, 3=1=2
+        hand={myHand}
+        theirHand={theirHand}
         cut={this.props.cut}
         cutIndex={this.props.cutIndex}
         crib={this.props.crib}
