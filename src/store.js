@@ -107,6 +107,7 @@ window.restart = () => {
     secondCut: null,
     cut: null,
     cutIndex: null,
+    pastPlayedCardsIndex: null,
     round: 0
   })
   window.localStorage.clear()
@@ -126,6 +127,7 @@ const pegState = {
   crib: ['S1', 'S2', 'H1', 'H2'],
   cut: 'C4',
   cutIndex: 23,
+  pastPlayedCardsIndex: 0,
   firstCut: 'C3',
   secondCut: 'C4',
   round: 1

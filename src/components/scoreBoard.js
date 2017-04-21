@@ -1,24 +1,6 @@
 import React, { Component } from 'react'
-import { getFifteens, getRuns, getPairs } from '../points'
+import { getFifteens, getRuns, getPairs, sumLengths, sumValues } from '../points'
 import { isEmpty } from 'lodash'
-
-// Sum the length of all arrays in obj
-function sumLengths (obj) {
-  return Object.keys(obj).map((k) => {
-    return obj[k].length
-  }).reduce((acc, curr) => {
-    return acc + curr
-  }, 0)
-}
-
-// Sum all values in obj
-function sumValues (obj) {
-  return Object.keys(obj).map((k) => {
-    return obj[k]
-  }).reduce((acc, curr) => {
-    return acc + curr
-  }, 0)
-}
 
 export default class ScoreBoard extends Component {
   constructor (props) {

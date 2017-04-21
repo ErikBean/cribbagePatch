@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { difference, last, every, isEmpty, includes, isNull } from 'lodash'
-import { sumOf, isTooHighToPlay, calcPegPoints } from '../points'
+import { sumOf, isTooHighToPlay, calcPegPoints, totalHandPoints } from '../points'
 import * as messages from './playerMessages'
 
 const isP1Selector = (state, props, meta = state.meta || {}) => meta.isPlayer1 && props.num === '1'
@@ -28,14 +28,6 @@ const needsSecondCutSelector = createSelector(
   [firstCutSelector, secondCutSelector],
   (firstCut, secondCut) => firstCut && !secondCut
 )
-const visiblePegCardsSelector = createSelector(
-  [playedCardsSelector],
-  (played = []) => {
-    if (isNull(played)) return []
-    const isFirstRound = played.indexOf('RESTART') !== -1
-    return isFirstRound ? played : played.slice(played.lastIndexOf('RESTART') + 1)
-  }
-)
 
 const isCurrentPlayerSelector = createSelector(
   [isP1Selector, isP2Selector],
@@ -51,7 +43,7 @@ const pegCountSelector = createSelector(
 )
 
 const myUnplayedSelector = createSelector(
-  [myHandSelector, visiblePegCardsSelector],
+  [myHandSelector, playedCardsSelector],
   (myHand = [], played = []) => difference(myHand, played)
 )
 const theirUnplayedSelector = createSelector(
@@ -181,20 +173,41 @@ const pegPointsPromptSelector = createSelector(
     } else return ''
   }
 )
+const donePeggingPromptSelector = createSelector(
+  [pastPlayedCardsIndexSelector, playedCardsSelector],
+  (pastPlayedCardsIndex, playedCards) => {
+    if(pastPlayedCardsIndex === 0 && (playedCards || []).length === 8){
+      return messages.COUNT_HAND
+    } else return ''
+  }
+)
+const handPointsSelector = createSelector(
+  [myHandWithCutSelector],
+  (myHand) => totalHandPoints(myHand)
+)
+const handPointsPromptSelector = createSelector(
+  [handPointsSelector],
+  (handPoints) => {
+    return `Your hand score: ${handPoints}`
+  }
+)
+
 const playerPromptSelector = createSelector(
-  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector],
-  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt) => {
+  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector, donePeggingPromptSelector],
+  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt, donePeggingPrompt) => {
     return startGamePrompt ||
       cutDeckPrompt ||
+      donePeggingPrompt ||
       pegPointsPrompt ||
       playPegCardPrompt ||
       'I dont know what to say'
   }
 )
 
+
 const playerActionSelector = createSelector(
-  [playerPromptSelector, actionsSelector, playerNumSelector],
-  (prompt, actions, playerNum) => {
+  [playerPromptSelector, actionsSelector, playerNumSelector, handPointsSelector],
+  (prompt, actions, playerNum, handPoints) => {
     switch (prompt) { // TODO: move first 2 someplace else? Player not assigned yet
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
@@ -208,13 +221,15 @@ const playerActionSelector = createSelector(
         return actions.selectCutIndex
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
+      case messages.COUNT_HAND:
+        return (playerNum) => actions.countHand(playerNum, handPoints)
       default:
         break
     }
     if (prompt.indexOf(messages.HAS_NORMAL_GO) !== -1) {
-      return () => actions.restartPegging(1, parseInt(playerNum))
+      return () => actions.advanceRound(1, parseInt(playerNum))
     } else if (prompt.indexOf(messages.HAS_DOUBLE_GO) !== -1) {
-      return () => actions.restartPegging(2, parseInt(playerNum))
+      return () => actions.advanceRound(2, parseInt(playerNum))
     }
     return null
   }

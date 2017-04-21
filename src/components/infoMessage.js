@@ -9,7 +9,7 @@ class OkButton extends Component {
     this.onClick = this.onClick.bind(this)
   }
   componentWillReceiveProps (nextProps) {
-    if (nextProps.clickAction !== this.props.clickAction) {
+    if (nextProps.text !== this.props.text) {
       this.setState({wasClicked: false})
     }
   }
@@ -48,6 +48,6 @@ export default (props) => (
   <div style={bannerStyle}>
     {props.text}
     {props.text === 'Cut the Deck!' ? props.children : null}
-    <OkButton clickAction={props.onConfirm} />
+    <OkButton text={props.text} clickAction={props.onConfirm} />
   </div>
 )

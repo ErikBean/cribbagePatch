@@ -17,3 +17,5 @@ export const WAIT_FOR_LEAD_PEGGING = 'Waitng for other player to lead'
 
 export const HAS_NORMAL_GO = 'a go for one point'
 export const HAS_DOUBLE_GO = '31 for two points'
+
+export const COUNT_HAND = 'TIME TO COUNT HANDS!'

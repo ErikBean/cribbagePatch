@@ -30,20 +30,19 @@ export default (props) => {
   const renderPegCard = (card) => (
     <div key={card} style={cardContainer}>
       <Card card={card}>
-        <div style={fontStyle} hidden={!isLast(card)}>
+        <div style={fontStyle} hidden={!isLast(card) || (props.playedCards.length === 8 && props.pastPlayedCardsIndex === 0)}>
           {pegCount}
         </div>
       </Card>
     </div>
   )
-  const renderP1 = <div>{cardsPlayedByP1.map(renderPegCard)}</div>
-  const renderP2 = <div>{cardsPlayedByP2.map(renderPegCard)}</div>
-  console.log('>>> Here: ', {currentPegCards})
+  const renderP1 = () => <div>{cardsPlayedByP1.map(renderPegCard)}</div>
+  const renderP2 = () => <div>{cardsPlayedByP2.map(renderPegCard)}</div>
   return (
     <div style={tableStyle}>
-      <div>{props.invert ? renderP1 : renderP2}</div>
+      <div>{props.invert ? renderP1() : renderP2()}</div>
       {props.children}
-      <div>{props.invert ? renderP2 : renderP1}</div>
+      <div>{props.invert ? renderP2() : renderP1()}</div>
     </div>
   )
 }

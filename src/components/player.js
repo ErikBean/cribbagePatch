@@ -21,27 +21,23 @@ class Player extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      selected: [null, null]
+      selected: [null, null],
     }
     this.tryPlayCard = this.tryPlayCard.bind(this)
     this.onCardClick = this.onCardClick.bind(this)
     this.toggleSelect = this.toggleSelect.bind(this)
   }
   componentWillMount () {
-    this.props.actions.showMessage(this.props.prompt, this.props.nextAction)
+    const wrappedAction = this.props.nextAction ? () => this.props.nextAction(this.props.num, this.state.selected) : null
+    this.props.actions.showMessage(this.props.prompt, wrappedAction)
   }
   componentWillReceiveProps (nextProps) {
     const hasNewPrompt = nextProps.prompt !== this.props.prompt
+    const wrappedAction = nextProps.nextAction ? () => this.props.nextAction(this.props.num, this.state.selected) : null
     if (nextProps.isCurrentPlayer && hasNewPrompt) {
-      if (nextProps.nextAction === this.props.actions.discard) {
-        this.props.actions.showMessage(nextProps.prompt, () => nextProps.nextAction(this.state.selected, this.props.num))
-      } else {
-        this.props.actions.showMessage(nextProps.prompt, nextProps.nextAction)
-      }
+      console.log('>>> SM2! ', this.props.num)
+      this.props.actions.showMessage(nextProps.prompt, wrappedAction)
     }
-  }
-  componentDidUpdate () {
-
   }
   toggleSelect (card) {
     this.setState({

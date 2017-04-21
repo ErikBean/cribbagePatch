@@ -1,5 +1,6 @@
 import { valueOf } from './deck'
-import { uniq, includes, last } from 'lodash'
+import { uniq, includes, last, countBy } from 'lodash'
+import R from 'ramda'
 
 export function valueMaxTen (card) {
   return valueOf(card) > 10 ? 10 : valueOf(card)
@@ -163,7 +164,48 @@ export function getRuns (hand) {
     }
   }
 
-  // any run must include mid
   if (uniq(run.map(valueOf)).length < 3) return [] // no runs
   return run
+}
+
+export function calcHandPoints (hand) {
+  const fifteens = getFifteens(hand)
+  const pairs = getPairs(hand)
+  const run = getRuns(hand)
+  return {fifteens, pairs, run}
+}
+
+export function totalHandPoints(hand) {
+  if(!hand.length) return 0
+  const fifteens = getFifteens(hand)
+  const pairs = getPairs(hand)
+  const run = getRuns(hand).map(valueOf) // don't care what suits are
+  
+  const numPairs = sumValues(pairs)
+  const numFifteens = sumLengths(fifteens)
+  const numDuplicateRuns = R.sum(R.groupWith(R.equals, run).map(a=>a.length).filter((len) => len > 1))
+  
+  const pointsForPairs = (numPairs * 2) || 0
+  const pointsForFifteens = (numFifteens * 2) || 0
+  const pointsForRuns = (R.uniq(run).length * numDuplicateRuns) || 0
+  console.log('>>> handy points: ', {pointsForPairs, pointsForRuns, pointsForFifteens})
+  return pointsForFifteens + pointsForPairs + pointsForRuns
+}
+
+// Sum the length of all arrays in obj
+export function sumLengths (obj) {
+  return Object.keys(obj).map((k) => {
+    return obj[k].length
+  }).reduce((acc, curr) => {
+    return acc + curr
+  }, 0)
+}
+
+// Sum all values in obj
+export function sumValues (obj) {
+  return Object.keys(obj).map((k) => {
+    return obj[k]
+  }).reduce((acc, curr) => {
+    return acc + curr
+  }, 0)
 }

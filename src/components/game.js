@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { pick } from 'lodash'
 import { valueOf, shuffle, createDeck } from '../deck'
-
 import Player from './player'
 import Crib from './crib'
 import Deck from './deckComponent'
@@ -20,10 +20,12 @@ class Game extends Component {
     this.cutDeck = this.cutDeck.bind(this)
     this.deal = this.deal.bind(this)
     this.discard = this.discard.bind(this)
+    this.advanceRound = this.advanceRound.bind(this)
+    this.countHand = this.countHand.bind(this)
     this.state = {
       cutIndex: 20,
       message: 'Need to cut for first crib',
-      nextAction: () => {},
+      nextAction: null,
       // this helps restore state on refresh
       isPlayer1: window.localStorage.getItem('cribbagePatchPlayer1'),
       isPlayer2: window.localStorage.getItem('cribbagePatchPlayer2'),
@@ -47,7 +49,7 @@ class Game extends Component {
       window.localStorage.setItem('cribbagePatchPlayer2', true)
     }
   }
-  showMessage (message, cb = () => {}) {
+  showMessage (message, cb) {
     this.setState({message, nextAction: cb})
   }
   selectCutIndex () {
@@ -77,7 +79,7 @@ class Game extends Component {
     // Assign players here:
     this.assignPlayerByCut(myCut, theirCut)
   }
-  discard ([cardA, cardB], playerNum) {
+  discard (playerNum, [cardA, cardB]) {
     if (!cardA || !cardB) {
       window.alert('select 2 cards!')
       return
@@ -97,20 +99,33 @@ class Game extends Component {
     this.props.getHand('player1', hand1)
     this.props.getHand('player2', hand2)
   }
+  advanceRound(goPoints, playerNum){
+    const playedCards = this.props.playedCards || []
+    const numCardsPlayed = playedCards.length
+    if(numCardsPlayed === 0) throw new Error('shouldnt advance round with no cards played!')
+    if(numCardsPlayed < 8){
+      this.props.restartPegging(goPoints, playerNum, numCardsPlayed)
+    } else { // this will tell players pegging is done, since playedcards=8
+      this.props.restartPegging(goPoints, playerNum, 0) 
+    }
+  }
+  countHand(playerNum, handPoints){
+    const currentPoints = this.props[`player${playerNum}Points`]
+    const totalPoints = currentPoints + handPoints
+    this.props.getPointsForPlayer(playerNum, totalPoints)
+  }
   render () {
     const renderPlayer = (num) => {
       const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
       const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3=1=2
-      const { showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, selectCutIndex } = this
       const numCardsPlayed = (this.props.playedCards || []).length
-      const restartPegging = (goPoints, playerNum) => this.props.restartPegging(goPoints, playerNum, numCardsPlayed)
       return (<Player num={num}
         hand={myHand}
         theirHand={theirHand}
         cut={this.props.cut}
         cutIndex={this.props.cutIndex}
         crib={this.props.crib}
-        actions={{showMessage, doFirstCut, doSecondCut, cutDeck, deal, discard, restartPegging, selectCutIndex}} />)
+        actions={pick(this,['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex'])} />)
     }
     return (
       <div>
@@ -129,9 +144,7 @@ class Game extends Component {
             playedCards={this.props.playedCards || []}
             pastPlayedCardsIndex={this.props.pastPlayedCardsIndex}
             player1Hand={this.props.player1Hand}
-            player2Hand={this.props.player2Hand}
-            isPlayer1={this.props.isPlayer1}
-            isPlayer2={this.props.isPlayer2} >
+            player2Hand={this.props.player2Hand} >
             {/* put <Board /> here */}
           </PeggingArea>
         </div>
@@ -185,8 +198,10 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     updateDeck: (deck) => dispatch({type: 'UPDATE_DECK', payload: deck}),
     restartPegging: (goPoints, playerNum, numCardsPlayed) => {
       dispatch({type: `PLAYER${playerNum}_POINTS`, payload: goPoints}) // take points for the go
-      dispatch({type: 'MARK_CARDS_PEGGED', payload: numCardsPlayed}) // grey-out cards from last round (future)
-    }
+      dispatch({type: 'MARK_CARDS_PEGGED', payload: (numCardsPlayed)}) // grey-out cards from last round (future). subtract one because we want the index, not the length
+    },
+    getPointsForPlayer: (playerNum, points) => dispatch({type: `PLAYER${playerNum}_POINTS`, payload: points})
+
   }
 }
 
