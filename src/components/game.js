@@ -7,6 +7,7 @@ import Crib from './crib'
 import Deck from './deckComponent'
 import GameInfo from './infoMessage'
 import PeggingArea from './peggingArea'
+import Board from './board'
 
 class Game extends Component {
   constructor (props) {
@@ -99,33 +100,44 @@ class Game extends Component {
     this.props.getHand('player1', hand1)
     this.props.getHand('player2', hand2)
   }
-  advanceRound(goPoints, playerNum){
+  advanceRound (goPoints, playerNum) {
     const playedCards = this.props.playedCards || []
     const numCardsPlayed = playedCards.length
-    if(numCardsPlayed === 0) throw new Error('shouldnt advance round with no cards played!')
-    if(numCardsPlayed < 8){
+    if (numCardsPlayed === 0) throw new Error('shouldnt advance round with no cards played!')
+    if (numCardsPlayed < 8) {
       this.props.restartPegging(goPoints, playerNum, numCardsPlayed)
     } else { // this will tell players pegging is done, since playedcards=8
-      this.props.restartPegging(goPoints, playerNum, 0) 
+      this.props.restartPegging(goPoints, playerNum, 0)
     }
   }
-  countHand(playerNum, handPoints){
+  countHand (playerNum, handPoints) {
     const currentPoints = this.props[`player${playerNum}Points`]
     const totalPoints = currentPoints + handPoints
     this.props.getPointsForPlayer(playerNum, totalPoints)
   }
   render () {
-    const renderPlayer = (num) => {
+    const playerActions = pick(this, ['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex'])
+    const renderPlayerSpace = (num) => {
       const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
       const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3=1=2
       const numCardsPlayed = (this.props.playedCards || []).length
-      return (<Player num={num}
-        hand={myHand}
-        theirHand={theirHand}
-        cut={this.props.cut}
-        cutIndex={this.props.cutIndex}
-        crib={this.props.crib}
-        actions={pick(this,['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex'])} />)
+      return (
+        <Player num={num}
+          hand={myHand}
+          theirHand={theirHand}
+          cut={this.props.cut}
+          cutIndex={this.props.cutIndex}
+          crib={this.props.crib}
+          actions={playerActions} >
+          <PeggingArea
+            isHidden={!this.props.cut}
+            playedCards={this.props.playedCards || []}
+            pastPlayedCardsIndex={this.props.pastPlayedCardsIndex}
+            playerHand={this.props[`player${num}Hand`]} >
+            {/*  Put half of board here*/}
+          </PeggingArea>
+        </Player>
+      )
     }
     return (
       <div>
@@ -136,19 +148,8 @@ class Game extends Component {
             disabled={this.props.cutIndex}
             onChange={this.changeCutIndex} />
         </GameInfo>
-        {this.props.isPlayer1 ? renderPlayer('2') : renderPlayer('1')}
-        <div id='played-cards' hidden={!this.props.cut}>
-          On the Table:<br />
-          <PeggingArea
-            invert={this.props.isPlayer2}
-            playedCards={this.props.playedCards || []}
-            pastPlayedCardsIndex={this.props.pastPlayedCardsIndex}
-            player1Hand={this.props.player1Hand}
-            player2Hand={this.props.player2Hand} >
-            {/* put <Board /> here */}
-          </PeggingArea>
-        </div>
-        {this.props.isPlayer1 ? renderPlayer('1') : renderPlayer('2')}
+        {this.props.isPlayer1 ? renderPlayerSpace('2') : renderPlayerSpace('1')}
+        {this.props.isPlayer1 ? renderPlayerSpace('1') : renderPlayerSpace('2')}
         <Deck
           showMessage={this.showMessage}
           assignPlayer={this.assignPlayerByCut}

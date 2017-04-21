@@ -17,16 +17,13 @@ export default (props) => {
     display: 'inline-block'
   }
   const tableStyle = {
+    display: props.isHidden ? 'none' : 'block',
     backgroundColor: 'brown'
   }
-  // const pastPlayedCards = props.playedCards.slice(0, props.pastPlayedCardsIndex)
   const currentPegCards = props.playedCards.slice(props.pastPlayedCardsIndex)
   const isLast = (card) => card === last(props.playedCards)
   const pegCount = sumOf(currentPegCards)
-  // const pastPlayedP1 = intersection(pastPlayedCards, props.player1Hand) // TODO: show these greyed-out
-  // const pastPlayedP2 = intersection(pastPlayedCards, props.player2Hand)
-  const cardsPlayedByP1 = intersection(currentPegCards, props.player1Hand)
-  const cardsPlayedByP2 = intersection(currentPegCards, props.player2Hand)
+  const cardsPlayed = intersection(currentPegCards, props.playerHand)
   const renderPegCard = (card) => (
     <div key={card} style={cardContainer}>
       <Card card={card}>
@@ -36,13 +33,10 @@ export default (props) => {
       </Card>
     </div>
   )
-  const renderP1 = () => <div>{cardsPlayedByP1.map(renderPegCard)}</div>
-  const renderP2 = () => <div>{cardsPlayedByP2.map(renderPegCard)}</div>
   return (
     <div style={tableStyle}>
-      <div>{props.invert ? renderP1() : renderP2()}</div>
+      <div>{cardsPlayed.map(renderPegCard)}</div>
       {props.children}
-      <div>{props.invert ? renderP2() : renderP1()}</div>
     </div>
   )
 }

@@ -35,7 +35,6 @@ class Player extends Component {
     const hasNewPrompt = nextProps.prompt !== this.props.prompt
     const wrappedAction = nextProps.nextAction ? () => this.props.nextAction(this.props.num, this.state.selected) : null
     if (nextProps.isCurrentPlayer && hasNewPrompt) {
-      console.log('>>> SM2! ', this.props.num)
       this.props.actions.showMessage(nextProps.prompt, wrappedAction)
     }
   }

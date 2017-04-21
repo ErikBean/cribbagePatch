@@ -3,18 +3,18 @@ realtime cribbage game
 
 Refactor TODO:
 1. Hide scoreboard before hands counted
-2. 
+2. BUG: refreshing page allows hand to be counted twice
 3. Need to display scoreboard runs as not JSON array 
 4. Fifteens could be computed faster by converting hand to integers FIRST! 
 5. 
-6. Using  a magic string in an array is not the best way to restart pegging, instead just keep track of where last round ended in a separate metadata thing 
+6. 
 7. 
-8. What if I do the showPegPointsMessage, in the SELECTOR (message can be a selector (idempotent), and nextAction too if on PROPS)? 
+8.  
 
 Rules TODO / Roadmap:
 1. Hide/grey out previously pegged cards after first pegging round
-2. Show both hands after pegging over
-3. Show total hand points, and add to score
+2. DONE! Show both hands after pegging over
+3. Show total hand points, and add to score DONE!
 5. Reveal the crib, and show the score
 6. Need a way to goto the next round
 7. New prompt for P2 dealing the cards, (round other than first)
