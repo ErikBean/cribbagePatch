@@ -184,10 +184,11 @@ export function totalHandPoints(hand) {
   const numPairs = sumValues(pairs)
   const numFifteens = sumLengths(fifteens)
   const numDuplicateRuns = R.sum(R.groupWith(R.equals, run).map(a=>a.length).filter((len) => len > 1))
-  
+  const multiplier = numDuplicateRuns + 1
+  console.log('>>> Here: ', run, multiplier)
   const pointsForPairs = (numPairs * 2) || 0
   const pointsForFifteens = (numFifteens * 2) || 0
-  const pointsForRuns = (R.uniq(run).length * numDuplicateRuns) || 0
+  const pointsForRuns = (R.uniq(run).length * multiplier) || 0
   console.log('>>> handy points: ', {pointsForPairs, pointsForRuns, pointsForFifteens})
   return pointsForFifteens + pointsForPairs + pointsForRuns
 }
