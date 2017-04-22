@@ -19,7 +19,7 @@ Rules TODO / Roadmap:
 6. Need a way to goto the next round
 7. New prompt for P2 dealing the cards, (round other than first)
 8. 
-9. 
+9. TUTORIAL MODE (shoutout to matt carnovale)
 10. Points does not account for cutting a jack, or the right jack
 11. Points should count flushes of 4-5 in hand, or 5 in crib
 

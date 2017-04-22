@@ -119,7 +119,7 @@ class Game extends Component {
     const playerActions = pick(this, ['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex'])
     const renderPlayerSpace = (num) => {
       const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
-      const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3=1=2
+      const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3-1=2
       const numCardsPlayed = (this.props.playedCards || []).length
       return (
         <Player num={num}

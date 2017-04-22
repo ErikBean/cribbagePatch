@@ -181,14 +181,45 @@ const donePeggingPromptSelector = createSelector(
     } else return ''
   }
 )
+const handInfoSelector = createSelector(
+  [myHandWithCutSelector, roundSelector],
+  (hand,round)=>JSON.stringify({round, hand})
+)
+const wasHandCountedSelector = createSelector(
+  [handInfoSelector],
+  (handInfo) => {
+    return handInfo === window.localStorage.getItem('cribbagePatchLastHand')
+  }
+)
+
+
+
 const handPointsSelector = createSelector(
   [myHandWithCutSelector],
   (myHand) => totalHandPoints(myHand)
 )
+
 const handPointsPromptSelector = createSelector(
   [handPointsSelector],
   (handPoints) => {
     return `Your hand score: ${handPoints}`
+  }
+)
+
+const safeCountHandActionSelector = createSelector(
+  [actionsSelector, wasHandCountedSelector, playerNumSelector, handPointsSelector, handInfoSelector],
+  (actions, wasHandCounted, playerNum, handPoints, handInfo)=> {
+    if(!wasHandCounted){
+      return () => {
+        console.log('>>> HANDINFO: ', handInfo)
+        window.localStorage.setItem('cribbagePatchLastHand', handInfo)
+        actions.countHand(playerNum, handPoints)
+      }
+    } else {
+      console.error('hand was counted!');
+      console.log('>>> Here: ')
+      return () => {} // this is wrong
+    }
   }
 )
 
@@ -206,8 +237,8 @@ const playerPromptSelector = createSelector(
 
 
 const playerActionSelector = createSelector(
-  [playerPromptSelector, actionsSelector, playerNumSelector, handPointsSelector],
-  (prompt, actions, playerNum, handPoints) => {
+  [playerPromptSelector, actionsSelector, playerNumSelector, safeCountHandActionSelector],
+  (prompt, actions, playerNum, safeCountHandAction) => {
     switch (prompt) { // TODO: move first 2 someplace else? Player not assigned yet
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
@@ -222,7 +253,8 @@ const playerActionSelector = createSelector(
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
       case messages.COUNT_HAND:
-        return (playerNum) => actions.countHand(playerNum, handPoints)
+      console.log('>>> Here: ', safeCountHandAction)
+        return safeCountHandAction
       default:
         break
     }
