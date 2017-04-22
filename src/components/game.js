@@ -133,9 +133,7 @@ class Game extends Component {
             isHidden={!this.props.cut}
             playedCards={this.props.playedCards || []}
             pastPlayedCardsIndex={this.props.pastPlayedCardsIndex}
-            playerHand={this.props[`player${num}Hand`]} >
-            {/*  Put half of board here*/}
-          </PeggingArea>
+            playerHand={this.props[`player${num}Hand`]} />
         </Player>
       )
     }
@@ -149,6 +147,10 @@ class Game extends Component {
             onChange={this.changeCutIndex} />
         </GameInfo>
         {this.props.isPlayer1 ? renderPlayerSpace('2') : renderPlayerSpace('1')}
+        <Board
+          invert={this.props.isPlayer2}
+          player1Points={this.props.player1Points || 0}
+          player2Points={this.props.player2Points || 0} />
         {this.props.isPlayer1 ? renderPlayerSpace('1') : renderPlayerSpace('2')}
         <Deck
           showMessage={this.showMessage}

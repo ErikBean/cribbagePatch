@@ -36,7 +36,6 @@ export default (props) => {
   return (
     <div style={tableStyle}>
       <div>{cardsPlayed.map(renderPegCard)}</div>
-      {props.children}
     </div>
   )
 }

@@ -66,7 +66,9 @@ class Player extends Component {
   render () {
     return (
       <div id='player-container'>
+        {this.props.isCurrentPlayer ? this.props.children : null} 
         <h2>Player {this.props.num} {this.props.isCurrentPlayer ? '(This is You)' : ''}</h2>
+        {this.props.isCurrentPlayer ? null : this.props.children} 
         <div id='player-hand' hidden={!this.props.isCurrentPlayer}>
           Your Hand:
           <br />

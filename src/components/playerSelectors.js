@@ -14,7 +14,7 @@ const actionsSelector = (state, props) => props.actions
 const firstCutSelector = (state) => state.firstCut
 const secondCutSelector = (state) => state.secondCut
 const roundSelector = (state, props) => state.round
-const playedCardsSelector = (state) => state.playedCards
+const playedCardsSelector = (state) => state.playedCards || []
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
 const cutIndexSelector = (state) => state.cutIndex
