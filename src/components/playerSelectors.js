@@ -135,15 +135,24 @@ const cutDeckPromptSelector = createSelector(
   }
 )
 
+
+const isDonePeggingSelector = createSelector(
+  [pastPlayedCardsIndexSelector, playedCardsSelector],
+  (pastPlayedCardsIndex, playedCards) => (pastPlayedCardsIndex === 0 && (playedCards || []).length === 8)
+)
 const playPegCardPromptSelector = createSelector(
-  [isMyTurnSelector],
-  (isMyTurn) => isMyTurn ? 'Click a card to play' : 'Waiting for opponent to play a card'
+  [isMyTurnSelector, isDonePeggingSelector],
+  (isMyTurn, isDonePegging) => {
+    if(isDonePegging) return ''
+    return isMyTurn ? 'Click a card to play' : 'Waiting for opponent to play a card'
+  }
 )
 
 const pegPointsPromptSelector = createSelector(
-  [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector, hasAGoSelector, pegCountSelector],
-  (noCardsPlayed, isMyCrib, playedCards, myHand, hasAGo, pegCount) => {
+  [noCardsPlayedSelector, isMyCribSelector, playedCardsSelector, myHandSelector, hasAGoSelector, pegCountSelector, isDonePeggingSelector],
+  (noCardsPlayed, isMyCrib, playedCards, myHand, hasAGo, pegCount, isDonePegging) => {
     const {runsPoints, fifteenPoints, pairsPoints} = calcPegPoints(playedCards, myHand)
+    if(isDonePegging) return ''
     if (noCardsPlayed) {
       if (isMyCrib) return messages.WAIT_FOR_LEAD_PEGGING
       return messages.LEAD_PEGGING
@@ -189,11 +198,14 @@ const handPointsSelector = createSelector(
   [myHandWithCutSelector],
   (myHand) => totalHandPoints(myHand)
 )
+
+
 const donePeggingPromptSelector = createSelector(
-  [pastPlayedCardsIndexSelector, playedCardsSelector, wasHandCountedSelector],
-  (pastPlayedCardsIndex, playedCards, wasHandCounted) => {
-    if(pastPlayedCardsIndex === 0 && (playedCards || []).length === 8){
-      return wasHandCounted ? '' : messages.COUNT_HAND
+  [isDonePeggingSelector, wasHandCountedSelector],
+  (isDonePegging, wasHandCounted) => {
+    console.log('>>> Here: ', {isDonePegging, wasHandCounted})
+    if(isDonePegging && !wasHandCounted){
+      return messages.COUNT_HAND
     } else return ''
   }
 )
@@ -201,7 +213,7 @@ const donePeggingPromptSelector = createSelector(
 const handPointsPromptSelector = createSelector(
   [handPointsSelector, wasHandCountedSelector],
   (handPoints, wasHandCounted) => {
-    return wasHandCounted ? 'already counted' : `Your hand score: ${handPoints}`
+    return wasHandCounted ? '' : `Your hand score: ${handPoints}`
   }
 )
 
@@ -223,12 +235,14 @@ const safeCountHandActionSelector = createSelector(
 const playerPromptSelector = createSelector(
   [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector, donePeggingPromptSelector, handPointsPromptSelector],
   (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt, donePeggingPrompt, handPointsPrompt) => {
+    console.log('>>> Here: ', donePeggingPrompt)
     return startGamePrompt ||
       cutDeckPrompt ||
       donePeggingPrompt ||
       pegPointsPrompt ||
       playPegCardPrompt ||
       handPointsPrompt ||
+      // TODO: put messages / prompt to deal new hand here
       'I dont know what to say'
   }
 )
@@ -237,6 +251,7 @@ const playerPromptSelector = createSelector(
 const playerActionSelector = createSelector(
   [playerPromptSelector, actionsSelector, playerNumSelector, safeCountHandActionSelector],
   (prompt, actions, playerNum, safeCountHandAction) => {
+    console.log('>>> Here: ', prompt)
     switch (prompt) { // TODO: move first 2 someplace else? Player not assigned yet
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
