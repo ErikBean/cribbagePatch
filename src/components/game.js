@@ -23,6 +23,7 @@ class Game extends Component {
     this.discard = this.discard.bind(this)
     this.advanceRound = this.advanceRound.bind(this)
     this.countHand = this.countHand.bind(this)
+    this.flipCrib = this.flipCrib.bind(this)
     this.state = {
       cutIndex: 20,
       message: 'Need to cut for first crib',
@@ -115,8 +116,11 @@ class Game extends Component {
     const totalPoints = currentPoints + handPoints
     this.props.getPointsForPlayer(playerNum, totalPoints)
   }
+  flipCrib(){
+    console.log('ok, time to deal again...')
+  }
   render () {
-    const playerActions = pick(this, ['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex'])
+    const playerActions = pick(this, ['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex', 'flipCrib'])
     const renderPlayerSpace = (num) => {
       const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
       const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3-1=2

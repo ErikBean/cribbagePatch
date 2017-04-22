@@ -199,49 +199,46 @@ const handPointsSelector = createSelector(
   (myHand) => totalHandPoints(myHand)
 )
 
-
-const donePeggingPromptSelector = createSelector(
-  [isDonePeggingSelector, wasHandCountedSelector],
-  (isDonePegging, wasHandCounted) => {
-    console.log('>>> Here: ', {isDonePegging, wasHandCounted})
+const handPointsPromptSelector = createSelector(
+  [handPointsSelector, isDonePeggingSelector, wasHandCountedSelector],
+  (handPoints, isDonePegging, wasHandCounted) =>  {
     if(isDonePegging && !wasHandCounted){
-      return messages.COUNT_HAND
+      return `${messages.HAND_POINTS}: ${handPoints}. Take points:`
     } else return ''
   }
 )
 
-const handPointsPromptSelector = createSelector(
-  [handPointsSelector, wasHandCountedSelector],
-  (handPoints, wasHandCounted) => {
-    return wasHandCounted ? '' : `Your hand score: ${handPoints}`
+const countCribPromptSelector = createSelector(
+  [isMyCribSelector, wasHandCountedSelector],
+  (isMyCrib, wasHandCounted) => {
+    if(isMyCrib && wasHandCounted){
+      return messages.COUNT_CRIB
+    } else if(wasHandCounted){
+      return messages.WAIT_FOR_COUNT_CRIB
+    } else return ''
   }
 )
 
-const safeCountHandActionSelector = createSelector(
-  [actionsSelector, wasHandCountedSelector, playerNumSelector, handPointsSelector, handInfoSelector],
-  (actions, wasHandCounted, playerNum, handPoints, handInfo)=> {
-    if(!wasHandCounted){
-      return () => {
-        window.localStorage.setItem('cribbagePatchLastHand', handInfo)
-        actions.countHand(playerNum, handPoints)
-      }
-    } else {
-      console.error('hand was counted!');
-      return null // this is wrong
+
+const countHandActionSelector = createSelector(
+  [actionsSelector, playerNumSelector, handPointsSelector, handInfoSelector],
+  (actions, playerNum, handPoints, handInfo)=> {
+    return () => {
+      window.localStorage.setItem('cribbagePatchLastHand', handInfo)
+      actions.countHand(playerNum, handPoints)
     }
   }
 )
 
 const playerPromptSelector = createSelector(
-  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector, donePeggingPromptSelector, handPointsPromptSelector],
-  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt, donePeggingPrompt, handPointsPrompt) => {
-    console.log('>>> Here: ', donePeggingPrompt)
+  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector, handPointsPromptSelector, countCribPromptSelector],
+  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt, handPointsPrompt, countCribPrompt) => {
     return startGamePrompt ||
       cutDeckPrompt ||
-      donePeggingPrompt ||
       pegPointsPrompt ||
       playPegCardPrompt ||
       handPointsPrompt ||
+      countCribPrompt ||
       // TODO: put messages / prompt to deal new hand here
       'I dont know what to say'
   }
@@ -249,10 +246,9 @@ const playerPromptSelector = createSelector(
 
 
 const playerActionSelector = createSelector(
-  [playerPromptSelector, actionsSelector, playerNumSelector, safeCountHandActionSelector],
-  (prompt, actions, playerNum, safeCountHandAction) => {
-    console.log('>>> Here: ', prompt)
-    switch (prompt) { // TODO: move first 2 someplace else? Player not assigned yet
+  [playerPromptSelector, actionsSelector, playerNumSelector, countHandActionSelector, wasHandCountedSelector],
+  (prompt, actions, playerNum, countHandAction, wasHandCounted) => {
+    switch (prompt) {
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
       case messages.CUT_FOR_FIRST_CRIB_2:
@@ -265,15 +261,23 @@ const playerActionSelector = createSelector(
         return actions.selectCutIndex
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
-      case messages.COUNT_HAND:
-        return safeCountHandAction
       default:
         break
     }
-    if (prompt.indexOf(messages.HAS_NORMAL_GO) !== -1) {
+    const hasNormalGo = prompt.indexOf(messages.HAS_NORMAL_GO) !== -1
+    const hasDoubleGo = prompt.indexOf(messages.HAS_NORMAL_GO) !== -1
+    if (hasNormalGo) {
       return () => actions.advanceRound(1, parseInt(playerNum))
-    } else if (prompt.indexOf(messages.HAS_DOUBLE_GO) !== -1) {
+    } else if (hasDoubleGo){
       return () => actions.advanceRound(2, parseInt(playerNum))
+    }
+    const isShowingPoints = prompt.indexOf(messages.HAND_POINTS) !== -1
+    if(isShowingPoints){
+      return wasHandCounted ? null : countHandAction
+    }
+    const shouldCountCrib = prompt.indexOf(messages.COUNT_CRIB) !== -1
+    if(shouldCountCrib){
+      return actions.flipCrib
     }
     return null
   }

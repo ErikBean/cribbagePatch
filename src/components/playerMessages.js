@@ -15,7 +15,12 @@ export const WAIT_FOR_CUT = 'Waiting for other player to cut'
 export const LEAD_PEGGING = 'Click a card to start pegging'
 export const WAIT_FOR_LEAD_PEGGING = 'Waitng for other player to lead'
 
-export const HAS_NORMAL_GO = 'a go for one point. Take points and restart pegging >'
-export const HAS_DOUBLE_GO = '31 for two points. Take points and restart pegging >'
+export const HAS_NORMAL_GO = 'a go for one point. Take points and restart pegging'
+export const HAS_DOUBLE_GO = '31 for two points. Take points and restart pegging'
 
-export const COUNT_HAND = 'Click OK to count your hand >'
+export const HAND_POINTS = 'Your hand score'
+export const COUNT_CRIB = 'Ok, flip the crib'
+export const WAIT_FOR_COUNT_CRIB = 'Waiting for opponent to flip crib'
+
+export const SHOULD_DEAL = 'Deal next round'
+export const WAIT_FOR_DEAL = 'Waiting for opponent to deal next round'
