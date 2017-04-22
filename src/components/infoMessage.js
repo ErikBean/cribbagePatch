@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-
+import { isNull, isUndefined } from 'lodash'
 class OkButton extends Component {
   constructor (props) {
     super(props)
@@ -25,8 +25,9 @@ class OkButton extends Component {
       padding: '0 20px',
       marginLeft: '20px'
     }
+    const hasNoAction = !this.props.clickAction
     return (
-      <span hidden={!this.props.clickAction} style={buttonStyle} onClick={this.onClick}>
+      <span hidden={hasNoAction} style={buttonStyle} onClick={this.onClick}>
         OK
       </span>
     )
@@ -44,10 +45,11 @@ const bannerStyle = {
   cursor: 'pointer',
   zIndex: '100'
 }
-export default (props) => (
+export default (props) => {
+  return (
   <div style={bannerStyle}>
     {props.text}
     {props.text === 'Cut the Deck!' ? props.children : null}
-    <OkButton text={props.text} clickAction={props.onConfirm} />
+    <OkButton text={props.text} clickAction={props.onConfirm || null} />
   </div>
-)
+)}

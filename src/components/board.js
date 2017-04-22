@@ -17,23 +17,41 @@ export default class Board extends Component {
     }
   }
   render(){
-    const holesForPlayer = (num) => (
+    const holesForPlayer = (num, color) => (
       <div>
-        {R.times(Hole(this.props, num), ROW_LENGTH)}
+        {R.times(Hole(this.props, num, color), POINTS_TO_WIN)}
       </div>
     )
     return (
       <div id="board">
-        {this.props.invert ? holesForPlayer(1) : holesForPlayer(2)}
-        {this.props.invert ? holesForPlayer(2) : holesForPlayer(1)}
+        {this.props.invert ? holesForPlayer(1, 'red') : holesForPlayer(2, 'blue')}
+        <br />
+        {this.props.invert ? holesForPlayer(2, 'blue') : holesForPlayer(1, 'red')}
       </div>
     )
   }
 }
 
 
-const Hole = (props, num) => (index) => {
+const Hole = (props, num, color) => (index) => {
+  const hasPeg = (index === props[`player${num}Points`])
+
+  const getIcon = () => {    
+    if(hasPeg){
+      return '!'
+    } else if((index + 1)%5 === 0){
+      return index + 1
+    } else if(index%ROW_LENGTH == 0){
+      return <br />
+    } else {
+      return '.'
+    }
+  }
+  const pegStyle = {
+    color:  color,
+    fontWeight: 'bold'
+  }
   return (
-    <span key={index}>{index === props[`player${num}Points`] ? '!' : '.'}</span>
+    <span key={index} style={hasPeg ? pegStyle : null}>{getIcon()}</span>
   )
 }

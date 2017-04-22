@@ -173,14 +173,7 @@ const pegPointsPromptSelector = createSelector(
     } else return ''
   }
 )
-const donePeggingPromptSelector = createSelector(
-  [pastPlayedCardsIndexSelector, playedCardsSelector],
-  (pastPlayedCardsIndex, playedCards) => {
-    if(pastPlayedCardsIndex === 0 && (playedCards || []).length === 8){
-      return messages.COUNT_HAND
-    } else return ''
-  }
-)
+
 const handInfoSelector = createSelector(
   [myHandWithCutSelector, roundSelector],
   (hand,round)=>JSON.stringify({round, hand})
@@ -192,17 +185,23 @@ const wasHandCountedSelector = createSelector(
   }
 )
 
-
-
 const handPointsSelector = createSelector(
   [myHandWithCutSelector],
   (myHand) => totalHandPoints(myHand)
 )
+const donePeggingPromptSelector = createSelector(
+  [pastPlayedCardsIndexSelector, playedCardsSelector, wasHandCountedSelector],
+  (pastPlayedCardsIndex, playedCards, wasHandCounted) => {
+    if(pastPlayedCardsIndex === 0 && (playedCards || []).length === 8){
+      return wasHandCounted ? '' : messages.COUNT_HAND
+    } else return ''
+  }
+)
 
 const handPointsPromptSelector = createSelector(
-  [handPointsSelector],
-  (handPoints) => {
-    return `Your hand score: ${handPoints}`
+  [handPointsSelector, wasHandCountedSelector],
+  (handPoints, wasHandCounted) => {
+    return wasHandCounted ? 'already counted' : `Your hand score: ${handPoints}`
   }
 )
 
@@ -211,26 +210,25 @@ const safeCountHandActionSelector = createSelector(
   (actions, wasHandCounted, playerNum, handPoints, handInfo)=> {
     if(!wasHandCounted){
       return () => {
-        console.log('>>> HANDINFO: ', handInfo)
         window.localStorage.setItem('cribbagePatchLastHand', handInfo)
         actions.countHand(playerNum, handPoints)
       }
     } else {
       console.error('hand was counted!');
-      console.log('>>> Here: ')
-      return () => {} // this is wrong
+      return null // this is wrong
     }
   }
 )
 
 const playerPromptSelector = createSelector(
-  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector, donePeggingPromptSelector],
-  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt, donePeggingPrompt) => {
+  [startGamePromptSelector, cutDeckPromptSelector, pegPointsPromptSelector, playPegCardPromptSelector, donePeggingPromptSelector, handPointsPromptSelector],
+  (startGamePrompt, cutDeckPrompt, pegPointsPrompt, playPegCardPrompt, donePeggingPrompt, handPointsPrompt) => {
     return startGamePrompt ||
       cutDeckPrompt ||
       donePeggingPrompt ||
       pegPointsPrompt ||
       playPegCardPrompt ||
+      handPointsPrompt ||
       'I dont know what to say'
   }
 )
@@ -253,7 +251,6 @@ const playerActionSelector = createSelector(
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
       case messages.COUNT_HAND:
-      console.log('>>> Here: ', safeCountHandAction)
         return safeCountHandAction
       default:
         break
