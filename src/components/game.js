@@ -25,8 +25,9 @@ class Game extends Component {
     this.countHand = this.countHand.bind(this)
     this.flipCrib = this.flipCrib.bind(this)
     this.state = {
+      isCribHidden:true,
       cutIndex: 20,
-      message: 'Need to cut for first crib',
+      message: 'init game',
       nextAction: null,
       // this helps restore state on refresh
       isPlayer1: window.localStorage.getItem('cribbagePatchPlayer1'),
@@ -117,7 +118,10 @@ class Game extends Component {
     this.props.getPointsForPlayer(playerNum, totalPoints)
   }
   flipCrib(){
-    console.log('ok, time to deal again...')
+    console.log('>>> OK, flip the crib!: ')
+    this.setState({
+      isCribHidden: false
+    })
   }
   render () {
     const playerActions = pick(this, ['showMessage', 'doFirstCut', 'doSecondCut', 'countHand', 'cutDeck', 'deal', 'discard', 'advanceRound', 'selectCutIndex', 'flipCrib'])
@@ -132,6 +136,7 @@ class Game extends Component {
           cut={this.props.cut}
           cutIndex={this.props.cutIndex}
           crib={this.props.crib}
+          isCribHidden={this.state.isCribHidden}
           actions={playerActions} >
           <PeggingArea
             isHidden={!this.props.cut}
@@ -163,6 +168,7 @@ class Game extends Component {
           hasFirstCut={this.state.hasFirstCut}
           doSecondCut={this.doSecondCut} />
         <Crib
+          isHidden={this.state.isCribHidden}
           visibleCards={this.props.crib || []}
           cards={(this.props.crib || []).concat(this.props.cut || [])} />
       </div>

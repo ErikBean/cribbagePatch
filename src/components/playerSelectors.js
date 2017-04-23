@@ -10,6 +10,8 @@ const theirHandSelector = (state, props) => props.theirHand
 const playerNumSelector = (state, props) => props.num
 const myHandWithCutSelector = (state, props) => (props.hand || []).concat(props.cut || [])
 const actionsSelector = (state, props) => props.actions
+const isCribHiddenSelector = (state, props) => props.isCribHidden
+
 
 const firstCutSelector = (state) => state.firstCut
 const secondCutSelector = (state) => state.secondCut
@@ -261,6 +263,8 @@ const playerActionSelector = createSelector(
         return actions.selectCutIndex
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
+      case messages.COUNT_CRIB:
+        return actions.flipCrib
       default:
         break
     }
@@ -274,10 +278,6 @@ const playerActionSelector = createSelector(
     const isShowingPoints = prompt.indexOf(messages.HAND_POINTS) !== -1
     if(isShowingPoints){
       return wasHandCounted ? null : countHandAction
-    }
-    const shouldCountCrib = prompt.indexOf(messages.COUNT_CRIB) !== -1
-    if(shouldCountCrib){
-      return actions.flipCrib
     }
     return null
   }

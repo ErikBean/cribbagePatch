@@ -18,7 +18,7 @@ class Deck extends Component {
 
   render () {
     return (
-      <div>
+      <div style={{display: 'inline-block'}}>
         <div hidden={this.props.round > 0}>
           <Card card={this.props.firstCut} />
           <Card card={this.props.secondCut} />
