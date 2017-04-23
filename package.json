@@ -1,10 +1,10 @@
-{
+  {
   "name": "cribbagePatch",
   "version": "1.0.0",
   "description": "real time cribbage game",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r 'babel-register' ./test",
+    "test": "mocha -r 'babel-register' './test/setupDOM' ./test",
     "build": "webpack --env=dev --watch",
     "lint": "standard -v | snazzy",
     "start": "webpack-dev-server"
@@ -27,7 +27,7 @@
     "gun": "^0.6.3",
     "lodash": "^4.17.4",
     "ramda": "^0.23.0",
-    "react": "^15.4.2",
+    "react": "^15.5.4",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",
     "redux": "^3.6.0",
@@ -43,8 +43,12 @@
     "babel-preset-latest": "^6.22.0",
     "babel-preset-react": "^6.16.0",
     "babel-register": "^6.24.0",
+    "enzyme": "^2.8.2",
     "expect.js": "^0.3.1",
+    "jsdom": "^9.12.0",
     "mocha": "^3.2.0",
+    "nock": "^9.0.13",
+    "react-addons-test-utils": "^15.5.1",
     "react-hot-loader": "^3.0.0-beta.6",
     "snazzy": "^6.0.0",
     "standard": "^8.6.0",

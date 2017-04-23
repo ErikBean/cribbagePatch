@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { isNull, isUndefined } from 'lodash'
-class OkButton extends Component {
+export class OkButton extends Component { // export for testing
   constructor (props) {
     super(props)
     this.state = {

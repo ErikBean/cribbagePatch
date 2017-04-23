@@ -116,7 +116,6 @@ window.restart = () => {
   window.localStorage.clear()
   window.location.reload()
 }
-window.gunVal = game.val(console.log.bind(console))
 window.getHand = (hand, player) => {
   store.dispatch({
     type: `GET_${player.toUpperCase()}_HAND`,
@@ -162,4 +161,12 @@ window.startPegging = () => {
   window.localStorage.setItem('cribbagePatchPlayer1', true)
   const desiredStoreState = Object.assign({}, oldState, newState)
   store.dispatch({type: 'TEST_STATE', testState: desiredStoreState})
+}
+window.setTestState = (state) => {
+  const oldState = store.getState()
+  const newState = {
+    state,
+    ...oldState
+  }
+  store.dispatch({type: 'TEST_STATE', testState: newState})
 }

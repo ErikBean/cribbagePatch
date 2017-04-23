@@ -24,3 +24,5 @@ if (module.hot) {
     ReactDOM.render(App)
   })
 }
+// for enzyme tests: 
+export default App 

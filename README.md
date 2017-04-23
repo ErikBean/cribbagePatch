@@ -24,7 +24,7 @@ Rules TODO / Roadmap:
 11. Points should count flushes of 4-5 in hand, or 5 in crib
 
 
-State@3-13-17:
+State@4-22-17:
 {
   "crib":[
    "H9",

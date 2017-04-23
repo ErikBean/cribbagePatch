@@ -12,7 +12,6 @@ const myHandWithCutSelector = (state, props) => (props.hand || []).concat(props.
 const actionsSelector = (state, props) => props.actions
 const isCribHiddenSelector = (state, props) => props.isCribHidden
 
-
 const firstCutSelector = (state) => state.firstCut
 const secondCutSelector = (state) => state.secondCut
 const roundSelector = (state, props) => state.round

@@ -1,6 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
-module.exports = {
+module.exports = () => ({
   devtool: 'source-map',
   entry: {
     hmr: ['react-hot-loader/patch',
@@ -46,4 +46,4 @@ module.exports = {
     })
   ],
   externals: []
-}
+})
