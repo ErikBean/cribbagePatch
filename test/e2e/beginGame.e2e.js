@@ -19,21 +19,37 @@ describe('Starting the game', function() {
         browser.click(selectors.restartButton)
         browser.refresh()
         
+         // not good enough for mid-game, because already hidden
         browser.waitForVisible(selectors.firstCut, 100000, true)
         browser.waitForVisible(selectors.secondCut, 100000, true)
         expect(browser.select('alice').getText(selectors.prompt)).to.be.equal(messages.CUT_FOR_FIRST_CRIB_1)
         expect(browser.select('bob').getText(selectors.prompt)).to.be.equal(messages.CUT_FOR_FIRST_CRIB_1)
 
-        browser.select('alice').click(selectors.confirm)
+        browser.select('alice').click(selectors.confirm) //alice does first cut
         browser.select('bob').waitForVisible(selectors.firstCut, 1000000)
         expect(browser.select('bob').getText(selectors.prompt)).to.be.equal(messages.CUT_FOR_FIRST_CRIB_2)
         
-        browser.select('bob').click(selectors.confirm)
-        browser.select('alice').waitForVisible(selectors.secondCut)
+        browser.select('bob').click(selectors.confirm) //bob does second cut
+        browser.waitForVisible(selectors.secondCut) //both alice and bob need to see both cuts before proceeding
         
         expect(browser.select('bob').getText(selectors.prompt)).not.to.be.equal(messages.CUT_FOR_FIRST_CRIB_2)
-        // see which of alice vs bob have lower card
-        // either alice or bob should see 'Deal the cards!'
+        
+        //this is not part of this test description: 
+        const isPlayer1 = (player) => {
+          const firstCut = browser.select(player).getAttribute(selectors.firstCut, 'data-qa-card-value')
+          const secondCut = browser.select(player).getAttribute(selectors.secondCut, 'data-qa-card-value')
+          const myCut = player === 'alice' ? firstCut : secondCut
+          const theirCut = player === 'alice' ? secondCut : firstCut
+          if(parseInt(myCut.slice(1)) < parseInt(theirCut.slice(1))){
+            return true
+          } else if(parseInt(myCut.slice(1)) > parseInt(theirCut.slice(1))) {
+            return false
+          }
+        }
+        const player1 = isPlayer1('alice') ? browser.select('alice') : browser.select('bob')
+        const player2 = isPlayer1('bob') ? browser.select('alice') : browser.select('bob')
+        expect(player1.getText(selectors.prompt)).to.be.equal(messages.DEAL_FIRST_ROUND)
+        expect(player2.getText(selectors.prompt)).to.be.equal(messages.WAIT_FOR_DEAL_FIRST_ROUND)        
     });
 
 });

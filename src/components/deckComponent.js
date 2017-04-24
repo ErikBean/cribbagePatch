@@ -28,10 +28,10 @@ export default class Deck extends Component {
     return (
       <div style={{display: 'inline-block'}}>
         <div hidden={this.props.round > 0}>
-          <span hidden={!this.props.firstCut} data-qa="first-cut">
+          <span hidden={!this.props.firstCut} data-qa="first-cut" data-qa-card-value={this.props.firstCut}>
             <Card card={this.props.firstCut} />
           </span>
-          <span hidden={!this.props.secondCut} data-qa="second-cut">
+          <span hidden={!this.props.secondCut} data-qa="second-cut" data-qa-card-value={this.props.secondCut}>
             <Card card={this.props.secondCut} />
           </span>
         </div>
