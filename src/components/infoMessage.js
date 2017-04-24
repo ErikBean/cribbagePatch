@@ -27,7 +27,7 @@ export class OkButton extends Component { // export for testing
     }
     const hasNoAction = !this.props.clickAction
     return (
-      <span hidden={hasNoAction} style={buttonStyle} onClick={this.onClick}>
+      <span hidden={hasNoAction} style={buttonStyle} onClick={this.onClick} data-qa="confirm-prompt">
         OK
       </span>
     )
@@ -48,7 +48,9 @@ const bannerStyle = {
 export default (props) => {
   return (
   <div style={bannerStyle}>
-    {props.text}
+    <span data-qa="player-prompt">
+      {props.text}
+    </span>
     {props.text === 'Cut the Deck!' ? props.children : null}
     <OkButton text={props.text} clickAction={props.onConfirm || null} />
   </div>

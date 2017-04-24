@@ -16,7 +16,7 @@ const Card = (props) => {
   }
 
   return (
-    <div style={style} onClick={props.onClick}>
+    <div style={style} onClick={props.onClick} data-qa={`card-${props.card}`}>
       {props.children}
     </div>
   )

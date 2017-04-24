@@ -1,10 +1,11 @@
-  {
+{
   "name": "cribbagePatch",
   "version": "1.0.0",
   "description": "real time cribbage game",
   "main": "index.js",
   "scripts": {
     "test": "mocha -r 'babel-register' './test/setupDOM' ./test",
+    "e2e": "concurrently --kill-others \"selenium-standalone start\" \"wdio wdio.conf.js\"",
     "build": "webpack --env=dev --watch",
     "lint": "standard -v | snazzy",
     "start": "webpack-dev-server"
@@ -43,6 +44,7 @@
     "babel-preset-latest": "^6.22.0",
     "babel-preset-react": "^6.16.0",
     "babel-register": "^6.24.0",
+    "concurrently": "^3.4.0",
     "enzyme": "^2.8.2",
     "expect.js": "^0.3.1",
     "jsdom": "^9.12.0",
@@ -50,8 +52,11 @@
     "nock": "^9.0.13",
     "react-addons-test-utils": "^15.5.1",
     "react-hot-loader": "^3.0.0-beta.6",
+    "selenium-standalone": "^6.3.0",
     "snazzy": "^6.0.0",
     "standard": "^8.6.0",
+    "wdio-mocha-framework": "^0.5.10",
+    "webdriverio": "^4.7.1",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.4.1"
   }

@@ -1,6 +1,9 @@
 #Build artifacts
 dist
 
+#test output
+errorShots
+
 # Logs
 logs
 *.log

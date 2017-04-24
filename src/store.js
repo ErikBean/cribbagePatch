@@ -115,6 +115,7 @@ window.restart = () => {
   })
   window.localStorage.clear()
   window.location.reload()
+  return 'done!'
 }
 window.getHand = (hand, player) => {
   store.dispatch({
