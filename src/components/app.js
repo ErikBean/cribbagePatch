@@ -6,7 +6,7 @@ import Game from './game'
 const App = () => (
   <Provider store={store}>
     <div>
-      <button style={{width: '100%'}} onClick={window.restart}>Restart the Game</button>
+      <button style={{width: '100%'}} onClick={window.restart} data-qa="restart-button">Restart the Game</button>
       <h1>Cribbage Patch</h1>
       <Game />
     </div>
