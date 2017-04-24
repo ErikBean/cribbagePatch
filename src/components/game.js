@@ -167,7 +167,13 @@ class Game extends Component {
           assignPlayer={this.assignPlayerByCut}
           playerAssigned={this.props.isPlayer1 || this.props.isPlayer2}
           hasFirstCut={this.state.hasFirstCut}
-          doSecondCut={this.doSecondCut} />
+          doSecondCut={this.doSecondCut}
+          firstCut={this.props.firstCut}
+          secondCut={this.props.secondCut}
+          round={this.props.round}
+          cut={this.props.cut}
+          deck={this.props.deck}
+        />
         <Crib
           isHidden={this.state.isCribHidden}
           visibleCards={this.props.crib || []}
