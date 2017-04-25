@@ -19,7 +19,8 @@ export function shuffle (array) {
 }
 
 export function valueOf (card) {
-  return typeof card === 'string' ? parseInt(card.slice(1)) : console.trace(`cannot find value of ${card}`)
+  // TODO: Why is this sometimes NOT passd a string? 
+  return typeof card === 'string' ? parseInt(card.slice(1)) : 0
 }
 
 export function getNumberOrFace (card) {

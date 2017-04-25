@@ -105,11 +105,12 @@ class Game extends Component {
   advanceRound (goPoints, playerNum) {
     const playedCards = this.props.playedCards || []
     const numCardsPlayed = playedCards.length
+    const totalPoints = this.props[`player${playerNum}Points`] + goPoints
     if (numCardsPlayed === 0) throw new Error('shouldnt advance round with no cards played!')
     if (numCardsPlayed < 8) {
-      this.props.restartPegging(goPoints, playerNum, numCardsPlayed)
+      this.props.restartPegging(totalPoints, playerNum, numCardsPlayed)
     } else { // this will tell players pegging is done, since playedcards=8
-      this.props.restartPegging(goPoints, playerNum, 0)
+      this.props.restartPegging(totalPoints, playerNum, 0)
     }
   }
   countHand (playerNum, handPoints) {
@@ -137,7 +138,6 @@ class Game extends Component {
           cut={this.props.cut}
           cutIndex={this.props.cutIndex}
           crib={this.props.crib}
-          isCribHidden={this.state.isCribHidden}
           actions={playerActions} >
           <PeggingArea
             isHidden={!this.props.cut}

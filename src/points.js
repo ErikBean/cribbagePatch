@@ -50,6 +50,8 @@ function getPeggingRun (playedCards) {
       if (currentVal === (prevVal + 1)) {
         prevVal = currentVal
         runsPoints++
+      } else if(currentVal === prevVal) {
+        return 0 // pairs cant be runs
       } else {
         break
       }

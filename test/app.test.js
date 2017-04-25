@@ -11,7 +11,7 @@ import GameInfo, { OkButton } from '../src/components/infoMessage'
 import Deck from '../src/components/deckComponent'
 import * as messages from '../src/components/playerMessages'
 
-describe.only('<App /> ', () => {
+describe('<App /> ', () => {
   let app, prompt, action
   beforeEach(() => {
     app = mount(<App />)

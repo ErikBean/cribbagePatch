@@ -34,7 +34,7 @@ export default class Board extends Component {
 
 
 const Hole = (props, num, color) => (index) => {
-  const hasPeg = (index === props[`player${num}Points`])
+  const hasPeg = ((index + 1) === props[`player${num}Points`])
 
   const getIcon = () => {    
     if(hasPeg){
