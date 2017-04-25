@@ -22,7 +22,7 @@ class Game extends Component {
     this.deal = this.deal.bind(this)
     this.discard = this.discard.bind(this)
     this.advanceRound = this.advanceRound.bind(this)
-    this.countHand = this.countHand.bind(this)
+    this.countPoints = this.countPoints.bind(this)
     this.flipCrib = this.flipCrib.bind(this)
     this.state = {
       isCribHidden:true,
@@ -113,20 +113,19 @@ class Game extends Component {
       this.props.restartPegging(totalPoints, playerNum, 0)
     }
   }
-  countHand (playerNum, handPoints) {
+  countPoints (playerNum, handPoints) {
     const currentPoints = this.props[`player${playerNum}Points`]
     const totalPoints = currentPoints + handPoints
     this.props.getPointsForPlayer(playerNum, totalPoints)
   }
   flipCrib(){
-    console.log('>>> OK, flip the crib!: ')
     this.setState({
       isCribHidden: false
     })
   }
   render () {
-    const { showMessage, doFirstCut, doSecondCut, countHand, cutDeck, deal, discard, advanceRound, selectCutIndex, flipCrib } = this
-    const playerActions = { showMessage, doFirstCut, doSecondCut, countHand, cutDeck, deal, discard, advanceRound, selectCutIndex, flipCrib }
+    const { showMessage, doFirstCut, doSecondCut, countPoints, cutDeck, deal, discard, advanceRound, selectCutIndex, flipCrib } = this
+    const playerActions = { showMessage, doFirstCut, doSecondCut, countPoints, cutDeck, deal, discard, advanceRound, selectCutIndex, flipCrib }
     const renderPlayerSpace = (num) => {
       const myHand = Array.from(this.props[`player${num}Hand`] || []).sort()
       const theirHand = Array.from(this.props[`player${3 - parseInt(num)}Hand`] || []).sort()  // 3-2=1, 3-1=2
@@ -135,9 +134,7 @@ class Game extends Component {
         <Player num={num}
           hand={myHand}
           theirHand={theirHand}
-          cut={this.props.cut}
-          cutIndex={this.props.cutIndex}
-          crib={this.props.crib}
+          isCribHidden={this.state.isCribHidden}
           actions={playerActions} >
           <PeggingArea
             isHidden={!this.props.cut}

@@ -8,7 +8,8 @@ const isP2Selector = (state, props, meta = state.meta || {}) => meta.isPlayer2 &
 const myHandSelector = (state, props) => props.hand
 const theirHandSelector = (state, props) => props.theirHand
 const playerNumSelector = (state, props) => props.num
-const myHandWithCutSelector = (state, props) => (props.hand || []).concat(props.cut || [])
+const myHandWithCutSelector = (state, props) => (props.hand || []).concat((state || {}).cut || [])
+const isCribHiddenSelector = (state, props) => props.isCribHidden
 const actionsSelector = (state, props) => props.actions
 
 const firstCutSelector = (state) => state.firstCut
@@ -17,6 +18,7 @@ const roundSelector = (state, props) => state.round
 const playedCardsSelector = (state) => state.playedCards || []
 const cribSelector = (state) => state.crib
 const cutSelector = (state) => state.cut
+const cribWithCutSelector = (state) => (state.crib || []).concat((state || {}).cut || [])
 const cutIndexSelector = (state) => state.cutIndex
 const pastPlayedCardsIndexSelector = (state) => state.pastPlayedCardsIndex
 
@@ -187,10 +189,20 @@ const handInfoSelector = createSelector(
   [myHandWithCutSelector, roundSelector],
   (hand,round)=>JSON.stringify({round, hand})
 )
+const cribInfoSelector = createSelector(
+  [cribWithCutSelector, roundSelector],
+  (crib, round)=>JSON.stringify({round, crib})
+)
 const wasHandCountedSelector = createSelector(
   [handInfoSelector],
   (handInfo) => {
     return handInfo === window.localStorage.getItem('cribbagePatchLastHand')
+  }
+)
+const wasCribCountedSelector = createSelector(
+  [cribInfoSelector],
+  (cribInfo) => {
+    return cribInfo === window.localStorage.getItem('cribbagePatchLastCrib')
   }
 )
 
@@ -203,18 +215,27 @@ const handPointsPromptSelector = createSelector(
   [handPointsSelector, isDonePeggingSelector, wasHandCountedSelector],
   (handPoints, isDonePegging, wasHandCounted) =>  {
     if(isDonePegging && !wasHandCounted){
-      return `${messages.HAND_POINTS}: ${handPoints}. Take points:`
+      return `${messages.HAND_POINTS} Take ${handPoints} points:`
     } else return ''
   }
 )
 
+const cribPointsSelector = createSelector(
+  [cribWithCutSelector],
+  (myCrib) => totalHandPoints(myCrib)
+)
+
 const countCribPromptSelector = createSelector(
-  [isMyCribSelector, wasHandCountedSelector],
-  (isMyCrib, wasHandCounted) => {
-    if(isMyCrib && wasHandCounted){
-      return messages.COUNT_CRIB
-    } else if(wasHandCounted){
-      return messages.WAIT_FOR_COUNT_CRIB
+  [isMyCribSelector, wasHandCountedSelector, isCribHiddenSelector, cribPointsSelector, wasCribCountedSelector],
+  (isMyCrib, wasHandCounted, isCribHidden, cribPoints, wasCribCounted) => {
+    if(isMyCrib && wasHandCounted && isCribHidden && !wasCribCounted){
+      return messages.SHOW_CRIB
+    } else if(!isMyCrib && wasHandCounted && isCribHidden){
+      return messages.WAIT_FOR_SHOW_CRIB
+    } else if(!isCribHidden && !wasCribCounted){
+      return `${messages.CRIB_POINTS} Take ${cribPoints} points: `
+    } else if(wasCribCounted){
+      return 'ahhhh, need to deal next round?'
     } else return ''
   }
 )
@@ -225,7 +246,17 @@ const countHandActionSelector = createSelector(
   (actions, playerNum, handPoints, handInfo)=> {
     return () => {
       window.localStorage.setItem('cribbagePatchLastHand', handInfo)
-      actions.countHand(playerNum, handPoints)
+      actions.countPoints(playerNum, handPoints)
+    }
+  }
+)
+
+const countCribActionSelector = createSelector(
+  [actionsSelector, playerNumSelector, cribPointsSelector, cribInfoSelector],
+  (actions,playerNum,cribPoints, cribInfo)=> {
+    return ()=> {
+      window.localStorage.setItem('cribbagePatchLastCrib', cribInfo)
+      actions.countPoints(playerNum, cribPoints)
     }
   }
 )
@@ -246,8 +277,8 @@ const playerPromptSelector = createSelector(
 
 
 const playerActionSelector = createSelector(
-  [playerPromptSelector, actionsSelector, playerNumSelector, countHandActionSelector, wasHandCountedSelector],
-  (prompt, actions, playerNum, countHandAction, wasHandCounted) => {
+  [playerPromptSelector, actionsSelector, playerNumSelector, countHandActionSelector, countCribActionSelector],
+  (prompt, actions, playerNum, countPointsAction, countCribAction) => {
     switch (prompt) {
       case messages.CUT_FOR_FIRST_CRIB_1:
         return actions.doFirstCut
@@ -261,21 +292,23 @@ const playerActionSelector = createSelector(
         return actions.selectCutIndex
       case messages.CUT_FIFTH_CARD:
         return actions.cutDeck
-      case messages.COUNT_CRIB:
+      case messages.SHOW_CRIB:
         return actions.flipCrib
       default:
         break
     }
     const hasNormalGo = prompt.indexOf(messages.HAS_NORMAL_GO) !== -1
     const hasDoubleGo = prompt.indexOf(messages.HAS_NORMAL_GO) !== -1
+    const hasHandPoints = prompt.indexOf(messages.HAND_POINTS) !== -1
+    const hasCribPoints = prompt.indexOf(messages.CRIB_POINTS) !== -1
     if (hasNormalGo) {
       return () => actions.advanceRound(1, parseInt(playerNum))
     } else if (hasDoubleGo){
       return () => actions.advanceRound(2, parseInt(playerNum))
-    }
-    const isShowingPoints = prompt.indexOf(messages.HAND_POINTS) !== -1
-    if(isShowingPoints){
-      return wasHandCounted ? null : countHandAction
+    } else if(hasHandPoints){
+      return countPointsAction
+    } else if(hasCribPoints){
+      return countCribAction
     }
     return null
   }
