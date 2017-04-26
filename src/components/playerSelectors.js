@@ -234,8 +234,10 @@ const countCribPromptSelector = createSelector(
       return messages.WAIT_FOR_SHOW_CRIB
     } else if(!isCribHidden && !wasCribCounted){
       return `${messages.CRIB_POINTS} Take ${cribPoints} points: `
-    } else if(wasCribCounted){
-      return 'ahhhh, need to deal next round?'
+    } else if(!isMyCrib && wasCribCounted){ // this doesn't work becasue wasCribCounted is in other localStorage... 
+      return messages.SHOULD_DEAL
+    } else if(isMyCrib && wasCribCounted){
+      return messages.WAIT_FOR_DEAL
     } else return ''
   }
 )
@@ -285,6 +287,7 @@ const playerActionSelector = createSelector(
       case messages.CUT_FOR_FIRST_CRIB_2:
         return actions.doSecondCut
       case messages.DEAL_FIRST_ROUND:
+      case messages.SHOULD_DEAL:
         return actions.deal
       case messages.DO_DISCARD:
         return actions.discard

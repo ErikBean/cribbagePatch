@@ -2,20 +2,20 @@
 realtime cribbage game
 
 Refactor TODO:
-1. Hide scoreboard before hands counted
-2. BUG: refreshing page allows hand to be counted twice
+1. 
+2. Player could figure out myHand/theirHand props just from num and state in selectors
 3. Need to display scoreboard runs as not JSON array 
-4. Fifteens could be computed faster by converting hand to integers FIRST! 
-5. 
+4. 
+5. Need better way to deploy; webpack prod config or something
 6. 
-7. 
-8.  
+7. Hide scoreboard before hands counted ?
+8. Hide/grey out previously pegged cards after first pegging round ?
 
 Rules TODO / Roadmap:
-1. Hide/grey out previously pegged cards after first pegging round
-2. DONE! Show both hands after pegging over
-3. Show total hand points, and add to score DONE!
-5. Reveal the crib, and show the score
+1. Need a way to tell other player to show opponent's crib. Just wait for opp points to update?
+2. 
+3. 
+5. 
 6. Need a way to goto the next round
 7. New prompt for P2 dealing the cards, (round other than first)
 8. 
